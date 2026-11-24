@@ -28,7 +28,7 @@
 <title>Budget og Mad</title>
 <script src="opskrifter.js"></script>
 <script>
-addEventListener('error',function(){try{if(localStorage.getItem('madapp-v1-test')&&navigator.serviceWorker&&navigator.serviceWorker.controller){localStorage.removeItem('madapp-v1-test');localStorage.setItem('madapp-v1-fejl','1');navigator.serviceWorker.controller.postMessage('TILBAGE');setTimeout(function(){location.reload()},400)}}catch(e){}});
+addEventListener('error',function(ev){try{var mn=document.getElementById('main');if(mn&&!mn.innerHTML.trim()){mn.innerHTML='<div style="background:#fff;border-radius:20px;padding:20px;margin:20px;font:17px system-ui"><b>Ups – appen kunne ikke starte.</b><p>Tag et skærmbillede af denne besked, og send det til Søren.</p><p style="color:#a33;font-size:14px">'+String(ev.message||'').replace(/</g,'&lt;')+' (linje '+(ev.lineno||'?')+')</p><button onclick="location.reload()" style="font:inherit;padding:10px 16px;border-radius:12px;border:0;background:#e8553e;color:#fff">Prøv igen</button></div>'}}catch(x){}try{if(localStorage.getItem('madapp-v1-test')&&navigator.serviceWorker&&navigator.serviceWorker.controller){localStorage.removeItem('madapp-v1-test');localStorage.setItem('madapp-v1-fejl','1');navigator.serviceWorker.controller.postMessage('TILBAGE');setTimeout(function(){location.reload()},400)}}catch(e){}});
 </script>
 <style>
 html{background:#2f7d4f}
@@ -249,7 +249,7 @@ button.b,label.b{box-shadow:0 6px 16px rgba(232,85,62,.3)}
 <style>@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}</style>
 </head>
 <body>
-<header><h1><img src="ikoner/ikon-192.png" alt="" style="width:1.3em;height:1.3em;border-radius:.3em;vertical-align:-.3em;margin-right:.35em">Budget og Mad</h1><button id="instknap" onclick="visGuide()" style="display:none;border:1px solid #fff;background:none;color:#fff;border-radius:10px;padding:6px 10px;font:inherit;font-size:14px;cursor:pointer">📲<span class="itxt"> Installér</span></button><button id="fortrydknap" hidden onclick="fortrydSidste()">↩️<span class="ftxt"> Fortryd</span></button><button id="indstilknap" onclick="visIndstillinger()" title="Indstillinger">⚙️</button><span class="ver" id="ver">version 20</span></header>
+<header><h1><img src="ikoner/ikon-192.png" alt="" style="width:1.3em;height:1.3em;border-radius:.3em;vertical-align:-.3em;margin-right:.35em">Budget og Mad</h1><button id="instknap" onclick="visGuide()" style="display:none;border:1px solid #fff;background:none;color:#fff;border-radius:10px;padding:6px 10px;font:inherit;font-size:14px;cursor:pointer">📲<span class="itxt"> Installér</span></button><button id="fortrydknap" hidden onclick="fortrydSidste()">↩️<span class="ftxt"> Fortryd</span></button><button id="indstilknap" onclick="visIndstillinger()" title="Indstillinger">⚙️</button><span class="ver" id="ver">version 21</span></header>
 <nav id="nav">
   <button data-p="forside"><span class="ic">🏠</span>Hjem</button>
   <button data-p="opskrifter"><span class="ic">📖</span>Opskrifter</button>
@@ -263,8 +263,14 @@ button.b,label.b{box-shadow:0 6px 16px rgba(232,85,62,.3)}
 <dialog id="dlg"><div class="in" id="dlgin"></div></dialog>
 
 <script>
-const KEY='madapp-v1';const APP_VERSION=20, EJER='Søren';
-let D=JSON.parse(localStorage.getItem(KEY)||'null')||{opskrifter:[],indkob:[],lager:[],madplan:{},budget:{maaned:0,udgifter:[]}};
+const KEY='madapp-v1';const APP_VERSION=21, EJER='Søren';
+let D;try{D=JSON.parse(localStorage.getItem(KEY)||'null')}catch(e){D=null;try{localStorage.setItem(KEY+'-skadet-'+Date.now(),localStorage.getItem(KEY))}catch(x){}}
+if(!D||typeof D!=='object')D={};
+['opskrifter','indkob','lager','stdSlettet','gemteLister'].forEach(k=>{if(!Array.isArray(D[k]))D[k]=[]});
+['madplan','priser','indstil'].forEach(k=>{if(!D[k]||typeof D[k]!=='object'||Array.isArray(D[k]))D[k]={}});
+if(!D.budget||typeof D.budget!=='object')D.budget={maaned:0,udgifter:[]};['udgifter','ind','faste','maal'].forEach(k=>{if(!Array.isArray(D.budget[k]))D.budget[k]=[]});
+D.opskrifter=D.opskrifter.filter(o=>o&&o.id&&o.navn).map(o=>({...o,ing:Array.isArray(o.ing)?o.ing.filter(i=>i&&i.navn):[],tags:Array.isArray(o.tags)?o.tags:[]}));
+D.indkob=D.indkob.filter(x=>x&&x.navn);D.lager=D.lager.filter(x=>x&&x.navn);
 
 // Faste opskrifter (klassiske, billige retter). Fotos: se kilder.txt
 
