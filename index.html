@@ -268,23 +268,20 @@ button.b,label.b{box-shadow:0 6px 16px rgba(232,85,62,.3)}
 @media (max-width:350px){nav button{font-size:9.5px}.tile{height:135px}.tn{font-size:19px}}
 </style>
 <style>@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}</style>
+<style>#nav{justify-content:space-between}#nav button{flex:0 0 auto;min-width:96px;padding-left:14px;padding-right:14px}</style>
 </head>
 <body>
-<header><h1><img src="ikoner/ikon-192.png" alt="" style="width:1.3em;height:1.3em;border-radius:.3em;vertical-align:-.3em;margin-right:.35em">Budget og Mad</h1><button id="instknap" onclick="visGuide()" style="display:none;border:1px solid #fff;background:none;color:#fff;border-radius:10px;padding:6px 10px;font:inherit;font-size:14px;cursor:pointer">📲<span class="itxt"> Installér</span></button><button id="fortrydknap" hidden onclick="fortrydSidste()">↩️<span class="ftxt"> Fortryd</span></button><button id="indstilknap" onclick="visIndstillinger()" title="Indstillinger">⚙️</button><span class="ver" id="ver">version 43</span></header>
+<header><h1><img src="ikoner/ikon-192.png" alt="" style="width:1.3em;height:1.3em;border-radius:.3em;vertical-align:-.3em;margin-right:.35em">Budget og Mad</h1><button id="instknap" onclick="visGuide()" style="display:none;border:1px solid #fff;background:none;color:#fff;border-radius:10px;padding:6px 10px;font:inherit;font-size:14px;cursor:pointer">📲<span class="itxt"> Installér</span></button><button id="fortrydknap" hidden onclick="fortrydSidste()">↩️<span class="ftxt"> Fortryd</span></button><span class="ver" id="ver">version 43</span></header>
 <nav id="nav">
   <button data-p="forside"><span class="ic">🏠</span>Hjem</button>
-  <button data-p="opskrifter"><span class="ic">📖</span>Opskrifter</button>
-  <button data-p="madplan"><span class="ic">📅</span>Madplan</button>
-  <button data-p="indkob"><span class="ic">🛒</span>Indkøb</button>
-  <button data-p="lager"><span class="ic">🥫</span>Lager</button>
-  <button data-p="budget"><span class="ic">💰</span>Budget</button>
+  <button data-p="indstil" title="Indstillinger"><span class="ic">⚙️</span>Indstillinger</button>
 </nav>
 <main id="main"></main>
 <div class="toast" id="toast"><span id="tmsg"></span><button id="tundo">Fortryd</button></div>
 <dialog id="dlg"><div class="in" id="dlgin"></div></dialog>
 
 <script>
-const KEY='madapp-v1';const ENHED=(()=>{let e=localStorage.getItem('madapp-v1-enhed');if(!e){e=(crypto.randomUUID?crypto.randomUUID():Date.now().toString(36)+Math.random().toString(36).slice(2));localStorage.setItem('madapp-v1-enhed',e)}return e})();const APP_VERSION=45, EJER='Søren';
+const KEY='madapp-v1';const ENHED=(()=>{let e=localStorage.getItem('madapp-v1-enhed');if(!e){e=(crypto.randomUUID?crypto.randomUUID():Date.now().toString(36)+Math.random().toString(36).slice(2));localStorage.setItem('madapp-v1-enhed',e)}return e})();const APP_VERSION=46, EJER='Søren';
 let D;try{D=JSON.parse(localStorage.getItem(KEY)||'null')}catch(e){D=null;try{localStorage.setItem(KEY+'-skadet-'+Date.now(),localStorage.getItem(KEY))}catch(x){}}
 if(!D||typeof D!=='object')D={};
 ['opskrifter','indkob','lager','stdSlettet','gemteLister'].forEach(k=>{if(!Array.isArray(D[k]))D[k]=[]});
@@ -469,7 +466,7 @@ function vis(){
   const s=document.getElementById('soeg');if(s){s.oninput=()=>{window._q=s.value;const p=s.selectionStart;vis();const n=document.getElementById('soeg');n.focus();n.setSelectionRange(p,p)}}
   [['nyvare',tilfojVare],['nylager',tilfojLager],['ubelob',tilfojUdgift],['ibelob',tilfojInd],['hurtig',hurtigTekst],['fbelob',tilfojFast]].forEach(([i,f])=>{const e=document.getElementById(i);if(e)e.onkeydown=ev=>{if(ev.key==='Enter')f()}});
 }
-document.querySelectorAll('#nav button').forEach(b=>b.onclick=()=>{side=b.dataset.p;localStorage.setItem(KEY+'-side',side);vis();scrollTo(0,0)});
+document.querySelectorAll('#nav button').forEach(b=>b.onclick=()=>{if(b.dataset.p==='indstil'){visIndstillinger();return}side=b.dataset.p;localStorage.setItem(KEY+'-side',side);vis();scrollTo(0,0)});
 
 // Opskrifter
 const dlg=document.getElementById('dlg'),dlgin=document.getElementById('dlgin');dlg.addEventListener('close',()=>{window._enKat=null;if(window.speechSynthesis)speechSynthesis.cancel()});
