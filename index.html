@@ -28,6 +28,7 @@
 <title>Budget og Mad</title>
 <script src="opskrifter.js"></script>
 <script src="motion.js"></script>
+<script src="spil.js"></script>
 <script src="jura.js"></script>
 <script>
 window.FEJLLOG=[];(function(){function gem(o){try{var l=JSON.parse(localStorage.getItem('madapp-v1-fejllog')||'[]');l.push(o);l=l.slice(-20);localStorage.setItem('madapp-v1-fejllog',JSON.stringify(l))}catch(e){}}addEventListener('error',function(e){gem({tid:new Date().toISOString(),fejl:String(e.message||'').slice(0,200),linje:e.lineno||0,kol:e.colno||0,fil:String(e.filename||'').split('/').pop().split('?')[0]})});addEventListener('unhandledrejection',function(e){gem({tid:new Date().toISOString(),fejl:'Promise: '+String((e.reason&&e.reason.message)||e.reason||'').slice(0,200)})})})();
@@ -337,7 +338,7 @@ body{padding-top:env(safe-area-inset-top)}
 <dialog id="dlg"><div class="in" id="dlgin"></div></dialog>
 
 <script>
-const KEY='madapp-v1';const ENHED=(()=>{let e=localStorage.getItem('madapp-v1-enhed');if(!e){e=(crypto.randomUUID?crypto.randomUUID():Date.now().toString(36)+Math.random().toString(36).slice(2));localStorage.setItem('madapp-v1-enhed',e)}return e})();const APP_VERSION=52, EJER='Søren';
+const KEY='madapp-v1';const ENHED=(()=>{let e=localStorage.getItem('madapp-v1-enhed');if(!e){e=(crypto.randomUUID?crypto.randomUUID():Date.now().toString(36)+Math.random().toString(36).slice(2));localStorage.setItem('madapp-v1-enhed',e)}return e})();const APP_VERSION=53, EJER='Søren';
 let D;try{D=JSON.parse(localStorage.getItem(KEY)||'null')}catch(e){D=null;try{localStorage.setItem(KEY+'-skadet-'+Date.now(),localStorage.getItem(KEY))}catch(x){}}
 if(!D||typeof D!=='object')D={};
 ['opskrifter','indkob','lager','stdSlettet','gemteLister'].forEach(k=>{if(!Array.isArray(D[k]))D[k]=[]});
@@ -770,7 +771,7 @@ SIDER.forside=function(){
   const snart=D.lager.filter(x=>x.udlob&&(new Date(x.udlob)-idag)/864e5<=3).length,paaListe=D.indkob.filter(x=>!x.kobt).length;
   const b=budgetTal(md);
   const info={budget:b.ind?'Tilbage: '+kr(b.tilbage):'Skriv din løn ind',opskrifter:D.opskrifter.length?D.opskrifter.length+' opskrifter':'Gem din første ret',madplan:ret?'I dag: '+ret:'Hvad skal du spise i dag?',indkob:paaListe?paaListe+' ting på listen':'Listen er tom',lager:D.lager.length?D.lager.length+' varer'+(snart?' · '+snart+' udløber snart':''):'Hvad har du derhjemme?'};
-  info.kalender=kalInfo();if(typeof motionInfo==='function')info.motion=motionInfo();const h=nu.getHours(),hilsen=h<10?'Godmorgen':h<17?'Hej':'Godaften';
+  info.kalender=kalInfo();if(typeof motionInfo==='function')info.motion=motionInfo();if(typeof spilInfo==='function')info.spil=spilInfo();const h=nu.getHours(),hilsen=h<10?'Godmorgen':h<17?'Hej':'Godaften';
   return `<div class="fhero" style="background-image:url('${valgtFoto()}')"><div><div class="fh1">${hilsen} 👋</div><div class="fh2">Hvad skal vi i dag?</div></div></div>
   ${typeof styringForside==='function'?styringForside():''}
   <div class="tiles">${Object.entries(FOTO).filter(([k])=>typeof styringMaa!=='function'||styringMaa(k)).map(([k,f])=>`<button class="tile t-${k}" onclick="gaaTil('${k}')" style="background-image:url(${knapFoto(k)})"><span class="te">${f[1]}</span><span class="tskift" role="button" title="Skift billede" onclick="event.stopPropagation();vaelgKnapFoto('${k}')">🖼️</span><span class="tn">${f[2]}</span><span class="ti">${esc(info[k])}</span></button>`).join('')}</div>
@@ -781,6 +782,8 @@ SIDER.forside=function(){
 
 // Motion og vægttab (version 48) – selve koden ligger i motion.js
 SIDER.motion=()=>typeof motionSide==='function'?motionSide():'';
+// Spillet Kurv-Kaos (version 53) – selve koden ligger i spil.js
+SIDER.spil=()=>typeof spilSide==='function'?spilSide():'';
 // ---------- Pris ud fra egne priser (version 10) ----------
 function prisOverslag(ing,p){let sum=0,n=0;ing.forEach(i=>{const pr=D.priser[norm(i.navn)];if(pr){sum+=pr;n++}});return{sum:Math.round(sum),n,af:ing.length}}
 // ---------- Scan stregkode -> lager (Open Food Facts, gratis) ----------
@@ -1409,6 +1412,9 @@ KNAPFOTOS.kalender=[['fotos/kalender.jpg','Åben kalender']];
 // Motion og vægttab som fotoknap (version 52) – samme størrelse som Budget
 FOTO.motion=['fotos/motion.jpg','💪','Motion og vægttab'];
 KNAPFOTOS.motion=[['fotos/motion.jpg','Træning udenfor']];
+// Spillet Kurv-Kaos (version 53)
+FOTO.spil=['fotos/spil.jpg','🎮','Spil: Kurv-Kaos'];
+KNAPFOTOS.spil=[['fotos/spil.jpg','Venner griner']];
 const KA=()=>Array.isArray(D.kalender)?D.kalender:(D.kalender=[]);
 const KO=()=>Array.isArray(D.kontakter)?D.kontakter:(D.kontakter=[]);
 const MDR=['januar','februar','marts','april','maj','juni','juli','august','september','oktober','november','december'];

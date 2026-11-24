@@ -285,3 +285,6 @@ Brugsstatistik (tilføjet 24/11-2026)
 - I appen: jura.js juraStatistikOK() er kun sand, når brugeren selv har sat flueben (ikke forudvalgt) eller trykket Ja under Indstillinger.
 Motion og vægttab-knappen (version 52, Unsplash, gratis efter Unsplash-licensen, hentet 24-11-2026):
 Motion: Gabin Vallet – https://unsplash.com/photos/J154nEkpzlQ
+
+Spil-knappen (version 53, Unsplash, gratis efter Unsplash-licensen, hentet 24-11-2026):
+Spil: Hiki App – https://unsplash.com/photos/aM-BRQtrng8
