@@ -95,3 +95,29 @@ fotos/retter/pasta/tunfad.jpg: sheri silver – https://unsplash.com/photos/-MNx
 fotos/retter/pasta/kyllingfad.jpg: Giorgio Sannino – https://unsplash.com/photos/jyR7C1IYX00
 fotos/retter/pasta/skinkefad.jpg: irws – https://unsplash.com/photos/xkyXo2A1kkg
 fotos/retter/pasta/squash.jpg: Michelle Brittain – https://unsplash.com/photos/zCPqG0tU6a0
+
+Version 17 – bid 2: pasta og nudler nr. 46–90 (Unsplash, gratis efter Unsplash-licensen, hentet 24-11-2026). 17 retter uden foto.
+fotos/retter/pasta/boennepasta.jpg: Snappr – https://unsplash.com/photos/hKnOvK2vhDU
+fotos/retter/pasta/linsepesto.jpg: Victoria Aleksandrova – https://unsplash.com/photos/n56ZKeW9bVM
+fotos/retter/pasta/tunpastasalat.jpg: Rui Silvestre – https://unsplash.com/photos/D3lKRy7A_FY
+fotos/retter/pasta/fetapastasalat.jpg: PRATEEK JAISWAL – https://unsplash.com/photos/OJ-MYn8pKmo
+fotos/retter/pasta/mozzpastasalat.jpg: Adam Bartoszewicz – https://unsplash.com/photos/MaqdFCtH8Oo
+fotos/retter/pasta/muslinger.jpg: Ensora – https://unsplash.com/photos/2Hbj43Nn2BM
+fotos/retter/pasta/lasagnette.jpg: sunorwind – https://unsplash.com/photos/PgkGsxjvGB4
+fotos/retter/pasta/tortellinisuppe.jpg: Jason Leung – https://unsplash.com/photos/YAjDHgZH1M0
+fotos/retter/pasta/chowmein.jpg: Mohammad Fahim – https://unsplash.com/photos/-q8D0-ELL3E
+fotos/retter/pasta/chowmeingroent.jpg: Mohammad Fahim – https://unsplash.com/photos/5sXHtv7o_-I
+fotos/retter/pasta/yakisoba.jpg: Larissa Uemura – https://unsplash.com/photos/hmxnwweDuf4
+fotos/retter/pasta/soba.jpg: Donghun Shin – https://unsplash.com/photos/HMs8QhgJUTM
+fotos/retter/pasta/phoboi.jpg: Jamie Trinh – https://unsplash.com/photos/FZRZev12J8Q
+fotos/retter/pasta/laksa.jpg: Advocator SY – https://unsplash.com/photos/IWwZUVAHsmo
+fotos/retter/pasta/khaosoi.jpg: Kittitep Khotchalee – https://unsplash.com/photos/vxJZOosHvcU
+fotos/retter/pasta/dandan.jpg: Hanxiao Xu – https://unsplash.com/photos/hJKJQrsNHGQ
+fotos/retter/pasta/japchae.jpg: Ryan Kwok – https://unsplash.com/photos/H6iSwrAOMG0
+fotos/retter/pasta/chorizoflode.jpg: Rodrigo Lezcano – https://unsplash.com/photos/iZQPLaerwos
+fotos/retter/pasta/soltorret.jpg: Kelvin Foo – https://unsplash.com/photos/kP8xGHCjCWw
+fotos/retter/pasta/ostesovs.jpg: kimia kazemi – https://unsplash.com/photos/971_E-LvZuc
+fotos/retter/pasta/aertemynte.jpg: Bakd&Raw by Karolin Baitinger – https://unsplash.com/photos/4MX7xLAiWBc
+fotos/retter/pasta/roedbede.jpg: Rachel Schoenberger – https://unsplash.com/photos/QCtHztkM4Ec
+fotos/retter/pasta/ragu.jpg: Louis Hansel – https://unsplash.com/photos/qfxAEVCDWiU
+fotos/retter/pasta/orzofeta.jpg: Lisha Riabinina – https://unsplash.com/photos/BySJbuQniyg
