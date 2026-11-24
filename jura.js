@@ -40,6 +40,7 @@ function juraVilkaar() {
 <p>Nogle knapper åbner andre sider, fx eTilbudsavis, Google Maps og LMS, eller deler via din telefons SMS, mail osv. Der gælder deres egne regler.</p>
 <h3>11. Nye regler</h3>
 <p>Kommer der nye regler, viser appen dem, og du bliver spurgt igen.</p>
+<p>Appen er gratis nu. Kommer den senere til at koste penge, får du besked først, og der kommer nye regler. Du betaler aldrig noget uden selv at have sagt ja til det.</p>
 <h3>12. Alder</h3>
 <p>Er du under 18, så vis gerne reglerne til en forælder.</p>
 <h3>13. Appen tilhører Søren</h3>
