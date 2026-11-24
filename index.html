@@ -212,6 +212,7 @@ a.tilbud{font-size:12px;font-weight:700;color:var(--acc);text-decoration:none;ba
 button.x{font-size:18px}
 .chips.kats .chip{font-size:14px;padding:7px 12px;box-shadow:none;background:var(--felt)}.chips.kats .chip.on{background:var(--grad)}
 .madidag{background:linear-gradient(135deg,#fff3e6,#ffe9ef)}@media (prefers-color-scheme:dark){.madidag{background:linear-gradient(135deg,#2b1d12,#2b1520)}}
+.hjdel{background:var(--felt);border-radius:14px;padding:10px 14px;margin:8px 0}.hjdel summary{cursor:pointer;list-style:none}.hjdel summary::after{content:' ▾';color:var(--muted)}.hjdel ul{margin:8px 0 2px;padding-left:20px}.hjdel li{margin:5px 0}
 /* Version 8: fotofarver og forside */
 :root{--bg:#fff6ef;--acc:#e8553e;--acc2:#ffe7df;--grad:linear-gradient(135deg,#ff8a3d 0%,#e8364f 100%);--felt:#fff1e9;--line:#f1e2d8}
 @media (prefers-color-scheme:dark){:root{--bg:#140d0a;--card:#211612;--acc:#ff8a5c;--acc2:#3a1d14;--felt:#1a110d;--line:#3a2a22}}
@@ -259,7 +260,7 @@ button.b,label.b{box-shadow:0 6px 16px rgba(232,85,62,.3)}
 <dialog id="dlg"><div class="in" id="dlgin"></div></dialog>
 
 <script>
-const KEY='madapp-v1';const APP_VERSION=17, EJER='Søren';
+const KEY='madapp-v1';const APP_VERSION=18, EJER='Søren';
 let D=JSON.parse(localStorage.getItem(KEY)||'null')||{opskrifter:[],indkob:[],lager:[],madplan:{},budget:{maaned:0,udgifter:[]}};
 
 // Faste opskrifter (klassiske, billige retter). Fotos: se kilder.txt
@@ -334,6 +335,7 @@ opskrifter(){
   if(kt)liste=liste.filter(o=>o.kat===kt);
   const antal=liste.length,vis_=window._visN||40;liste=liste.slice(0,vis_);
   return `<h2>Opskrifter</h2>
+  <div class="row" style="margin-bottom:12px"><button class="b" style="flex:1;background:linear-gradient(135deg,#16a34a,#0d9488)!important" onclick="visPengeDialog()">💰 Hvad kan jeg få for pengene?</button><button class="l" onclick="visOpskriftHjaelp()">❓ Hjælp</button></div>
   <div class="row" style="margin-bottom:12px"><input class="grow" id="soeg" placeholder="Søg i opskrifter eller ingredienser" value="${esc(window._q||'')}"><button class="b" onclick="redigerOpskrift()">+ Ny opskrift</button></div>
   <div class="chips">${Object.entries(F).map(([k,v])=>`<button class="chip ${fl===k?'on':''}" onclick="window._fl='${k}';window._visN=40;vis()">${v}</button>`).join('')}</div>
   <div class="chips kats"><button class="chip ${kt?'':'on'}" onclick="window._kat='';window._visN=40;vis()">Alle slags</button>${KATS.map(k=>`<button class="chip ${kt===k?'on':''}" onclick="window._kat='${k}';window._visN=40;vis()">${k}</button>`).join('')}</div>
@@ -442,14 +444,14 @@ function visOpskrift(oid,p){
   const dage=[...Array(7)].map((_,k)=>{const d=new Date();d.setHours(0,0,0,0);d.setDate(d.getDate()+k);return d});
   dlgin.innerHTML=`${o.foto?`<div class="dfoto" style="background-image:url(${o.foto})"></div>`:''}<h2>${esc(o.navn)}</h2>
   <div>${o.tid?`<span class="tag">⏱️ ${o.tid} min</span>`:''}${(o.tags||[]).map(x=>`<span class="tag">${x}</span>`).join('')}${D.lager.length?`<span class="tag">🥫 Du har ${mt.har}/${mt.af}</span>`:''}</div>
-  ${o.portioner?`<div class="port" style="margin-top:12px"><button class="l" onclick="visOpskrift('${o.id}',${Math.max(1,p-1)})">−</button><b>${p} personer</b><button class="l" onclick="visOpskrift('${o.id}',${p+1})">+</button></div>`:''}
+  ${o.portioner?`<div class="port" style="margin-top:12px"><button class="l" onclick="visOpskrift('${o.id}',${Math.max(1,p-1)})">−</button><input type="number" min="1" max="50" inputmode="numeric" value="${p}" style="width:76px;text-align:center;font-weight:800" onchange="visOpskrift('${o.id}',Math.max(1,Math.min(50,parseInt(this.value)||1)))"><b>personer</b><button class="l" onclick="visOpskrift('${o.id}',${p+1})">+</button></div>`:''}
   ${(()=>{const har=ing.filter(i=>iLager(i.navn)),mangler=ing.filter(i=>!iLager(i.navn)),pr=prisOverslag(mangler.length?mangler:ing,p);
    return `<div class="infobar"><span>⏱️ <b>${o.tid?o.tid+' min':'–'}</b><br><small>tid</small></span><span>👥 <b>${p}</b><br><small>personer</small></span><span>💰 <b>${pr.sum?'ca. '+kr(pr.sum):'?'}</b><br><small>${pr.sum?'at købe':'ingen priser endnu'}</small></span></div>
    ${pr.sum?`<p class="muted" style="font-size:13px;margin:4px 0 0">Det er ca. prisen for ${pr.n} af de ${pr.af} varer, du skal købe – hele pakker, ud fra de priser, du selv har skrevet. Du får rester med hjem til næste gang.</p>`:`<p class="muted" style="font-size:13px;margin:4px 0 0">Skriv priser på dine indkøb, så regner appen prisen ud her. Jeg gætter aldrig priser.</p>`}
    ${mangler.length?`<h3>🛒 Du mangler (${mangler.length})</h3><ul class="ingl">${mangler.map(i=>`<li>▫️ ${esc(ingTekst(i))} <a class="tilbud" href="https://etilbudsavis.dk/soeg/${encodeURIComponent(i.navn)}" target="_blank" rel="noopener">tilbud ↗</a></li>`).join('')}</ul>`:''}
    ${har.length?`<h3>✅ Du har på lager (${har.length})</h3><ul class="ingl">${har.map(i=>`<li>✅ ${esc(ingTekst(i))}</li>`).join('')}</ul>`:''}`})()}
   ${o.trin&&o.trin.length?`<h3>Sådan gør du</h3><ol class="trin">${o.trin.map(x=>`<li>${esc(x)}</li>`).join('')}</ol>`:o.frem?`<h3>Sådan gør du</h3><div style="white-space:pre-wrap">${esc(o.frem)}</div>`:''}
-  <div class="row" style="margin-top:16px"><button class="b" onclick="opskriftTilIndkob('${o.id}')">🛒 Det, jeg mangler, på listen</button><button class="b" onclick="document.getElementById('vdag').hidden=false">📅 På madplan</button><button class="b" onclick="lavRet('${o.id}')">👩‍🍳 Jeg har lavet den</button></div>
+  <div class="row" style="margin-top:16px"><button class="b" onclick="opskriftTilIndkob('${o.id}')">🛒 Læg det, jeg mangler, i indkøbslisten</button><button class="b" onclick="document.getElementById('vdag').hidden=false">📅 På madplan</button><button class="b" onclick="lavRet('${o.id}')">👩‍🍳 Jeg har lavet den</button></div>
   <div id="vdag" hidden><p class="muted" style="margin:10px 0 6px">Hvilken dag?</p><div class="chips">${dage.map(d=>`<button class="chip" onclick="setPlan('${iso(d)}','opskrift','${o.id}');dlg.close();toast('${esc(o.navn)} er sat på ${d.toLocaleDateString('da-DK',{weekday:'long'})}')">${d.toLocaleDateString('da-DK',{weekday:'short',day:'numeric'})}</button>`).join('')}</div></div>
   <div class="row" style="margin-top:10px"><button class="l" onclick="del('opskrift:${o.id}')">📤 Del</button><button class="l" onclick="redigerOpskrift('${o.id}')">Ret</button><button class="l" onclick="sletOpskrift('${o.id}')">Slet</button><button class="l" onclick="dlg.close()">Luk</button></div>
   <p class="muted" style="font-size:13px">✅ = det har du på lager. Salt, peber og vand regner vi med, at du har.</p>`;
@@ -793,6 +795,56 @@ function gemRet(type,pid){
   const s=snap();p.tekst=tx;p.belob=b;
   if(type==='fast'){const dg=parseInt(document.getElementById('rdag').value)||null;p.dag=dg&&dg>=1&&dg<=31?dg:null}else{const d=document.getElementById('rdato').value;if(d)p.dato=d}
   save();dlg.close();vis();toast('Rettet ✔',fortrydTil(s));
+}
+
+// ---------- Hvad kan jeg få for pengene? (version 18) ----------
+function retPris(o,p){ // ud fra egne priser – hele pakker af det, man mangler
+  const gange=Math.max(1,Math.ceil(p/(o.portioner||4)));let sum=0,ukendt=0,mangler=0;
+  o.ing.forEach(i=>{const n=norm(i.navn);if(BASIS.includes(n))return;if(iLager(i.navn))return;mangler++;const pr=D.priser[n];if(pr)sum+=pr*gange;else ukendt++});
+  return{sum:Math.round(sum),ukendt,mangler};
+}
+function visPengeDialog(){
+  const v=window._penge||{belob:'',pers:2,dage:5};
+  dlgin.innerHTML=`<h2>💰 Hvad kan jeg få for pengene?</h2><p class="muted" style="margin-top:-6px">Skriv hvor mange penge du har til mad, hvor mange I er, og hvor mange dage det skal række.</p>
+  <label>Penge til mad (kr)</label><input id="pbelob" type="text" inputmode="decimal" style="width:100%" placeholder="Fx 300" value="${v.belob}">
+  <div class="row" style="flex-wrap:nowrap"><div style="flex:1"><label>Personer</label><input id="ppers" type="number" min="1" max="20" style="width:100%" value="${v.pers}"></div><div style="flex:1"><label>Dage</label><input id="pdage" type="number" min="1" max="14" style="width:100%" value="${v.dage}"></div></div>
+  <div class="row" style="margin-top:14px"><button class="b" style="flex:1" onclick="lavPengePlan()">✨ Find retter</button><button class="l" onclick="dlg.close()">Luk</button></div>
+  <div id="pplan"></div>`;
+  if(!dlg.open)dlg.showModal();
+  if(v.belob)lavPengePlan();
+}
+function lavPengePlan(){
+  const belob=tal('pbelob'),pers=Math.max(1,parseInt(document.getElementById('ppers').value)||1),dage=Math.max(1,Math.min(14,parseInt(document.getElementById('pdage').value)||1));
+  if(!belob){alert('Skriv hvor mange penge du har');return}
+  window._penge={belob:document.getElementById('pbelob').value,pers,dage};
+  const kandidater=D.opskrifter.map(o=>({o,...retPris(o,pers),m:match(o).pct})).sort((a,b)=>(a.ukendt-b.ukendt)||(a.sum-b.sum)||(b.m-a.m));
+  const valg=[];let total=0;
+  for(const k of kandidater){if(valg.length>=dage)break;if(total+k.sum<=belob||k.sum===0){valg.push(k);total+=k.sum}}
+  const ukendte=valg.reduce((s,k)=>s+k.ukendt,0),antalPriser=Object.keys(D.priser||{}).length,prDag=belob/dage,prPers=belob/dage/pers;
+  window._pengeValg=valg.map(k=>k.o.id);
+  document.getElementById('pplan').innerHTML=`<div style="background:var(--felt);border-radius:16px;padding:12px;margin-top:14px">
+   <div class="row" style="justify-content:space-between;font-weight:700"><span>${kr(Math.floor(prDag))} pr. dag</span><span>${kr(Math.floor(prPers))} pr. person pr. dag</span></div>
+   ${prPers<15?'<p class="muted" style="font-size:13px;margin:6px 0 0">Det er et stramt budget. Retter med ris, pasta, linser, kartofler, æg og havregryn er tit de billigste.</p>':''}</div>
+   <h3>Forslag til ${dage} ${dage===1?'dag':'dage'}</h3>
+   <ul class="ingl">${valg.map((k,i)=>`<li class="row" style="flex-wrap:nowrap"><span class="muted" style="width:52px">Dag ${i+1}</span><a href="#" style="flex:1;color:inherit;font-weight:700" onclick="event.preventDefault();visOpskrift('${k.o.id}',${pers})">${esc(k.o.navn)}</a><span style="font-size:13px;text-align:right">${k.mangler===0?'✅ du har alt':(k.sum?'ca. '+kr(k.sum):'')+(k.ukendt?`<br><span class="muted">${k.ukendt} uden pris</span>`:'')}</span></li>`).join('')}</ul>
+   <p style="font-weight:700;margin:10px 0 4px">Kendte udgifter: ca. ${kr(total)} af ${kr(belob)}</p>
+   <p class="muted" style="font-size:13px;margin:0">${antalPriser?`Prisen er regnet ud fra ${antalPriser} priser, du selv har skrevet (hele pakker). ${ukendte?ukendte+' varer har ingen pris endnu, så de er ikke talt med.':''}`:'Appen kender ingen priser endnu, så den har valgt retter, der bruger det, du har på lager, og billige basisvarer. Skriv priser i Indkøb, så bliver forslaget mere præcist.'} Jeg gætter aldrig priser.</p>
+   <div class="row" style="margin-top:12px"><button class="b" style="flex:1" onclick="pengeTilMadplan(${pers})">📅 Sæt på madplan</button><button class="b" style="flex:1" onclick="pengeTilIndkob(${pers})">🛒 Det, jeg mangler, i indkøb</button></div>`;
+}
+function pengeTilMadplan(pers){const s=snap();(window._pengeValg||[]).forEach((oid,i)=>{const d=new Date();d.setDate(d.getDate()+i);D.madplan[iso(d)]={opskrift:oid}});save();dlg.close();gaaTil('madplan');toast('Retterne er sat på madplanen 📅',fortrydTil(s))}
+function pengeTilIndkob(pers){const s=snap();let n=0;(window._pengeValg||[]).forEach(oid=>{const o=D.opskrifter.find(x=>x.id===oid);if(o)n+=tilIndkob(o.ing.map(i=>skal(i,o,pers)))});save();dlg.close();gaaTil('indkob');toast(n+' varer lagt i indkøbslisten 🛒',fortrydTil(s))}
+// ---------- Hjælp under Opskrifter ----------
+function visOpskriftHjaelp(){
+  const afsnit=[
+   ['📖 Sådan bruger du opskrifterne',['Tryk på en ret for at se ingredienser og trin.','Skriv antal personer i feltet – så regnes mængderne om.','✅ betyder, at du har varen på Lager. Resten står under »Du mangler«.','»Læg det, jeg mangler, i indkøbslisten« sender kun det, du ikke har.','»Jeg har lavet den« trækker varerne fra dit lager.','Brug filtrene øverst: Dansk, Vegetar, Hurtig, Kan laves nu og kategorierne.','»💰 Hvad kan jeg få for pengene?« foreslår retter til dit budget.']],
+   ['👩‍🍳 Gode råd i køkkenet',['Læs hele opskriften, før du starter.','Find alle ting frem og skær grøntsagerne ud, før du tænder for komfuret.','Smag til undervejs – salt kan altid komme i, men ikke tages ud.','Kød er gennemstegt, når saften er klar og kødet ikke er rødt i midten. Kylling skal altid være helt gennemstegt.','Pasta: brug rigeligt vand med salt, og gem lidt kogevand til sovsen.','Ris: 1 dl ris giver ca. 1 portion. Lad dem trække med låg på til sidst.','Vask hænder og skærebræt efter rå kylling og kød.']],
+   ['💰 Spar penge på mad',['Lav en madplan, før du handler – og hold dig til listen.','Køb ind efter tilbud, og byg ugens mad op omkring dem.','Lav dobbelt portion, og frys resten til en travl dag.','Brug rester: biksemad, stegte ris, æggekage og suppe er gode til det.','Linser, bønner, kikærter og æg er billigt protein.','Sammenlign kiloprisen – store pakker er ikke altid billigst.','Butikkens egne mærker er tit lige så gode og billigere.']],
+   ['⚖️ Mål og vægt',['1 spsk (spiseske) = 15 ml','1 tsk (teske) = 5 ml','1 dl = 100 ml','1 dl hvedemel ≈ 60 g','1 dl sukker ≈ 85 g','1 dl ris ≈ 85 g','1 fed hvidløg er et lille stykke af et helt hvidløg']],
+   ['❄️ Holdbarhed og frys',['Nedkøl rester hurtigt, og spis dem inden for 2–3 dage.','De fleste gryderetter, supper og kødsovs kan fryses i 2–3 måneder.','Tø frosne ting op i køleskabet, ikke på køkkenbordet.','»Bedst før« betyder, at maden tit er god længe efter – se, lugt og smag. »Sidste anvendelse« skal overholdes.']]
+  ];
+  dlgin.innerHTML=`<h2>❓ Hjælp til opskrifter</h2>${afsnit.map(([h,l])=>`<details class="hjdel"><summary><b>${h}</b></summary><ul>${l.map(x=>`<li>${esc(x)}</li>`).join('')}</ul></details>`).join('')}
+  <div class="row" style="margin-top:14px"><button class="b" style="flex:1" onclick="visHjaelp()">💬 Skriv til ${esc(EJER)}</button><button class="l" onclick="dlg.close()">Luk</button></div>`;
+  if(!dlg.open)dlg.showModal();
 }
 
 // ---------- Gemte indkøbslister (version 14) ----------
