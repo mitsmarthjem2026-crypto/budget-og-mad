@@ -271,6 +271,7 @@ button.b,label.b{box-shadow:0 6px 16px rgba(232,85,62,.3)}
 </style>
 <style>@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}</style>
 <style>.tile .te,.tile .tskift{display:none!important}
+#dlgin .chips{flex-wrap:wrap;overflow:visible}
 #nav{justify-content:space-between}#nav button{flex:0 0 auto;min-width:96px;padding-left:14px;padding-right:14px}
 header{display:none!important}
 body{padding-top:env(safe-area-inset-top)}
@@ -983,11 +984,11 @@ function brugIndstil(){D.indstil=D.indstil||{};document.body.style.zoom=STR[D.in
 function stemmer(){return window.speechSynthesis?speechSynthesis.getVoices():[]}
 function visIndstillinger(){
   D.indstil=D.indstil||{};const v=D.indstil,st=stemmer(),da=st.filter(x=>/^da/i.test(x.lang)),andre=st.filter(x=>!/^da/i.test(x.lang));
-  dlgin.innerHTML=`<h2>⚙️ Indstillinger</h2>
+  dlgin.innerHTML=`<h2>⚙️ Indstillinger</h2><p class="muted" style="margin:-6px 0 8px;font-size:14px">Version ${APP_VERSION}</p>
   <h3>🔠 Tekststørrelse</h3><div class="chips">${[['lille','Lille'],['normal','Normal'],['stor','Stor'],['kaempe','Meget stor']].map(([k,n])=>`<button class="chip ${ (v.str||'normal')===k?'on':''}" onclick="setIndstil('str','${k}')">${n}</button>`).join('')}</div>
   <h3>✍️ Skrifttype</h3><div class="chips">${[['rund','Rund'],['klassisk','Klassisk'],['enkel','Enkel'],['laese','Let at læse']].map(([k,n])=>`<button class="chip ${(v.font||'rund')===k?'on':''}" style="font-family:${FONTE[k]||'inherit'}" onclick="setIndstil('font','${k}')">${n}</button>`).join('')}</div>
   <h3>🖼️ Billedet øverst</h3><div class="row" style="flex-wrap:nowrap;align-items:center"><div style="width:110px;height:70px;border-radius:14px;background:url('${valgtFoto()}') center/cover;flex:none"></div><button class="b" style="flex:1" onclick="vaelgFoto()">Skift billedet øverst</button></div>
-  <p class="muted" style="font-size:13px">Vælg mellem 20 billeder eller dit eget foto. Billederne på knapperne skifter du med 🖼️ på hver knap.</p>
+  <p class="muted" style="font-size:13px">Vælg mellem 20 billeder eller dit eget foto. Billederne på knapperne skifter du under »Skift billedet øverst« → fanen »Knapperne«.</p>
   <h3>💬 Brug for hjælp til appen?</h3>${hjaelpIndstil()}
   <button class="l" style="width:100%;margin-top:10px" onclick="visFejlrapport()">🛠️ Noget virker ikke – send en fejlrapport</button>
   <h3>🎨 Farver</h3><div class="temaer"><button class="tema ${!D.indstil.tema?'on':''}" style="background:linear-gradient(135deg,#ff8a3d,#e8364f)" onclick="setIndstil('tema','')"><span>Standard</span></button>${Object.entries(TEMAER).filter(([k])=>k!=='solnedgang').map(([k,v])=>`<button class="tema ${D.indstil.tema===k?'on':''}" style="background:linear-gradient(135deg,${v[1]},${v[2]})" onclick="setIndstil('tema','${k}')"><span>${v[0]}</span></button>`).join('')}</div>
@@ -1639,7 +1640,7 @@ function tegnAndreBrugere(){
      ${!x.ejer&&x.afvist?`<div style="font-size:14px;margin-top:4px;color:#c0392b;font-weight:700">⚠️ ${x.aktiv?'Prøvet':'Lukket, fordi koden blev prøvet'} på en anden enhed ${x.afvist} ${x.afvist===1?'gang':'gange'}${x.afvist_slags?' ('+esc(x.afvist_slags)+')':''}${x.afvist_sidst?', sidst '+dato(x.afvist_sidst):''}. Måske er koden givet videre.${x.aktiv?'':' Tryk ✅ Tænd og 🔓 Frigiv for at åbne den igen.'}</div>`:''}
      ${typeof styringKodeHTML==='function'?styringKodeHTML(x):''}
      <div class="row" style="margin-top:8px;flex-wrap:wrap">${x.ejer?'':`<button class="b" style="flex:1" onclick="sendKode('${esc(x.kode)}')">📤 Send</button>`}<button class="l" onclick="navnKode('${esc(x.kode)}')">✏️ Navn</button>${!x.ejer&&typeof styringAdgang==='function'?`<button class="l" onclick="styringAdgang('${esc(x.kode)}')">⚙️ Adgang</button>`:''}${!x.ejer&&x.enheder?`<button class="l" onclick="frigivKode('${esc(x.kode)}')">🔓 Frigiv</button>`:''}${x.ejer?'':`<button class="l" onclick="slaaKode('${esc(x.kode)}',${!x.aktiv})">${x.aktiv?'⛔ Sluk':'✅ Tænd'}</button>`}</div></div>`).join('');
-  dlgin.innerHTML=`<h2>👥 Til andre app brugere</h2><p class="muted" style="margin-top:-6px">Kun du kan se denne side. Her giver du andre en kode til appen. Du kan ikke se deres tal – de bliver på deres egen telefon.</p>
+  dlgin.innerHTML=`<h2>👥 Til andre app brugere</h2><div style="display:inline-block;background:var(--acc2);border-radius:20px;padding:4px 12px;font-weight:800;margin:-4px 0 8px">Appen er version ${APP_VERSION}</div><p class="muted" style="margin-top:0">Kun du kan se denne side. Her giver du andre en kode til appen. Du kan ikke se deres tal – de bliver på deres egen telefon.</p>
   <div style="background:var(--acc2);border-radius:14px;padding:12px;margin:10px 0"><b>➕ Giv en ny person adgang</b>
    <input id="nynavn" placeholder="Personens navn" maxlength="60" style="width:100%;margin-top:8px">
    <button class="b" style="width:100%;margin-top:8px;font-size:17px;padding:12px" onclick="nyKode()">Lav kode</button>
