@@ -284,7 +284,7 @@ button.b,label.b{box-shadow:0 6px 16px rgba(232,85,62,.3)}
 <dialog id="dlg"><div class="in" id="dlgin"></div></dialog>
 
 <script>
-const KEY='madapp-v1';const ENHED=(()=>{let e=localStorage.getItem('madapp-v1-enhed');if(!e){e=(crypto.randomUUID?crypto.randomUUID():Date.now().toString(36)+Math.random().toString(36).slice(2));localStorage.setItem('madapp-v1-enhed',e)}return e})();const APP_VERSION=44, EJER='Søren';
+const KEY='madapp-v1';const ENHED=(()=>{let e=localStorage.getItem('madapp-v1-enhed');if(!e){e=(crypto.randomUUID?crypto.randomUUID():Date.now().toString(36)+Math.random().toString(36).slice(2));localStorage.setItem('madapp-v1-enhed',e)}return e})();const APP_VERSION=45, EJER='Søren';
 let D;try{D=JSON.parse(localStorage.getItem(KEY)||'null')}catch(e){D=null;try{localStorage.setItem(KEY+'-skadet-'+Date.now(),localStorage.getItem(KEY))}catch(x){}}
 if(!D||typeof D!=='object')D={};
 ['opskrifter','indkob','lager','stdSlettet','gemteLister'].forEach(k=>{if(!Array.isArray(D[k]))D[k]=[]});
@@ -720,6 +720,7 @@ SIDER.forside=function(){
   const h=nu.getHours(),hilsen=h<10?'Godmorgen':h<17?'Hej':'Godaften';
   return `<div class="fhero" style="background-image:url('${valgtFoto()}')"><div><div class="fh1">${hilsen} 👋</div><div class="fh2">Hvad skal vi i dag?</div></div></div>
   <div class="tiles">${Object.entries(FOTO).map(([k,f])=>`<button class="tile t-${k}" onclick="gaaTil('${k}')" style="background-image:url(${knapFoto(k)})"><span class="te">${f[1]}</span><span class="tskift" role="button" title="Skift billede" onclick="event.stopPropagation();vaelgKnapFoto('${k}')">🖼️</span><span class="tn">${f[2]}</span><span class="ti">${esc(info[k])}</span></button>`).join('')}</div>
+  ${erEjer()?'<button class="b" style="width:100%;font-size:19px;padding:16px;margin:14px 0 4px" onclick="visAndreBrugere()">👥 Til andre app brugere</button>':''}
   ${forsideTips()}
   ${hjaelpKort()}`;
 };
@@ -1376,12 +1377,16 @@ let LAAST=false,dlgVenter=false,guideEfter=false;
 const _visDlg=dlg.showModal.bind(dlg);
 dlg.showModal=function(){if(LAAST){dlgVenter=true;return}_visDlg()};
 function loginGemt(){try{return JSON.parse(localStorage.getItem(KEY+'-login')||'null')}catch(e){return null}}
-async function tjekKode(k){
+async function rpc(navn,data){
   const h={'Content-Type':'application/json',apikey:LOGIN.noegle};if(LOGIN.noegle.startsWith('eyJ'))h.Authorization='Bearer '+LOGIN.noegle;
-  const r=await fetch(LOGIN.url.replace(/\/+$/,'')+'/rest/v1/rpc/tjek_kode',{method:'POST',headers:h,body:JSON.stringify({k}),cache:'no-store'});
+  const r=await fetch(LOGIN.url.replace(/\/+$/,'')+'/rest/v1/rpc/'+navn,{method:'POST',headers:h,body:JSON.stringify(data),cache:'no-store'});
   if(!r.ok)throw new Error('server '+r.status);
-  return (await r.json())===true;
+  const t=await r.text();return t?JSON.parse(t):null;
 }
+async function tjekKode(k){return (await rpc('tjek_kode',{k}))===true}
+function erEjer(){try{const g=LOGIN_TIL&&loginGemt();return !!(g&&g.ejer===true)}catch(e){return false}}
+async function opdaterEjer(){const g=loginGemt();if(!g||!g.kode)return;let e=false;try{e=(await rpc('ejer_tjek',{k:g.kode}))===true}catch(x){return}
+  if(e!==(g.ejer===true)){g.ejer=e;localStorage.setItem(KEY+'-login',JSON.stringify(g));if(side==='forside')vis()}}
 function visLogin(besked){
   LAAST=true;
   let d=document.getElementById('logind');
@@ -1410,7 +1415,7 @@ async function logInd(){
   try{
     if(await tjekKode(k)){
       localStorage.setItem(KEY+'-login',JSON.stringify({kode:k,tid:Date.now()}));
-      LAAST=false;d.close();toast('Velkommen 👋');
+      LAAST=false;d.close();toast('Velkommen 👋');opdaterEjer();
       if(dlgVenter){dlgVenter=false;_visDlg()}else if(guideEfter){guideEfter=false;setTimeout(visGuide,600)}
       return;
     }
@@ -1421,9 +1426,63 @@ async function logInd(){
 if(LOGIN_TIL){
   const g=loginGemt();
   if(!g||!g.kode)visLogin();
-  else if(navigator.onLine!==false)tjekKode(g.kode).then(ok=>{if(!ok){localStorage.removeItem(KEY+'-login');if(dlg.open)dlg.close();visLogin('Din kode virker ikke længere. Spørg efter en ny kode.')}}).catch(()=>{});
+  else if(navigator.onLine!==false)tjekKode(g.kode).then(ok=>{if(ok)opdaterEjer();if(!ok){localStorage.removeItem(KEY+'-login');if(dlg.open)dlg.close();visLogin('Din kode virker ikke længere. Spørg efter en ny kode.')}}).catch(()=>{});
 }
 
+
+if(erEjer()&&side==='forside')vis();
+
+// ---------- Til andre app brugere (version 45) – kun for ejeren ----------
+const APP_LINK='https://mitsmarthjem2026-crypto.github.io/budget-og-mad/';
+let ejerListe=[],ejerNy=null;
+function ejerKode(){const g=loginGemt();return g&&g.kode}
+async function visAndreBrugere(){
+  if(!erEjer())return;
+  dlgin.innerHTML=`<h2>👥 Til andre app brugere</h2><p class="muted" style="margin-top:-6px">Kun du kan se denne side.</p><p class="muted">Henter listen…</p>`;
+  if(!dlg.open)dlg.showModal();
+  try{ejerListe=await rpc('ejer_koder',{k:ejerKode()})||[]}catch(e){ejerListe=null}
+  tegnAndreBrugere();
+}
+function tegnAndreBrugere(){
+  const dato=t=>t?new Date(t).toLocaleDateString('da-DK',{day:'numeric',month:'short',year:'numeric'}):'';
+  const liste=ejerListe===null?`<p style="color:#c0392b;font-weight:700">Kan ikke hente listen lige nu. Tjek at du har internet, og prøv igen.</p><button class="l" style="width:100%" onclick="visAndreBrugere()">Prøv igen</button>`:
+   ejerListe.map(x=>`<div style="background:var(--felt);border-radius:14px;padding:12px;margin:8px 0;${x.aktiv?'':'opacity:.6'}">
+     <div style="display:flex;justify-content:space-between;gap:8px;align-items:center"><b style="font-size:17px">${esc(x.navn||'Uden navn')}</b><span style="font-weight:700;color:${x.aktiv?'#1e8e4e':'#c0392b'}">${x.ejer?'Din kode':x.aktiv?'Tændt':'Slukket'}</span></div>
+     <div style="font-size:22px;letter-spacing:3px;font-weight:700;margin:4px 0">${esc(x.kode)}</div>
+     <div class="muted" style="font-size:14px">${x.sidst_brugt?'Sidst brugt '+dato(x.sidst_brugt):'Ikke brugt endnu'}</div>
+     <div class="row" style="margin-top:8px;flex-wrap:wrap">${x.ejer?'':`<button class="b" style="flex:1" onclick="sendKode('${esc(x.kode)}')">📤 Send</button>`}<button class="l" onclick="navnKode('${esc(x.kode)}')">✏️ Navn</button>${x.ejer?'':`<button class="l" onclick="slaaKode('${esc(x.kode)}',${!x.aktiv})">${x.aktiv?'⛔ Sluk':'✅ Tænd'}</button>`}</div></div>`).join('');
+  dlgin.innerHTML=`<h2>👥 Til andre app brugere</h2><p class="muted" style="margin-top:-6px">Kun du kan se denne side. Her giver du andre en kode til appen. Du kan ikke se deres tal – de bliver på deres egen telefon.</p>
+  <div style="background:var(--acc2);border-radius:14px;padding:12px;margin:10px 0"><b>➕ Giv en ny person adgang</b>
+   <input id="nynavn" placeholder="Personens navn" maxlength="60" style="width:100%;margin-top:8px">
+   <button class="b" style="width:100%;margin-top:8px;font-size:17px;padding:12px" onclick="nyKode()">Lav kode</button>
+   ${ejerNy?`<div style="margin-top:10px;background:var(--card);border-radius:12px;padding:10px;text-align:center"><div class="muted">Ny kode til ${esc(ejerNy.navn||'ny person')}</div><div style="font-size:26px;letter-spacing:4px;font-weight:800">${esc(ejerNy.kode)}</div><button class="b" style="width:100%;margin-top:6px" onclick="sendKode('${esc(ejerNy.kode)}')">📤 Send link og kode</button></div>`:''}</div>
+  <b>Alle koder</b>${liste}
+  <div class="row" style="margin-top:12px"><button class="l" style="flex:1" onclick="ejerNy=null;dlg.close()">Luk</button></div>`;
+}
+async function nyKode(){
+  const navn=(document.getElementById('nynavn').value||'').trim();
+  if(!navn){alert('Skriv personens navn først');return}
+  try{const k=await rpc('ejer_ny_kode',{k:ejerKode(),nyt_navn:navn});ejerNy={kode:k,navn};ejerListe=await rpc('ejer_koder',{k:ejerKode()})||[];tegnAndreBrugere();toast('Ny kode lavet ✔')}
+  catch(e){alert('Det virkede ikke. Tjek at du har internet, og prøv igen.')}
+}
+async function sendKode(kode){
+  const x=(ejerListe||[]).find(y=>y.kode===kode)||ejerNy||{};
+  const tekst=`Hej${x.navn?' '+x.navn:''}! Her er appen Budget og Mad 🍲\n\nÅbn linket: ${APP_LINK}\nDin kode: ${kode}\n\nSkriv koden, når appen spørger. Dine tal bliver kun gemt på din egen telefon.`;
+  if(navigator.share){try{await navigator.share({title:'Budget og Mad',text:tekst});return}catch(e){if(e.name==='AbortError')return}}
+  try{await navigator.clipboard.writeText(tekst);toast('Beskeden er kopieret – sæt den ind i en sms')}catch(e){prompt('Kopiér beskeden og send den:',tekst)}
+}
+async function navnKode(kode){
+  const x=(ejerListe||[]).find(y=>y.kode===kode);if(!x)return;
+  const n=prompt('Navn til koden '+kode+':',x.navn||'');if(n===null)return;
+  try{await rpc('ejer_ret_kode',{k:ejerKode(),hvilken:kode,nyt_navn:n,er_aktiv:x.aktiv});x.navn=n.trim()||null;tegnAndreBrugere();toast('Navnet er gemt ✔')}
+  catch(e){alert('Det virkede ikke. Tjek at du har internet, og prøv igen.')}
+}
+async function slaaKode(kode,taend){
+  const x=(ejerListe||[]).find(y=>y.kode===kode);if(!x||x.ejer)return;
+  if(!taend&&!confirm('Vil du slukke koden for '+(x.navn||kode)+'?\n\nPersonen kan så ikke åbne appen mere. Du kan tænde den igen senere.'))return;
+  try{await rpc('ejer_ret_kode',{k:ejerKode(),hvilken:kode,nyt_navn:x.navn||'',er_aktiv:taend});x.aktiv=taend;tegnAndreBrugere();toast(taend?'Koden er tændt ✔':'Koden er slukket')}
+  catch(e){alert('Det virkede ikke. Tjek at du har internet, og prøv igen.')}
+}
 if(erMobil&&!erInstalleret){
   document.getElementById('instknap').style.display='';
   if(!localStorage.getItem(KEY+'-guide'))setTimeout(()=>{if(LAAST)guideEfter=true;else visGuide()},800);
