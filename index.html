@@ -147,7 +147,7 @@ button.x:hover{background:var(--warnbg);color:var(--warn)}
 /* Hurtigt-kortet med regnbuekant */
 .card[style*="border:2px solid"]{border:2px solid transparent!important;background:linear-gradient(var(--card),var(--card)) padding-box,linear-gradient(135deg,#10b981,#06b6d4,#a855f7,#ff4d8d) border-box!important}
 #mic,label.b{font-size:17px}
-#mic[style],#mic{background:linear-gradient(135deg,#a855f7,#ff4d8d)!important;box-shadow:0 6px 16px rgba(168,85,247,.3)}
+#mic[style],#mic{background:var(--grad)!important;box-shadow:0 6px 16px rgba(0,0,0,.18);filter:saturate(1.15) brightness(.95)}
 /* Gode råd */
 .card[style*="fffbea"]{background:linear-gradient(135deg,#fff6d5,#ffe6f0)!important;border:0!important}
 @media (prefers-color-scheme:dark){.card[style*="fffbea"]{background:linear-gradient(135deg,#2b2614,#2e1824)!important}}
@@ -234,7 +234,7 @@ nav button.on{box-shadow:0 6px 16px rgba(232,54,79,.35)}
 button.b,label.b{box-shadow:0 6px 16px rgba(232,85,62,.3)}
 .card[style*="text-align:center"]{background:var(--grad)}
 .card[style*="text-align:center"]:has(.big[style*="warn"]){background:linear-gradient(135deg,rgba(190,18,60,.9),rgba(120,20,40,.8)),url(fotos/budget.jpg) center 30%/cover}
-.card[style*="border:2px solid"]{background:linear-gradient(var(--card),var(--card)) padding-box,linear-gradient(135deg,#ff8a3d,#e8364f,#a855f7,#4f8a3c) border-box!important}
+.card[style*="border:2px solid"]{background:linear-gradient(var(--card),var(--card)) padding-box,var(--grad) border-box!important}
 .fhero{height:210px;border-radius:26px;background-size:cover;background-position:60% 22%;position:relative;overflow:hidden;display:flex;align-items:flex-end;padding:18px;color:#fff;box-shadow:var(--skygge);animation:op .35s ease both;margin-bottom:14px}
 .fhero::before{content:"";position:absolute;inset:0;background:linear-gradient(to top,rgba(20,10,5,.75),rgba(20,10,5,0) 65%)}
 .fhero>div{position:relative}.fh1{font-size:30px;font-weight:800;letter-spacing:-.5px}.fh2{font-size:17px;opacity:.92;font-weight:600}
@@ -258,7 +258,7 @@ button.b,label.b{box-shadow:0 6px 16px rgba(232,85,62,.3)}
 <style>@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}</style>
 </head>
 <body>
-<header onclick="if(event.target===this||event.target.tagName==='H1'||event.target.tagName==='IMG')vaelgFoto()" style="cursor:pointer"><h1><img src="ikoner/ikon-192.png" alt="" style="width:1.3em;height:1.3em;border-radius:.3em;vertical-align:-.3em;margin-right:.35em">Budget og Mad</h1><button id="instknap" onclick="visGuide()" style="display:none;border:1px solid #fff;background:none;color:#fff;border-radius:10px;padding:6px 10px;font:inherit;font-size:14px;cursor:pointer">📲<span class="itxt"> Installér</span></button><button id="fortrydknap" hidden onclick="fortrydSidste()">↩️<span class="ftxt"> Fortryd</span></button><button id="indstilknap" onclick="visIndstillinger()" title="Indstillinger">⚙️</button><span class="ver" id="ver">version 27</span></header>
+<header onclick="if(event.target===this||event.target.tagName==='H1'||event.target.tagName==='IMG')vaelgFoto()" style="cursor:pointer"><h1><img src="ikoner/ikon-192.png" alt="" style="width:1.3em;height:1.3em;border-radius:.3em;vertical-align:-.3em;margin-right:.35em">Budget og Mad</h1><button id="instknap" onclick="visGuide()" style="display:none;border:1px solid #fff;background:none;color:#fff;border-radius:10px;padding:6px 10px;font:inherit;font-size:14px;cursor:pointer">📲<span class="itxt"> Installér</span></button><button id="fortrydknap" hidden onclick="fortrydSidste()">↩️<span class="ftxt"> Fortryd</span></button><button id="indstilknap" onclick="visIndstillinger()" title="Indstillinger">⚙️</button><span class="ver" id="ver">version 28</span></header>
 <nav id="nav">
   <button data-p="forside"><span class="ic">🏠</span>Hjem</button>
   <button data-p="opskrifter"><span class="ic">📖</span>Opskrifter</button>
@@ -272,7 +272,7 @@ button.b,label.b{box-shadow:0 6px 16px rgba(232,85,62,.3)}
 <dialog id="dlg"><div class="in" id="dlgin"></div></dialog>
 
 <script>
-const KEY='madapp-v1';const APP_VERSION=27, EJER='Søren';
+const KEY='madapp-v1';const APP_VERSION=28, EJER='Søren';
 let D;try{D=JSON.parse(localStorage.getItem(KEY)||'null')}catch(e){D=null;try{localStorage.setItem(KEY+'-skadet-'+Date.now(),localStorage.getItem(KEY))}catch(x){}}
 if(!D||typeof D!=='object')D={};
 ['opskrifter','indkob','lager','stdSlettet','gemteLister'].forEach(k=>{if(!Array.isArray(D[k]))D[k]=[]});
