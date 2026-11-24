@@ -217,6 +217,12 @@ button.x{font-size:18px}
 header h1{min-width:0;overflow:hidden;text-overflow:ellipsis}@media (max-width:760px){.ftxt{display:none}#fortrydknap{padding:6px 10px}header .ver{display:none}}
 #indstilknap{border:0;background:rgba(255,255,255,.22);color:#fff;border-radius:50%;width:36px;height:36px;font-size:18px;cursor:pointer;flex:none}
 .nivboks{background:var(--felt);border-radius:16px;padding:10px 12px;margin-top:12px}.nivboks .l{background:var(--card);font-size:14px;padding:8px 10px}
+
+.temaer{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.tema{height:56px;border:3px solid transparent;border-radius:16px;cursor:pointer;display:flex;align-items:flex-end;padding:5px 7px;color:#fff;font:inherit;font-size:12px;font-weight:800;text-shadow:0 1px 3px rgba(0,0,0,.4)}
+.tema.on{border-color:var(--txt);box-shadow:0 0 0 2px var(--card) inset}
+
+body.medbg{background:linear-gradient(color-mix(in srgb,var(--bg) 72%,transparent),color-mix(in srgb,var(--bg) 72%,transparent)),var(--bgfoto) center/cover fixed!important}
 /* Version 8: fotofarver og forside */
 :root{--bg:#fff6ef;--acc:#e8553e;--acc2:#ffe7df;--grad:linear-gradient(135deg,#ff8a3d 0%,#e8364f 100%);--felt:#fff1e9;--line:#f1e2d8}
 @media (prefers-color-scheme:dark){:root{--bg:#140d0a;--card:#211612;--acc:#ff8a5c;--acc2:#3a1d14;--felt:#1a110d;--line:#3a2a22}}
@@ -224,7 +230,7 @@ body{background:radial-gradient(900px 500px at 100% -10%,rgba(255,138,61,.14),tr
 header{background:linear-gradient(rgba(25,14,8,.55),rgba(25,14,8,.55)),var(--hfoto,url(fotos/galleri/madlavning.jpg)) center 35%/cover!important}
 nav button.on{box-shadow:0 6px 16px rgba(232,54,79,.35)}
 button.b,label.b{box-shadow:0 6px 16px rgba(232,85,62,.3)}
-.card[style*="text-align:center"]{background:linear-gradient(135deg,rgba(232,54,79,.82),rgba(255,138,61,.72)),url(fotos/budget.jpg) center 30%/cover}
+.card[style*="text-align:center"]{background:var(--grad)}
 .card[style*="text-align:center"]:has(.big[style*="warn"]){background:linear-gradient(135deg,rgba(190,18,60,.9),rgba(120,20,40,.8)),url(fotos/budget.jpg) center 30%/cover}
 .card[style*="border:2px solid"]{background:linear-gradient(var(--card),var(--card)) padding-box,linear-gradient(135deg,#ff8a3d,#e8364f,#a855f7,#4f8a3c) border-box!important}
 .fhero{height:210px;border-radius:26px;background-size:cover;background-position:60% 22%;position:relative;overflow:hidden;display:flex;align-items:flex-end;padding:18px;color:#fff;box-shadow:var(--skygge);animation:op .35s ease both;margin-bottom:14px}
@@ -250,7 +256,7 @@ button.b,label.b{box-shadow:0 6px 16px rgba(232,85,62,.3)}
 <style>@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}</style>
 </head>
 <body>
-<header><h1><img src="ikoner/ikon-192.png" alt="" style="width:1.3em;height:1.3em;border-radius:.3em;vertical-align:-.3em;margin-right:.35em">Budget og Mad</h1><button id="instknap" onclick="visGuide()" style="display:none;border:1px solid #fff;background:none;color:#fff;border-radius:10px;padding:6px 10px;font:inherit;font-size:14px;cursor:pointer">📲<span class="itxt"> Installér</span></button><button id="fortrydknap" hidden onclick="fortrydSidste()">↩️<span class="ftxt"> Fortryd</span></button><button id="indstilknap" onclick="visIndstillinger()" title="Indstillinger">⚙️</button><span class="ver" id="ver">version 22</span></header>
+<header><h1><img src="ikoner/ikon-192.png" alt="" style="width:1.3em;height:1.3em;border-radius:.3em;vertical-align:-.3em;margin-right:.35em">Budget og Mad</h1><button id="instknap" onclick="visGuide()" style="display:none;border:1px solid #fff;background:none;color:#fff;border-radius:10px;padding:6px 10px;font:inherit;font-size:14px;cursor:pointer">📲<span class="itxt"> Installér</span></button><button id="fortrydknap" hidden onclick="fortrydSidste()">↩️<span class="ftxt"> Fortryd</span></button><button id="indstilknap" onclick="visIndstillinger()" title="Indstillinger">⚙️</button><span class="ver" id="ver">version 23</span></header>
 <nav id="nav">
   <button data-p="forside"><span class="ic">🏠</span>Hjem</button>
   <button data-p="opskrifter"><span class="ic">📖</span>Opskrifter</button>
@@ -264,7 +270,7 @@ button.b,label.b{box-shadow:0 6px 16px rgba(232,85,62,.3)}
 <dialog id="dlg"><div class="in" id="dlgin"></div></dialog>
 
 <script>
-const KEY='madapp-v1';const APP_VERSION=22, EJER='Søren';
+const KEY='madapp-v1';const APP_VERSION=23, EJER='Søren';
 let D;try{D=JSON.parse(localStorage.getItem(KEY)||'null')}catch(e){D=null;try{localStorage.setItem(KEY+'-skadet-'+Date.now(),localStorage.getItem(KEY))}catch(x){}}
 if(!D||typeof D!=='object')D={};
 ['opskrifter','indkob','lager','stdSlettet','gemteLister'].forEach(k=>{if(!Array.isArray(D[k]))D[k]=[]});
@@ -297,7 +303,7 @@ function flet(){D.opskrifter=(D.opskrifter||[]).filter(o=>!erStd(o.id)||o.rettet
 let HIST=[],sidst=tilGem();
 const save=()=>{const ny=tilGem();if(ny===sidst)return;if(sidst){HIST.push(sidst);if(HIST.length>30)HIST.shift()}sidst=ny;try{localStorage.setItem(KEY,ny)}catch(e){alert('Telefonen har ikke mere plads til appens data. Gem en kopi, og slet evt. dit eget foto.')}visFortrydKnap()};
 function visFortrydKnap(){const b=document.getElementById('fortrydknap');if(b){b.hidden=!HIST.length;b.title='Fortryd ('+HIST.length+')'}}
-function fortrydSidste(){if(!HIST.length)return;const s=HIST.pop();D=JSON.parse(s);flet();sidst=s;localStorage.setItem(KEY,s);if(window.brugFoto)brugFoto();if(dlg.open)dlg.close();vis();visFortrydKnap();toast('↩️ Fortrudt'+(HIST.length?' – tryk igen for at fortryde mere':''))}
+function fortrydSidste(){if(!HIST.length)return;const s=HIST.pop();D=JSON.parse(s);flet();sidst=s;localStorage.setItem(KEY,s);if(window.brugFoto)brugFoto();if(window.brugIndstil)brugIndstil();if(dlg.open)dlg.close();vis();visFortrydKnap();toast('↩️ Fortrudt'+(HIST.length?' – tryk igen for at fortryde mere':''))}
 const id=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,6);
 const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const kr=n=>{n=Math.round(n*100)/100;return n.toLocaleString('da-DK',{minimumFractionDigits:n%1?2:0,maximumFractionDigits:2})+' kr'};
@@ -307,7 +313,7 @@ const DAGE=['Mandag','Tirsdag','Onsdag','Torsdag','Fredag','Lørdag','Søndag'];
 
 let undoFn=null,tT;
 function toast(msg,undo){const t=document.getElementById('toast');document.getElementById('tmsg').textContent=msg;undoFn=undo;document.getElementById('tundo').style.display=undo?'':'none';t.style.display='flex';clearTimeout(tT);tT=setTimeout(()=>t.style.display='none',8000)}
-document.getElementById('tundo').onclick=()=>{if(undoFn){undoFn();save();if(window.brugFoto)brugFoto();vis()}document.getElementById('toast').style.display='none'};
+document.getElementById('tundo').onclick=()=>{if(undoFn){undoFn();save();if(window.brugFoto)brugFoto();if(window.brugIndstil)brugIndstil();vis()}document.getElementById('toast').style.display='none'};
 function snap(){return JSON.stringify(D)}
 function fortrydTil(s){return()=>{D=JSON.parse(s);flet()}}
 
@@ -862,13 +868,23 @@ function visOpskriftHjaelp(){
 
 // ---------- Indstillinger, oplæsning og foto af opskrift (version 19) ----------
 const STR={lille:.9,normal:1,stor:1.15,kaempe:1.3},FONTE={rund:'',klassisk:'Georgia,"Times New Roman",serif',enkel:'system-ui,-apple-system,"Segoe UI",Roboto,sans-serif',laese:'Verdana,Tahoma,"Trebuchet MS",sans-serif'};
-function brugIndstil(){D.indstil=D.indstil||{};document.body.style.zoom=STR[D.indstil.str||'normal']||1;document.body.style.fontFamily=FONTE[D.indstil.font||'rund']||''}
+const TEMAER={solnedgang:['Solnedgang','#ff8a3d','#e8364f','#e8553e','#ffe7df','#fff6ef'],mynte:['Mynte','#10b981','#06b6d4','#0fa968','#e4f7ee','#f2f7f4'],hav:['Hav','#3b82f6','#06b6d4','#2563eb','#e0edff','#f2f7ff'],lilla:['Lilla','#a855f7','#ec4899','#9333ea','#f3e8ff','#faf5ff'],skov:['Skov','#65a30d','#15803d','#4d7c0f','#ecfccb','#f7fbef'],kaffe:['Kaffe','#a16207','#78350f','#92400e','#fef3c7','#fbf7f0'],nat:['Nat','#475569','#0f172a','#334155','#e2e8f0','#f1f5f9'],slik:['Slik','#f472b6','#fb923c','#db2777','#fce7f3','#fff5fa']};
+const BAGGRUNDE=[['ingen','Ingen'],['fotos/galleri/frugt.jpg','Frugt og bær'],['fotos/galleri/bord.jpg','Fyldt bord'],['fotos/galleri/opskrifter4.jpg','Grøntsager'],['fotos/galleri/opskrifter2.jpg','Skærebræt'],['fotos/galleri/picnic.jpg','Picnic'],['fotos/galleri/indkob2.jpg','Torvehal'],['fotos/galleri/lager3.jpg','Krydderier']];
+function brugIndstil(){D.indstil=D.indstil||{};document.body.style.zoom=STR[D.indstil.str||'normal']||1;document.body.style.fontFamily=FONTE[D.indstil.font||'rund']||'';
+  const tm=TEMAER[D.indstil.tema],r=document.documentElement.style;
+  if(tm){r.setProperty('--grad',`linear-gradient(135deg,${tm[1]} 0%,${tm[2]} 100%)`);r.setProperty('--acc',tm[3]);if(!matchMedia('(prefers-color-scheme: dark)').matches){r.setProperty('--acc2',tm[4]);r.setProperty('--bg',tm[5]);r.setProperty('--felt',tm[4])}}
+  else ['--grad','--acc','--acc2','--bg','--felt'].forEach(v=>r.removeProperty(v));
+  const bg=D.indstil.baggrund;document.body.classList.toggle('medbg',!!(bg&&bg!=='ingen'));document.documentElement.style.setProperty('--bgfoto',bg&&bg!=='ingen'?`url('${bg}')`:'none');
+  const th=document.querySelector('meta[name=theme-color]');if(th)th.content=tm?tm[3]:'#2f7d4f'}
 function stemmer(){return window.speechSynthesis?speechSynthesis.getVoices():[]}
 function visIndstillinger(){
   D.indstil=D.indstil||{};const v=D.indstil,st=stemmer(),da=st.filter(x=>/^da/i.test(x.lang)),andre=st.filter(x=>!/^da/i.test(x.lang));
   dlgin.innerHTML=`<h2>⚙️ Indstillinger</h2>
   <h3>🔠 Tekststørrelse</h3><div class="chips">${[['lille','Lille'],['normal','Normal'],['stor','Stor'],['kaempe','Meget stor']].map(([k,n])=>`<button class="chip ${ (v.str||'normal')===k?'on':''}" onclick="setIndstil('str','${k}')">${n}</button>`).join('')}</div>
   <h3>✍️ Skrifttype</h3><div class="chips">${[['rund','Rund'],['klassisk','Klassisk'],['enkel','Enkel'],['laese','Let at læse']].map(([k,n])=>`<button class="chip ${(v.font||'rund')===k?'on':''}" style="font-family:${FONTE[k]||'inherit'}" onclick="setIndstil('font','${k}')">${n}</button>`).join('')}</div>
+  <h3>🎨 Farver</h3><div class="temaer"><button class="tema ${!D.indstil.tema?'on':''}" style="background:linear-gradient(135deg,#ff8a3d,#e8364f)" onclick="setIndstil('tema','')"><span>Standard</span></button>${Object.entries(TEMAER).filter(([k])=>k!=='solnedgang').map(([k,v])=>`<button class="tema ${D.indstil.tema===k?'on':''}" style="background:linear-gradient(135deg,${v[1]},${v[2]})" onclick="setIndstil('tema','${k}')"><span>${v[0]}</span></button>`).join('')}</div>
+  <h3>🖼️ Baggrund</h3><div class="galleri g3">${BAGGRUNDE.map(([p,n])=>`<button class="gfoto ${(D.indstil.baggrund||'ingen')===p?'on':''}" style="${p==='ingen'?'background:var(--felt)':'background-image:url('+p+')'}" onclick="setIndstil('baggrund','${p}')"><span>${n}</span></button>`).join('')}</div>
+  <p class="muted" style="font-size:13px">Billedet til forsiden og knapperne vælger du med »🖼️ Skift billede« på forsiden.</p>
   <h3>📝 Ret opskrifter</h3><p class="muted" style="margin-top:-6px;font-size:14px">Opskrifter rettes kun her. Find den, du vil rette.</p><input id="iret" style="width:100%" placeholder="Søg efter opskrift…" oninput="visRetListe(this.value)"><ul class="ingl" id="iretliste"></ul>
   <h3>🔊 Oplæsning</h3>
   ${window.speechSynthesis?`<label>Stemme</label><select id="istemme" style="width:100%" onchange="setIndstil('stemme',this.value,true)"><option value="">Telefonens danske stemme</option>${da.map(x=>`<option value="${esc(x.name)}" ${v.stemme===x.name?'selected':''}>${esc(x.name)} (dansk)</option>`).join('')}${andre.length?`<optgroup label="Andre sprog">${andre.map(x=>`<option value="${esc(x.name)}" ${v.stemme===x.name?'selected':''}>${esc(x.name)} (${esc(x.lang)})</option>`).join('')}</optgroup>`:''}</select>
