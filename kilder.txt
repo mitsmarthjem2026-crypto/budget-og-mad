@@ -236,3 +236,6 @@ fotos/galleri/lager-25.jpg: Julia Fiander – https://unsplash.com/photos/U2edNL
 
 Version 35 – genkendelse af varer på foto: TensorFlow.js + COCO-SSD (gratis, åben kildekode, kører på telefonen) – https://github.com/tensorflow/tfjs-models
 
+
+Kalender-knappen (version 47, Unsplash, gratis efter Unsplash-licensen, hentet 24-11-2026):
+Kalender: Eric Rothermel – https://unsplash.com/photos/FoKO4DpXamQ

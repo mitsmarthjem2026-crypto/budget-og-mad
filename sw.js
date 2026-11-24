@@ -1,12 +1,12 @@
 // Budget og Mad – gemmer appen på telefonen, så den virker uden internet.
 // Sikre opdateringer: en ny version bliver først brugt, når brugeren selv trykker »Opdater«.
 // Har den nye version fejl, bliver den ikke taget i brug, og appen kører videre på den gamle.
-const VERSION = 46;
+const VERSION = 47;
 const CACHE = 'bom-v' + VERSION;
 const META = 'bom-meta';
 const FILER = ['./', './index.html', './opskrifter.js', './manifest.json', './version.json',
   './ikoner/ikon-180.png', './ikoner/ikon-192.png', './ikoner/ikon-512.png', './fotos/galleri/madlavning.jpg', './fotos/galleri/koekken.jpg', './fotos/galleri/picnic.jpg', './fotos/galleri/udenfor.jpg', './fotos/galleri/bord.jpg', './fotos/galleri/salat.jpg', './fotos/galleri/frugt.jpg',
-  './fotos/budget.jpg', './fotos/opskrifter.jpg', './fotos/madplan.jpg', './fotos/indkob.jpg', './fotos/lager.jpg',
+  './fotos/budget.jpg', './fotos/opskrifter.jpg', './fotos/madplan.jpg', './fotos/indkob.jpg', './fotos/lager.jpg', './fotos/kalender.jpg',
   './fotos/retter/frikadeller.jpg', './fotos/retter/boller.jpg', './fotos/retter/biksemad.jpg', './fotos/retter/braendende.jpg',
   './fotos/retter/millionbof.jpg', './fotos/retter/porresuppe.jpg', './fotos/retter/gulearter.jpg', './fotos/retter/risengrod.jpg',
   './fotos/retter/pandekager.jpg', './fotos/retter/kyllingkarry.jpg', './fotos/retter/spaghetti.jpg', './fotos/retter/chili.jpg',

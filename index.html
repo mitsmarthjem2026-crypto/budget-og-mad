@@ -275,6 +275,44 @@ body{padding-top:env(safe-area-inset-top)}
 #nav #fortrydknap,#nav #instknap{min-width:0;flex-direction:column;align-items:center;justify-content:center;background:var(--acc2)!important;color:var(--txt)!important;border:0!important;border-radius:16px!important;padding:5px 10px!important;font-size:19px!important;line-height:1.2;font-weight:700}
 #nav #fortrydknap:not([hidden]),#nav #instknap{display:flex}
 #nav .ftxt,#nav .itxt{display:block!important;font-size:11px;font-weight:700}</style>
+<style>/* Kalender og kontakter (version 47) */
+.t-kalender{grid-column:1/-1;background-position:center 60%}
+@media (min-width:761px){.t-kalender{grid-column:auto}}
+.kfaner{display:flex;gap:10px;margin-bottom:14px}
+.kfaner button{flex:1;font:inherit;font-size:18px;font-weight:700;border:0;border-radius:16px;padding:14px 8px;background:var(--card);color:var(--txt);box-shadow:var(--skygge);cursor:pointer}
+.kfaner button.on{background:var(--grad);color:#fff}
+.kmd{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:10px}
+.knav{font:inherit;font-size:30px;line-height:1;width:54px;height:54px;border:0;border-radius:50%;background:var(--felt);color:var(--txt);cursor:pointer;font-weight:700}
+.ktitel{font:inherit;font-size:24px;font-weight:800;border:0;background:none;color:var(--txt);cursor:pointer;text-transform:capitalize;padding:8px;white-space:nowrap}
+.kuge,.kgrid{display:grid;grid-template-columns:repeat(7,1fr);gap:5px}
+.kuge span{text-align:center;font-size:13px;font-weight:700;color:var(--muted)}
+.kdag{font:inherit;border:0;border-radius:12px;background:var(--felt);color:var(--txt);min-height:58px;padding:4px 2px;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;gap:2px;cursor:pointer}
+.kdag b{font-size:18px}.kdag i{font-style:normal;font-size:15px;line-height:1.1;min-height:14px;letter-spacing:-1px}
+.kdag i s{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--acc);margin:0 1px;vertical-align:middle}
+.kdag.weekend b{color:var(--acc)}
+.kdag.idag{box-shadow:inset 0 0 0 3px var(--acc)}
+.kdag.valgt{background:var(--grad);color:#fff}.kdag.valgt b{color:#fff}.kdag.valgt i s{background:#fff}
+.kfind{position:relative;overflow:hidden;text-align:center;cursor:pointer;margin:0;font-weight:600;color:var(--txt);background:var(--felt);border-radius:14px;padding:10px 14px}
+.kfind input[type=date]{position:absolute;inset:0;opacity:0;width:100%;height:100%;cursor:pointer}
+.kting .ktid,.list .ktid{width:52px;flex:0 0 52px;font-size:14px;font-weight:700;color:var(--acc);text-align:center}
+.kting .n{cursor:pointer}
+#dlgin .ktid{font-size:22px}
+.kb{font-size:22px;text-decoration:none;border:0;background:var(--felt);border-radius:50%;width:44px;height:44px;flex:0 0 44px;display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0}
+.kmdr{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.kmdr button{font:inherit;font-size:17px;font-weight:600;text-transform:capitalize;border:0;border-radius:14px;padding:16px 4px;background:var(--felt);color:var(--txt);cursor:pointer}
+.kmdr button.on{background:var(--grad);color:#fff}
+.ksmil{display:flex;flex-wrap:wrap;gap:4px;margin-top:6px}
+.ksmil button{font-size:24px;width:44px;height:44px;border:0;border-radius:12px;background:var(--felt);cursor:pointer;padding:0}
+.kchk{display:flex!important;gap:10px;align-items:center;font-size:17px!important;color:var(--txt)!important;margin-top:14px!important}
+.kchk input{width:26px;height:26px}
+.kfoto{display:inline-flex;align-items:center;justify-content:center;flex:0 0 auto;border-radius:50%;background:var(--grad) center/cover;color:#fff;font-weight:800}
+.kkon{cursor:pointer}
+.kknapper{display:flex;gap:8px;justify-content:center;margin:10px 0}
+.kknapper a{flex:1;max-width:110px;display:flex;flex-direction:column;align-items:center;gap:2px;font-size:28px;text-decoration:none;background:var(--felt);color:var(--txt);border-radius:16px;padding:10px 4px}
+.kknapper a span{font-size:14px;font-weight:700}
+.kdeltekst{white-space:pre-wrap;background:var(--felt);border-radius:14px;padding:12px;font-size:17px}
+@media (max-width:380px){.kdag{min-height:50px}.kdag b{font-size:16px}.kgrid,.kuge{gap:3px}}
+</style>
 </head>
 <body>
 <header><h1><img src="ikoner/ikon-192.png" alt="" style="width:1.3em;height:1.3em;border-radius:.3em;vertical-align:-.3em;margin-right:.35em">Budget og Mad</h1><button id="instknap" onclick="visGuide()" style="display:none;border:1px solid #fff;background:none;color:#fff;border-radius:10px;padding:6px 10px;font:inherit;font-size:14px;cursor:pointer">📲<span class="itxt"> Installér</span></button><button id="fortrydknap" hidden onclick="fortrydSidste()">↩️<span class="ftxt"> Fortryd</span></button><span class="ver" id="ver">version 43</span></header>
@@ -289,7 +327,7 @@ body{padding-top:env(safe-area-inset-top)}
 <dialog id="dlg"><div class="in" id="dlgin"></div></dialog>
 
 <script>
-const KEY='madapp-v1';const ENHED=(()=>{let e=localStorage.getItem('madapp-v1-enhed');if(!e){e=(crypto.randomUUID?crypto.randomUUID():Date.now().toString(36)+Math.random().toString(36).slice(2));localStorage.setItem('madapp-v1-enhed',e)}return e})();const APP_VERSION=46, EJER='Søren';
+const KEY='madapp-v1';const ENHED=(()=>{let e=localStorage.getItem('madapp-v1-enhed');if(!e){e=(crypto.randomUUID?crypto.randomUUID():Date.now().toString(36)+Math.random().toString(36).slice(2));localStorage.setItem('madapp-v1-enhed',e)}return e})();const APP_VERSION=47, EJER='Søren';
 let D;try{D=JSON.parse(localStorage.getItem(KEY)||'null')}catch(e){D=null;try{localStorage.setItem(KEY+'-skadet-'+Date.now(),localStorage.getItem(KEY))}catch(x){}}
 if(!D||typeof D!=='object')D={};
 ['opskrifter','indkob','lager','stdSlettet','gemteLister'].forEach(k=>{if(!Array.isArray(D[k]))D[k]=[]});
@@ -313,7 +351,7 @@ function match(o){const ing=o.ing.filter(i=>!BASIS.includes(norm(i.navn)));const
 D.budget.ind=D.budget.ind||[];D.budget.faste=D.budget.faste||[];D.budget.maal=D.budget.maal||[];D.priser=D.priser||{};D.stdSlettet=D.stdSlettet||[];
 flet();
 let budgetMd=new Date().getFullYear()+'-'+String(new Date().getMonth()+1).padStart(2,'0');
-let side='forside';if(['#forside','#opskrifter','#madplan','#indkob','#lager','#budget'].includes(location.hash))side=location.hash.slice(1);
+let side='forside';if(['#forside','#opskrifter','#madplan','#indkob','#lager','#budget','#kalender'].includes(location.hash))side=location.hash.slice(1);
 let ugeStart=mandag(new Date());
 var STD_IDS=null;function erStd(x){if(!STD_IDS)STD_IDS=new Set(STD_OPSKRIFTER.map(s=>s.id));return STD_IDS.has(x)}
 const tilGem=()=>JSON.stringify({...D,opskrifter:D.opskrifter.filter(o=>!erStd(o.id)||o.rettet)});
@@ -722,7 +760,7 @@ SIDER.forside=function(){
   const snart=D.lager.filter(x=>x.udlob&&(new Date(x.udlob)-idag)/864e5<=3).length,paaListe=D.indkob.filter(x=>!x.kobt).length;
   const b=budgetTal(md);
   const info={budget:b.ind?'Tilbage: '+kr(b.tilbage):'Skriv din løn ind',opskrifter:D.opskrifter.length?D.opskrifter.length+' opskrifter':'Gem din første ret',madplan:ret?'I dag: '+ret:'Hvad skal du spise i dag?',indkob:paaListe?paaListe+' ting på listen':'Listen er tom',lager:D.lager.length?D.lager.length+' varer'+(snart?' · '+snart+' udløber snart':''):'Hvad har du derhjemme?'};
-  const h=nu.getHours(),hilsen=h<10?'Godmorgen':h<17?'Hej':'Godaften';
+  info.kalender=kalInfo();const h=nu.getHours(),hilsen=h<10?'Godmorgen':h<17?'Hej':'Godaften';
   return `<div class="fhero" style="background-image:url('${valgtFoto()}')"><div><div class="fh1">${hilsen} 👋</div><div class="fh2">Hvad skal vi i dag?</div></div></div>
   <div class="tiles">${Object.entries(FOTO).map(([k,f])=>`<button class="tile t-${k}" onclick="gaaTil('${k}')" style="background-image:url(${knapFoto(k)})"><span class="te">${f[1]}</span><span class="tskift" role="button" title="Skift billede" onclick="event.stopPropagation();vaelgKnapFoto('${k}')">🖼️</span><span class="tn">${f[2]}</span><span class="ti">${esc(info[k])}</span></button>`).join('')}</div>
   ${erEjer()?'<button class="b" style="width:100%;font-size:19px;padding:16px;margin:14px 0 4px" onclick="visAndreBrugere()">👥 Til andre app brugere</button>':''}
@@ -1351,6 +1389,113 @@ function egetFoto(inp){const fl=inp.files[0];if(!fl)return;const img=new Image()
   const s=snap();D.indstil.egetFoto=c.toDataURL('image/jpeg',.8);D.indstil.foto='eget';try{save()}catch(e){D=JSON.parse(s);alert('Billedet er for stort. Prøv et andet.');return}URL.revokeObjectURL(img.src);brugFoto();dlg.close();vis();toast('Dit eget foto er sat ind 🎉',fortrydTil(s))};img.src=URL.createObjectURL(fl)}
 brugFoto();
 
+// ---------- Kalender og kontakter (version 47) ----------
+FOTO.kalender=['fotos/kalender.jpg','🗓️','Kalender'];
+KNAPFOTOS.kalender=[['fotos/kalender.jpg','Åben kalender']];
+const KA=()=>Array.isArray(D.kalender)?D.kalender:(D.kalender=[]);
+const KO=()=>Array.isArray(D.kontakter)?D.kontakter:(D.kontakter=[]);
+const MDR=['januar','februar','marts','april','maj','juni','juli','august','september','oktober','november','december'];
+const UGD=['søndag','mandag','tirsdag','onsdag','torsdag','fredag','lørdag'];
+const SMIL=['😀','😊','😍','🥳','😢','😴','🎂','🎉','🎁','❤️','👍','⭐','☀️','🌧️','❄️','🏥','🦷','💊','🚗','🚌','✈️','🏠','🍽️','☕','🛒','💼','📚','⚽','🐶','🎵','📞','⚠️'];
+const kEmo=s=>(String(s||'').match(/\p{Extended_Pictographic}️?/u)||[])[0];
+const kDag=s=>{const[a,b,c]=s.split('-').map(Number);return new Date(a,b-1,c)};
+const kPaen=s=>{const d=kDag(s);return UGD[d.getDay()]+' '+d.getDate()+'. '+MDR[d.getMonth()]};
+const tlfRen=t=>String(t||'').replace(/[^\d+]/g,'');
+const kFodAar=k=>{const y=+String(k.fodsel||'').slice(0,4);return y>1900?y:null};
+function dagensTing(ds){const md=ds.slice(5),aar=+ds.slice(0,4);
+  const f=KO().filter(k=>k.fodsel&&k.fodsel.slice(5)===md).map(k=>({t:'f',k,alder:kFodAar(k)?aar-kFodAar(k):null}));
+  const a=KA().filter(x=>x.dato===ds||(x.aarlig&&x.dato.slice(5)===md&&x.dato<ds)).sort((p,q)=>(p.tid||'99').localeCompare(q.tid||'99')).map(x=>({t:'a',x}));
+  return[...f,...a]}
+function kalInfo(){const t=dagensTing(iso(new Date()));const f=t.find(z=>z.t==='f');if(f)return '🎂 '+f.k.navn+' har fødselsdag';
+  const n=t.length;if(n)return 'I dag: '+n+(n===1?' aftale':' aftaler');return KA().length||KO().length?'Ingen aftaler i dag':'Aftaler, fødselsdage og kontakter'}
+SIDER.kalender=function(){const fane=window._kfane||'kal';
+  return `<div class="kfaner"><button class="${fane==='kal'?'on':''}" onclick="window._kfane='kal';vis()">🗓️ Kalender</button><button class="${fane==='kon'?'on':''}" onclick="window._kfane='kon';vis()">👥 Kontakter</button></div>`+(fane==='kon'?kontaktSide():kalSide())};
+function kTingLi(z,ds){if(z.t==='f'){const k=z.k,t=tlfRen(k.tlf);return `<li class="kting"><span class="ktid" style="font-size:26px">🎂</span><span class="n" onclick="visKontakt('${k.id}')"><b>${esc(k.navn)}</b> har fødselsdag${z.alder!=null?' – '+z.alder+' år':''}${ds?`<br><span class="muted">${kPaen(ds)}</span>`:''}</span>${t?`<a class="kb" href="tel:${t}" title="Ring">📞</a><a class="kb" href="sms:${t}" title="Skriv en SMS">💬</a>`:''}</li>`}
+  const x=z.x;return `<li class="kting"><span class="ktid">${x.tid?esc(x.tid):'Hele<br>dagen'}</span><span class="n" onclick="retAftale('${x.id}')"><b>${esc(x.titel)}</b>${x.aarlig?' <span class="muted">🔁</span>':''}${x.note?`<br><span class="muted" style="white-space:pre-wrap">${esc(x.note)}</span>`:''}${ds?`<br><span class="muted">${kPaen(ds)}</span>`:''}</span><button class="kb" title="Del" onclick="delAftale('${x.id}','${ds||x.dato}')">📤</button><button class="kb" title="Ret" onclick="retAftale('${x.id}')">✏️</button></li>`}
+function kalSide(){const idag=iso(new Date()),valgt=window._kd||idag,m=window._km||valgt.slice(0,7);
+  const[y,mo]=m.split('-').map(Number),start=(new Date(y,mo-1,1).getDay()+6)%7,antal=new Date(y,mo,0).getDate();
+  let celler='<span></span>'.repeat(start);
+  for(let d=1;d<=antal;d++){const ds=m+'-'+String(d).padStart(2,'0'),t=dagensTing(ds);
+    const ik=t.slice(0,3).map(z=>z.t==='f'?'🎂':(kEmo(z.x.titel)||'<s></s>')).join('');
+    celler+=`<button class="kdag${ds===idag?' idag':''}${ds===valgt?' valgt':''}${(start+d-1)%7>4?' weekend':''}" onclick="kalVaelg('${ds}')"><b>${d}</b><i>${ik}</i></button>`}
+  const t=dagensTing(valgt);let naeste=[];const d0=kDag(idag);
+  for(let i=1;i<=60&&naeste.length<6;i++){const d=new Date(d0);d.setDate(d.getDate()+i);const ds=iso(d);dagensTing(ds).forEach(z=>{if(naeste.length<6)naeste.push(kTingLi(z,ds))})}
+  return `<div class="card khoved"><div class="kmd"><button class="knav" onclick="kalMd(-1)" title="Forrige måned">‹</button><button class="ktitel" onclick="kalVaelgMd()">${MDR[mo-1]} ${y} ▾</button><button class="knav" onclick="kalMd(1)" title="Næste måned">›</button></div>
+  <div class="kuge"><span>Man</span><span>Tir</span><span>Ons</span><span>Tor</span><span>Fre</span><span>Lør</span><span>Søn</span></div><div class="kgrid">${celler}</div>
+  <div class="row" style="margin-top:12px"><button class="l" style="flex:1" onclick="kalVaelg('${idag}')">⭐ I dag</button><label class="l kfind" style="flex:1">🔎 Find dag<input type="date" value="${valgt}" onchange="if(this.value)kalVaelg(this.value)"></label></div></div>
+  <div class="card"><h3 style="margin:0 0 4px">${kPaen(valgt).replace(/^./,c=>c.toUpperCase())}${valgt===idag?' <span class="muted" style="text-transform:none">(i dag)</span>':''}</h3>
+  <ul class="list">${t.length?t.map(z=>kTingLi(z)).join(''):'<li class="empty" style="justify-content:center">Ingen aftaler denne dag.</li>'}</ul>
+  <button class="b" style="width:100%;font-size:18px;padding:14px;margin-top:10px" onclick="retAftale(null,'${valgt}')">➕ Ny aftale</button></div>
+  ${naeste.length?`<div class="card"><b>⏭️ Det næste der sker</b><ul class="list">${naeste.join('')}</ul></div>`:''}`}
+function kalVaelg(ds){window._kd=ds;window._km=ds.slice(0,7);vis()}
+function kalMd(n){const[y,m]=(window._km||iso(new Date()).slice(0,7)).split('-').map(Number);const d=new Date(y,m-1+n,1);window._km=iso(d).slice(0,7);const idag=iso(new Date());window._kd=idag.slice(0,7)===window._km?idag:window._km+'-01';vis()}
+function kalVaelgMd(aar){const m=window._km||iso(new Date()).slice(0,7);aar=aar||+m.slice(0,4);
+  dlgin.innerHTML=`<h2>🗓️ Vælg måned</h2><div class="kmd"><button class="knav" onclick="kalVaelgMd(${aar-1})">‹</button><b style="font-size:24px">${aar}</b><button class="knav" onclick="kalVaelgMd(${aar+1})">›</button></div>
+  <div class="kmdr">${MDR.map((n,i)=>{const v=aar+'-'+String(i+1).padStart(2,'0');return `<button class="${v===m?'on':''}" onclick="dlg.close();kalVaelg('${v}-01')">${n}</button>`}).join('')}</div>
+  <div class="row" style="margin-top:12px"><button class="l" style="flex:1" onclick="dlg.close()">Luk</button></div>`;if(!dlg.open)dlg.showModal()}
+function smilRaekke(){return `<div class="ksmil">${SMIL.map(e=>`<button type="button" onpointerdown="event.preventDefault()" onclick="indsaetSmil('${e}')">${e}</button>`).join('')}</div>`}
+function indsaetSmil(e){const f=window._kfelt;if(!f)return;const p=f.selectionStart==null?f.value.length:f.selectionStart,q=f.selectionEnd==null?p:f.selectionEnd;f.value=f.value.slice(0,p)+e+f.value.slice(q);const n=p+e.length;try{f.setSelectionRange(n,n)}catch(x){}}
+function retAftale(aid,ds){const a=aid?KA().find(x=>x.id===aid):null;if(aid&&!a)return;
+  dlgin.innerHTML=`<h2>${a?'✏️ Ret aftale':'➕ Ny aftale'}</h2>
+  <label>Hvad skal der ske?</label><input id="ka_titel" style="width:100%" value="${esc(a?a.titel:'')}" placeholder="Fx Tandlæge 🦷" onfocus="window._kfelt=this">
+  <label>Smileys – tryk for at sætte ind</label>${smilRaekke()}
+  <div class="row" style="margin-top:6px"><div style="flex:1;min-width:150px"><label>Dag</label><input type="date" id="ka_dato" style="width:100%" value="${a?a.dato:ds}"></div><div><label>Klokken (kan stå tom)</label><input type="time" id="ka_tid" value="${a?a.tid||'':''}"></div></div>
+  <label class="kchk"><input type="checkbox" id="ka_aar" ${a&&a.aarlig?'checked':''}> 🔁 Kommer igen hvert år</label>
+  <label>Noter</label><textarea id="ka_note" rows="3" style="width:100%" placeholder="Fx husk sygesikringskort" onfocus="window._kfelt=this">${esc(a?a.note||'':'')}</textarea>
+  <div class="row" style="margin-top:12px"><button class="b" style="flex:1;font-size:18px" onclick="gemAftale('${aid||''}')">✓ Gem</button>${a?`<button class="l" onclick="sletAftale('${a.id}')">🗑️ Slet</button>`:''}<button class="l" onclick="dlg.close()">Annullér</button></div>`;
+  if(!dlg.open)dlg.showModal();window._kfelt=document.getElementById('ka_titel')}
+function gemAftale(aid){const v=i=>document.getElementById(i).value.trim();const titel=v('ka_titel'),dato=v('ka_dato');
+  if(!titel){alert('Skriv hvad der skal ske.');return}if(!dato){alert('Vælg en dag.');return}
+  const s=snap(),x={id:aid||id(),titel,dato,tid:v('ka_tid'),note:v('ka_note'),aarlig:document.getElementById('ka_aar').checked};
+  const i=KA().findIndex(y=>y.id===aid);if(i>=0)KA()[i]=x;else KA().push(x);save();dlg.close();window._kfane='kal';kalVaelg(dato);toast(aid?'Aftalen er rettet ✏️':'Aftalen er gemt 🗓️',fortrydTil(s))}
+function sletAftale(aid){const a=KA().find(x=>x.id===aid);if(!a||!sikker(a.titel))return;const s=snap();D.kalender=KA().filter(x=>x.id!==aid);save();dlg.close();vis();toast('Aftalen er slettet 🗑️',fortrydTil(s))}
+function delAftale(aid,ds){const a=KA().find(x=>x.id===aid);if(!a)return;
+  const txt=a.titel+'\n'+kPaen(ds)+(a.tid?' kl. '+a.tid:'')+(a.note?'\n'+a.note:'');window._kdeltxt=txt;const e=encodeURIComponent(txt);
+  const ks=[...KO()].filter(k=>k.tlf||k.mail).sort((p,q)=>p.navn.localeCompare(q.navn,'da'));
+  dlgin.innerHTML=`<h2>📤 Del aftalen</h2><div class="kdeltekst">${esc(txt)}</div>
+  ${navigator.share?`<button class="b" style="width:100%;font-size:18px;padding:14px;margin-top:10px" onclick="navigator.share({text:window._kdeltxt}).catch(()=>{})">📤 Del med … (vælg app)</button>`:''}
+  <button class="l" style="width:100%;margin-top:8px" onclick="navigator.clipboard&&navigator.clipboard.writeText(window._kdeltxt).then(()=>toast('Teksten er kopieret 📋'))">📋 Kopiér teksten</button>
+  ${ks.length?`<h3 style="margin:16px 0 4px">Send til en fra Kontakter</h3><ul class="list">${ks.map(k=>`<li><span class="n"><b>${esc(k.navn)}</b></span>${k.tlf?`<a class="kb" href="sms:${tlfRen(k.tlf)}?&body=${e}" title="SMS">💬</a>`:''}${k.mail?`<a class="kb" href="mailto:${esc(k.mail)}?subject=${encodeURIComponent(a.titel)}&body=${e}" title="Mail">✉️</a>`:''}</li>`).join('')}</ul>`:''}
+  <div class="row" style="margin-top:12px"><button class="l" style="flex:1" onclick="dlg.close()">Luk</button></div>`;if(!dlg.open)dlg.showModal()}
+// Kontakter
+function kFoto(k,str){return k.foto?`<span class="kfoto" style="width:${str}px;height:${str}px;background-image:url('${k.foto}')"></span>`:`<span class="kfoto" style="width:${str}px;height:${str}px;font-size:${Math.round(str*.42)}px">${esc((k.navn||'?').trim().charAt(0).toUpperCase())}</span>`}
+function dageTil(k){if(!k.fodsel)return null;const nu=new Date();nu.setHours(0,0,0,0);const[mm,dd]=k.fodsel.slice(5).split('-').map(Number);let d=new Date(nu.getFullYear(),mm-1,dd);if(d<nu)d=new Date(nu.getFullYear()+1,mm-1,dd);return{dage:Math.round((d-nu)/864e5),d}}
+function fodTekst(k){if(!k.fodsel)return '';const[mm,dd]=k.fodsel.slice(5).split('-').map(Number),y=kFodAar(k),t=dageTil(k);
+  return dd+'. '+MDR[mm-1]+(y?' '+y:'')+(t?(t.dage===0?' – i dag! 🎉':' – om '+t.dage+(t.dage===1?' dag':' dage'))+(y?' (bliver '+(t.d.getFullYear()-y)+')':''):'')}
+function kontaktSide(){const l=[...KO()].sort((a,b)=>a.navn.localeCompare(b.navn,'da'));
+  const fod=KO().filter(k=>k.fodsel).map(k=>({k,t:dageTil(k)})).sort((a,b)=>a.t.dage-b.t.dage).slice(0,3);
+  return `<div class="card"><div class="row"><input class="grow" id="ksoeg" placeholder="🔎 Søg efter navn eller nummer" oninput="kSoeg(this.value)"><button class="b" onclick="retKontakt()">➕ Ny kontakt</button></div></div>
+  ${fod.length?`<div class="card"><b>🎂 Næste fødselsdage</b><ul class="list">${fod.map(({k})=>`<li onclick="visKontakt('${k.id}')" style="cursor:pointer">${kFoto(k,40)}<span class="n"><b>${esc(k.navn)}</b><br><span class="muted">${fodTekst(k)}</span></span></li>`).join('')}</ul></div>`:''}
+  <div class="card"><ul class="list" id="klist">${l.length?l.map(k=>`<li class="kkon" data-s="${esc((k.navn+' '+(k.tlf||'')+' '+tlfRen(k.tlf)+' '+(k.mail||'')+' '+(k.adresse||'')).toLowerCase())}" onclick="visKontakt('${k.id}')">${kFoto(k,48)}<span class="n"><b>${esc(k.navn)}</b>${k.tlf?`<br><span class="muted">${esc(k.tlf)}</span>`:''}</span>${k.tlf?`<a class="kb" href="tel:${tlfRen(k.tlf)}" onclick="event.stopPropagation()" title="Ring">📞</a>`:''}</li>`).join(''):'<li class="empty" style="justify-content:center">Ingen kontakter endnu. Tryk på »➕ Ny kontakt«.</li>'}</ul></div>`}
+function kSoeg(q){q=q.trim().toLowerCase();document.querySelectorAll('#klist .kkon').forEach(li=>li.style.display=!q||li.dataset.s.includes(q)?'':'none')}
+function visKontakt(kid){const k=KO().find(x=>x.id===kid);if(!k)return;const t=tlfRen(k.tlf);
+  dlgin.innerHTML=`<div style="text-align:center">${kFoto(k,110)}<h2 style="margin:10px 0 4px">${esc(k.navn)}</h2></div>
+  <div class="kknapper">${t?`<a href="tel:${t}">📞<span>Ring</span></a><a href="sms:${t}">💬<span>SMS</span></a>`:''}${k.mail?`<a href="mailto:${esc(k.mail)}">✉️<span>Mail</span></a>`:''}${k.adresse?`<a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(k.adresse)}" target="_blank" rel="noopener">🗺️<span>Kort</span></a>`:''}</div>
+  <ul class="list">${k.tlf?`<li><span class="ktid">📞</span><span class="n">${esc(k.tlf)}</span></li>`:''}${k.mail?`<li><span class="ktid">✉️</span><span class="n" style="word-break:break-all">${esc(k.mail)}</span></li>`:''}${k.adresse?`<li><span class="ktid">🏠</span><span class="n" style="white-space:pre-wrap">${esc(k.adresse)}</span></li>`:''}${k.fodsel?`<li><span class="ktid">🎂</span><span class="n">${fodTekst(k)}</span></li>`:''}${k.noter?`<li><span class="ktid">📝</span><span class="n" style="white-space:pre-wrap">${esc(k.noter)}</span></li>`:''}</ul>
+  <div class="row" style="margin-top:12px"><button class="b" style="flex:1" onclick="retKontakt('${k.id}')">✏️ Ret</button><button class="l" onclick="sletKontakt('${k.id}')">🗑️ Slet</button><button class="l" onclick="dlg.close()">Luk</button></div>`;if(!dlg.open)dlg.showModal()}
+function retKontakt(kid){const k=kid?KO().find(x=>x.id===kid):null;window._kfotoNy=k?k.foto||'':'';
+  const fd=k&&k.fodsel?k.fodsel.split('-'):['','',''],y=k&&kFodAar(k)?fd[0]:'';
+  dlgin.innerHTML=`<h2>${k?'✏️ Ret kontakt':'➕ Ny kontakt'}</h2>
+  <div class="row" style="align-items:center"><span id="ko_fotovis">${kFoto({navn:k?k.navn:'?',foto:window._kfotoNy},72)}</span><label class="l kfind" style="flex:1">📷 Vælg foto<input type="file" accept="image/*" hidden onchange="kontaktFoto(this)"></label><button class="l" onclick="window._kfotoNy='';document.getElementById('ko_fotovis').innerHTML=kFoto({navn:'?'},72)">Fjern foto</button></div>
+  <label>Navn</label><input id="ko_navn" style="width:100%" value="${esc(k?k.navn:'')}" placeholder="Fx Hanne Jensen" onfocus="window._kfelt=this">
+  <label>Telefon</label><input id="ko_tlf" type="tel" style="width:100%" value="${esc(k?k.tlf||'':'')}" placeholder="Fx 12 34 56 78">
+  <label>Adresse</label><textarea id="ko_adr" rows="2" style="width:100%" placeholder="Vej, nummer, postnr. og by">${esc(k?k.adresse||'':'')}</textarea>
+  <label>Mail</label><input id="ko_mail" type="email" style="width:100%" value="${esc(k?k.mail||'':'')}" placeholder="navn@mail.dk">
+  <label>Fødselsdag (året kan stå tomt)</label><div class="row"><select id="ko_dd"><option value="">Dag</option>${Array.from({length:31},(_,i)=>`<option ${+fd[2]===i+1?'selected':''}>${i+1}</option>`).join('')}</select><select id="ko_mm" style="flex:1"><option value="">Måned</option>${MDR.map((n,i)=>`<option value="${i+1}" ${+fd[1]===i+1?'selected':''}>${n}</option>`).join('')}</select><input id="ko_yy" type="number" inputmode="numeric" placeholder="År" value="${y}" style="width:90px"></div>
+  <label>Noter om personen</label><textarea id="ko_noter" rows="3" style="width:100%" placeholder="Fx kan lide kaffe, har en hund" onfocus="window._kfelt=this">${esc(k?k.noter||'':'')}</textarea>${smilRaekke()}
+  <div class="row" style="margin-top:12px"><button class="b" style="flex:1;font-size:18px" onclick="gemKontakt('${kid||''}')">✓ Gem</button><button class="l" onclick="dlg.close()">Annullér</button></div>`;
+  if(!dlg.open)dlg.showModal();window._kfelt=document.getElementById('ko_noter')}
+function kontaktFoto(inp){const fl=inp.files[0];if(!fl)return;const img=new Image();img.onload=()=>{const mx=320,sk=Math.min(1,mx/Math.max(img.width,img.height)),c=document.createElement('canvas');c.width=Math.round(img.width*sk);c.height=Math.round(img.height*sk);c.getContext('2d').drawImage(img,0,0,c.width,c.height);window._kfotoNy=c.toDataURL('image/jpeg',.8);URL.revokeObjectURL(img.src);document.getElementById('ko_fotovis').innerHTML=kFoto({foto:window._kfotoNy},72)};img.onerror=()=>alert('Billedet kan ikke læses. Prøv et andet.');img.src=URL.createObjectURL(fl)}
+function gemKontakt(kid){const v=i=>document.getElementById(i).value.trim();const navn=v('ko_navn');if(!navn){alert('Skriv et navn.');return}
+  const dd=v('ko_dd'),mm=v('ko_mm'),yy=v('ko_yy');if((dd&&!mm)||(mm&&!dd)){alert('Vælg både dag og måned til fødselsdagen.');return}
+  if(yy&&!(+yy>1900&&+yy<=new Date().getFullYear())){alert('Året skal skrives med 4 tal, fx 1980.');return}
+  const fodsel=dd&&mm?(yy||'0000')+'-'+String(mm).padStart(2,'0')+'-'+String(dd).padStart(2,'0'):'';
+  const s=snap(),x={id:kid||id(),navn,tlf:v('ko_tlf'),adresse:v('ko_adr'),mail:v('ko_mail'),fodsel,noter:v('ko_noter'),foto:window._kfotoNy||''};
+  const i=KO().findIndex(y=>y.id===kid);if(i>=0)KO()[i]=x;else KO().push(x);
+  try{save()}catch(e){D=JSON.parse(s);alert('Billedet er for stort. Prøv et andet.');return}
+  window._kfane='kon';vis();visKontakt(x.id);toast(kid?'Kontakten er rettet ✏️':'Kontakten er gemt 👤',fortrydTil(s))}
+function sletKontakt(kid){const k=KO().find(x=>x.id===kid);if(!k||!sikker(k.navn))return;const s=snap();D.kontakter=KO().filter(x=>x.id!==kid);save();dlg.close();vis();toast('Kontakten er slettet 🗑️',fortrydTil(s))}
+
 vis();
 
 // Læg appen på telefonen
@@ -1461,6 +1606,26 @@ function tegnAndreBrugere(){
    <input id="nynavn" placeholder="Personens navn" maxlength="60" style="width:100%;margin-top:8px">
    <button class="b" style="width:100%;margin-top:8px;font-size:17px;padding:12px" onclick="nyKode()">Lav kode</button>
    ${ejerNy?`<div style="margin-top:10px;background:var(--card);border-radius:12px;padding:10px;text-align:center"><div class="muted">Ny kode til ${esc(ejerNy.navn||'ny person')}</div><div style="font-size:26px;letter-spacing:4px;font-weight:800">${esc(ejerNy.kode)}</div><button class="b" style="width:100%;margin-top:6px" onclick="sendKode('${esc(ejerNy.kode)}')">📤 Send link og kode</button></div>`:''}</div>
+  <details style="background:var(--felt);border-radius:14px;padding:12px;margin:10px 0"><summary style="font-weight:800;font-size:17px;cursor:pointer">📘 Manual til mig</summary>
+   <div style="font-size:15px;line-height:1.45">
+   <p style="margin-top:8px"><b>🗺️ Her bliver appen lavet</b></p>
+   <ul style="margin:0 0 10px;padding-left:20px">
+    <li><b>Mappen på din PC:</b> Skrivebord → <b>Mad-App</b>. Her er selve appen. I <b>backups</b> ligger en kopi af hver version, i <b>billeder</b> ligger billederne, du har fået vist. Slet ikke noget derinde.</li>
+    <li><b>»Budget og Mad« på skrivebordet:</b> åbner appen på din PC.</li>
+    <li><b>»GitHub« på skrivebordet:</b> åbner GitHub, hvor du logger ind.</li>
+    <li><b>GitHub</b> (projektet <b>budget-og-mad</b>): her ligger hjemmesiden på nettet, så andre kan åbne den. Du skal ikke gøre noget der – nye versioner kommer derop, når du har sagt ja.</li>
+    <li><b>Supabase</b> (supabase.com): her ligger koderne til login. Ingen af brugernes tal ligger der.</li>
+    <li><b>Claude</b> (dit projekt »App med bygget og opskrifter…«): her beder du om ændringer. Du får billeder at se, og intet kommer ud, før du skriver <b>ja</b>.</li>
+    <li><b>Linket til appen:</b> det, du sender til folk (se nedenfor).</li>
+   </ul>
+   <p><b>🔗 Appen</b><br>Linket du sender til folk:<br><span style="word-break:break-all">${APP_LINK}</span></p>
+   <p><b>👥 Giv en person adgang</b><br>Skriv navnet her ovenfor → tryk <b>Lav kode</b> → tryk <b>Send</b>. Så får de link og kode i en sms.<br>Vil du lukke for en person: tryk <b>⛔ Sluk</b> ved deres kode. Du kan tænde den igen.</p>
+   <p><b>🔑 Din egen kode</b><br>Hold den for dig selv. Det er den, der viser denne side.</p>
+   <p><b>🗄️ Supabase – her ligger koderne</b><br>Gå til supabase.com → <b>Sign in</b> → <b>Continue with GitHub</b> → vælg projektet → <b>Table Editor</b> → <b>koder</b>. Der kan du også se alle koder.<br>Det er gratis. Bruges appen ikke i en uge, kan Supabase sætte den på pause. Så log ind og tryk <b>Restore project</b>.<br>Del aldrig <b>secret key</b> eller adgangskoden med nogen.</p>
+   <p><b>🐙 GitHub – her ligger selve appen</b><br>github.com → log ind → <b>budget-og-mad</b>. Du skal ikke gøre noget der. Nye versioner bliver lagt op, når du har sagt ja.</p>
+   <p><b>📲 Læg appen på en iPhone</b><br>Åbn linket i <b>Safari</b> → tryk på <b>Del</b> (firkant med pil op) → <b>Føj til hjemmeskærm</b> → <b>Tilføj</b>.</p>
+   <p style="margin-bottom:0"><b>✨ Ny version</b><br>Appen viser selv <b>Ny opdatering</b> → tryk <b>Opdater nu</b>. Kommer den ikke: luk appen helt og åbn den igen.</p>
+   </div></details>
   <b>Alle koder</b>${liste}
   <div class="row" style="margin-top:12px"><button class="l" style="flex:1" onclick="ejerNy=null;dlg.close()">Luk</button></div>`;
 }
