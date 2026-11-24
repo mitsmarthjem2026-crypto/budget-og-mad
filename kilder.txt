@@ -273,3 +273,4 @@ Markedsføring
 Tjenester nævnt i privatlivsteksten
 - GitHub General Privacy Statement (IP-adresse m.m. logges): https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement
 - Supabase (kodetjek), jsDelivr (hjælpeprogrammer), Open Food Facts (stregkode-opslag) – se tjenesternes egne privatlivspolitikker.
+- Supabase-projektets region: West EU (Ireland), eu-west-1 (fra ejerens skærmbillede af Supabase, 24/11-2026).
