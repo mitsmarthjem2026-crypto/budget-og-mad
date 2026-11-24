@@ -268,14 +268,22 @@ button.b,label.b{box-shadow:0 6px 16px rgba(232,85,62,.3)}
 @media (max-width:350px){nav button{font-size:9.5px}.tile{height:135px}.tn{font-size:19px}}
 </style>
 <style>@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}</style>
-<style>#nav{justify-content:space-between}#nav button{flex:0 0 auto;min-width:96px;padding-left:14px;padding-right:14px}</style>
+<style>#nav{justify-content:space-between}#nav button{flex:0 0 auto;min-width:96px;padding-left:14px;padding-right:14px}
+header{display:none!important}
+body{padding-top:env(safe-area-inset-top)}
+#nav{align-items:center}
+#nav #fortrydknap,#nav #instknap{min-width:0;flex-direction:column;align-items:center;justify-content:center;background:var(--acc2)!important;color:var(--txt)!important;border:0!important;border-radius:16px!important;padding:5px 10px!important;font-size:19px!important;line-height:1.2;font-weight:700}
+#nav #fortrydknap:not([hidden]),#nav #instknap{display:flex}
+#nav .ftxt,#nav .itxt{display:block!important;font-size:11px;font-weight:700}</style>
 </head>
 <body>
 <header><h1><img src="ikoner/ikon-192.png" alt="" style="width:1.3em;height:1.3em;border-radius:.3em;vertical-align:-.3em;margin-right:.35em">Budget og Mad</h1><button id="instknap" onclick="visGuide()" style="display:none;border:1px solid #fff;background:none;color:#fff;border-radius:10px;padding:6px 10px;font:inherit;font-size:14px;cursor:pointer">📲<span class="itxt"> Installér</span></button><button id="fortrydknap" hidden onclick="fortrydSidste()">↩️<span class="ftxt"> Fortryd</span></button><span class="ver" id="ver">version 43</span></header>
 <nav id="nav">
   <button data-p="forside"><span class="ic">🏠</span>Hjem</button>
+  <span id="navmidt" style="display:flex;gap:6px"></span>
   <button data-p="indstil" title="Indstillinger"><span class="ic">⚙️</span>Indstillinger</button>
 </nav>
+<script>(function(){var m=document.getElementById('navmidt');['instknap','fortrydknap'].forEach(function(i){var b=document.getElementById(i);if(b&&m)m.appendChild(b)})})()</script>
 <main id="main"></main>
 <div class="toast" id="toast"><span id="tmsg"></span><button id="tundo">Fortryd</button></div>
 <dialog id="dlg"><div class="in" id="dlgin"></div></dialog>
@@ -461,12 +469,12 @@ budget(){
 function ugenr(d){d=new Date(Date.UTC(d.getFullYear(),d.getMonth(),d.getDate()));const n=d.getUTCDay()||7;d.setUTCDate(d.getUTCDate()+4-n);const y=new Date(Date.UTC(d.getUTCFullYear(),0,1));return Math.ceil(((d-y)/864e5+1)/7)}
 
 function vis(){
-  document.querySelectorAll('#nav button').forEach(b=>b.classList.toggle('on',b.dataset.p===side));
+  document.querySelectorAll('#nav button[data-p]').forEach(b=>b.classList.toggle('on',b.dataset.p===side));
   document.getElementById('main').innerHTML=(side!=='forside'?banner(side):'')+SIDER[side]();
   const s=document.getElementById('soeg');if(s){s.oninput=()=>{window._q=s.value;const p=s.selectionStart;vis();const n=document.getElementById('soeg');n.focus();n.setSelectionRange(p,p)}}
   [['nyvare',tilfojVare],['nylager',tilfojLager],['ubelob',tilfojUdgift],['ibelob',tilfojInd],['hurtig',hurtigTekst],['fbelob',tilfojFast]].forEach(([i,f])=>{const e=document.getElementById(i);if(e)e.onkeydown=ev=>{if(ev.key==='Enter')f()}});
 }
-document.querySelectorAll('#nav button').forEach(b=>b.onclick=()=>{if(b.dataset.p==='indstil'){visIndstillinger();return}side=b.dataset.p;localStorage.setItem(KEY+'-side',side);vis();scrollTo(0,0)});
+document.querySelectorAll('#nav button[data-p]').forEach(b=>b.onclick=()=>{if(b.dataset.p==='indstil'){visIndstillinger();return}side=b.dataset.p;localStorage.setItem(KEY+'-side',side);vis();scrollTo(0,0)});
 
 // Opskrifter
 const dlg=document.getElementById('dlg'),dlgin=document.getElementById('dlgin');dlg.addEventListener('close',()=>{window._enKat=null;if(window.speechSynthesis)speechSynthesis.cancel()});
