@@ -211,6 +211,7 @@ a.tilbud{font-size:12px;font-weight:700;color:var(--acc);text-decoration:none;ba
 .list li{position:relative;touch-action:pan-y}
 button.x{font-size:18px}
 .chips.kats .chip{font-size:14px;padding:7px 12px;box-shadow:none;background:var(--felt)}.chips.kats .chip.on{background:var(--grad)}
+.madidag{background:linear-gradient(135deg,#fff3e6,#ffe9ef)}@media (prefers-color-scheme:dark){.madidag{background:linear-gradient(135deg,#2b1d12,#2b1520)}}
 /* Version 8: fotofarver og forside */
 :root{--bg:#fff6ef;--acc:#e8553e;--acc2:#ffe7df;--grad:linear-gradient(135deg,#ff8a3d 0%,#e8364f 100%);--felt:#fff1e9;--line:#f1e2d8}
 @media (prefers-color-scheme:dark){:root{--bg:#140d0a;--card:#211612;--acc:#ff8a5c;--acc2:#3a1d14;--felt:#1a110d;--line:#3a2a22}}
@@ -258,7 +259,7 @@ button.b,label.b{box-shadow:0 6px 16px rgba(232,85,62,.3)}
 <dialog id="dlg"><div class="in" id="dlgin"></div></dialog>
 
 <script>
-const KEY='madapp-v1';const APP_VERSION=15, EJER='Søren';
+const KEY='madapp-v1';const APP_VERSION=16, EJER='Søren';
 let D=JSON.parse(localStorage.getItem(KEY)||'null')||{opskrifter:[],indkob:[],lager:[],madplan:{},budget:{maaned:0,udgifter:[]}};
 
 // Faste opskrifter (klassiske, billige retter). Fotos: se kilder.txt
@@ -390,6 +391,7 @@ budget(){
   <div class="big" style="font-size:40px;color:${tilbage<0?'var(--warn)':'var(--acc)'}">${kr(tilbage)}</div>
   ${erNu&&tilbage>0?`<div class="muted">Det er ca. ${kr(Math.floor(tilbage/dageIgen))} pr. dag resten af måneden (${dageIgen} dage)</div>`:''}
   <div class="row" style="justify-content:center;gap:18px;margin-top:10px"><span>💵 Ind: <b>${kr(sumInd)}</b></span><span>🏠 Faste: <b>${kr(sumFaste)}</b></span><span>🛒 Køb: <b>${kr(brugt)}</b></span>${D.budget.maal.length?`<span>🐷 Sparet: <b>${kr(sparetMd)}</b></span>`:''}</div></div>
+  ${madIDagKort(md,erNu,dageIgen)}
   ${tipsKort(sumInd,sumFaste,brugt,tilbage,erNu)}
   <div class="card" style="border:2px solid var(--acc)"><b>⚡ Hurtigt: sig det, skriv det eller tag et billede</b>
   <div class="muted" style="margin:4px 0 8px">Fx »løn 12.000«, »husleje 4500« eller »Netto 250«</div>
@@ -402,10 +404,11 @@ budget(){
    <div class="row" style="margin-top:8px"><button class="b" onclick="gemForslag()">✓ Gem</button><button class="l" onclick="fs=null;hStatus='';vis()">Annullér</button></div></div>`:''}</div>
   <div class="card"><b>💵 Penge ind</b> <span class="muted">– fx løn eller SU, når du får den</span>
   <div class="row" style="margin-top:8px"><input class="grow" id="itekst" placeholder="Løn" value="Løn"><input type="text" inputmode="decimal" id="ibelob" placeholder="kr" style="width:120px"><button class="b" onclick="tilfojInd()">Tilføj</button></div>
-  <ul class="list">${ind.map(x=>`<li><span class="muted" style="width:70px">${kort(x)}</span><span class="n">${esc(x.tekst)}</span><b>${kr(x.belob)}</b><button class="x" title="Slet" onclick="sletInd('${x.id}')">🗑️</button></li>`).join('')}</ul></div>
-  <div class="card"><b>🏠 Faste udgifter hver måned</b> <span class="muted">– fx husleje, mobil, transport</span>
-  <div class="row" style="margin-top:8px"><input class="grow" id="ftekst" placeholder="Fx Husleje"><input type="text" inputmode="decimal" id="fbelob" placeholder="kr" style="width:120px"><button class="b" onclick="tilfojFast()">Tilføj</button></div>
-  <ul class="list">${D.budget.faste.map(x=>`<li><span class="n">${esc(x.tekst)}</span><b>${kr(x.belob)}</b><button class="x" title="Slet" onclick="sletFast('${x.id}')">🗑️</button></li>`).join('')}</ul></div>
+  <ul class="list">${ind.map(x=>`<li><span class="muted" style="width:70px">${kort(x)}</span><span class="n">${esc(x.tekst)}</span><b>${kr(x.belob)}</b><button class="x" title="Ret" onclick="retPost('ind','${x.id}')">✏️</button><button class="x" title="Slet" onclick="sletInd('${x.id}')">🗑️</button></li>`).join('')}</ul></div>
+  <div class="card"><b>🏦 Bank-budget – faste udgifter</b> <span class="muted">– det, der går fra i banken hver måned, fx husleje, mobil, transport</span>
+  <div class="row" style="margin-top:8px"><input class="grow" id="ftekst" placeholder="Fx Husleje"><input type="text" inputmode="decimal" id="fbelob" placeholder="kr" style="width:110px"><input type="number" min="1" max="31" id="fdag" placeholder="dag" title="Hvilken dag i måneden betales den?" style="width:80px"><button class="b" onclick="tilfojFast()">Tilføj</button></div>
+  <ul class="list">${[...D.budget.faste].sort((a,b)=>(a.dag||99)-(b.dag||99)).map(x=>`<li><span class="muted" style="width:52px">${x.dag?'d. '+x.dag:''}</span><span class="n">${esc(x.tekst)}</span><b>${kr(x.belob)}</b><button class="x" title="Ret" onclick="retPost('fast','${x.id}')">✏️</button><button class="x" title="Slet" onclick="sletFast('${x.id}')">🗑️</button></li>`).join('')}</ul>
+  ${D.budget.faste.length?`<div class="row" style="justify-content:space-between;margin-top:8px;font-weight:700"><span>I alt pr. måned: ${kr(sumFaste)}</span><span class="muted">pr. år: ${kr(sumFaste*12)}</span></div>`:''}</div>
   ${opsparingKort()}
   <h2 style="margin-top:22px">🛒 Køb</h2>
   <div class="card"><div class="row"><label style="margin:0">Budget til mad pr. måned</label><input type="text" inputmode="decimal" id="mbudget" value="${b||''}" placeholder="kr" style="width:140px"><button class="l" onclick="setBudget()">Gem</button></div>
@@ -414,7 +417,7 @@ budget(){
   <div class="card"><div class="muted">Tilbage</div><div class="big" style="color:${b&&brugt>b?'var(--warn)':'inherit'}">${b?kr(b-brugt):'–'}</div></div>
   <div class="card"><div class="muted">Antal køb</div><div class="big">${u.length}</div></div></div>
   <div class="card"><div class="row"><input type="date" id="udato" value="${datoIMd()}"><input class="grow" id="utekst" placeholder="Fx Netto"><input type="text" inputmode="decimal" id="ubelob" placeholder="kr" style="width:110px"><button class="b" onclick="tilfojUdgift()">Tilføj</button></div></div>
-  <div class="card"><ul class="list">${u.length?u.map(x=>`<li><span class="muted" style="width:70px">${new Date(x.dato).toLocaleDateString('da-DK',{day:'numeric',month:'short'})}</span><span class="n">${esc(x.tekst)}</span><b>${kr(x.belob)}</b><button class="x" onclick="sletUdgift('${x.id}')">🗑️</button></li>`).join(''):'<li class="empty" style="justify-content:center">Ingen køb i denne måned.</li>'}</ul></div>
+  <div class="card"><ul class="list">${u.length?u.map(x=>`<li><span class="muted" style="width:70px">${new Date(x.dato).toLocaleDateString('da-DK',{day:'numeric',month:'short'})}</span><span class="n">${esc(x.tekst)}</span><b>${kr(x.belob)}</b><button class="x" title="Ret" onclick="retPost('kob','${x.id}')">✏️</button><button class="x" title="Slet" onclick="sletUdgift('${x.id}')">🗑️</button></li>`).join(''):'<li class="empty" style="justify-content:center">Ingen køb i denne måned.</li>'}</ul></div>
   <div class="card"><b>📄 CSV-fil</b><p class="muted">Gem ${navn} som en fil, der kan åbnes i Excel.</p><button class="b" onclick="csv()">⬇ Gem som CSV</button></div>
   <div class="card"><b>Sikkerhedskopi</b><p class="muted">Gem alle dine data i en fil, eller hent dem igen.</p><div class="row"><button class="l" onclick="eksport()">⬇ Gem kopi</button><label class="l" style="margin:0;cursor:pointer;color:inherit;border:1px solid var(--line);border-radius:10px;padding:9px 14px">⬆ Hent kopi<input type="file" accept=".json" onchange="importer(this)" hidden></label></div></div>`;
 }};
@@ -516,9 +519,9 @@ function skiftMd(n){const d=new Date(budgetMd+'-01');d.setMonth(d.getMonth()+n);
 function datoIMd(){const i=iso(new Date());return i.slice(0,7)===budgetMd?i:budgetMd+'-01'}
 function tal(id){let v=String(document.getElementById(id).value).replace(/\s|kr\.?/gi,'');if(v.includes(','))v=v.replace(/\./g,'').replace(',','.');else if(/^\d{1,3}(\.\d{3})+$/.test(v))v=v.replace(/\./g,'');return parseFloat(v)}
 function tilfojInd(){const b=tal('ibelob');if(!b){alert('Skriv et beløb');return}D.budget.ind.push({id:id(),dato:datoIMd(),tekst:document.getElementById('itekst').value.trim()||'Løn',belob:b});save();vis();toast('Penge ind er gemt')}
-function sletInd(x){const s=snap();D.budget.ind=D.budget.ind.filter(y=>y.id!==x);save();vis();toast('Slettet',fortrydTil(s))}
-function tilfojFast(){const b=tal('fbelob'),t=document.getElementById('ftekst').value.trim();if(!t||!b){alert('Skriv navn og beløb');return}D.budget.faste.push({id:id(),tekst:t,belob:b});save();vis();toast('Fast udgift er gemt')}
-function sletFast(x){const s=snap();D.budget.faste=D.budget.faste.filter(y=>y.id!==x);save();vis();toast('Slettet',fortrydTil(s))}
+function sletInd(x){const p=D.budget.ind.find(y=>y.id===x);if(!sikker(p&&p.tekst))return;const s=snap();D.budget.ind=D.budget.ind.filter(y=>y.id!==x);save();vis();toast('Slettet',fortrydTil(s))}
+function tilfojFast(){const b=tal('fbelob'),t=document.getElementById('ftekst').value.trim(),dg=parseInt(document.getElementById('fdag').value)||null;if(!t||!b){alert('Skriv navn og beløb');return}D.budget.faste.push({id:id(),tekst:t,belob:b,dag:dg&&dg>=1&&dg<=31?dg:null});save();vis();toast('Fast udgift er gemt')}
+function sletFast(x){const p=D.budget.faste.find(y=>y.id===x);if(!sikker(p&&p.tekst))return;const s=snap();D.budget.faste=D.budget.faste.filter(y=>y.id!==x);save();vis();toast('Slettet',fortrydTil(s))}
 function csv(){
   const md=budgetMd,f=n=>String(Math.round(n*100)/100).replace('.',','),q=t=>'"'+String(t).replace(/"/g,'""')+'"';
   const r=[['Dato','Type','Tekst','Beløb (kr)']];
@@ -545,7 +548,7 @@ function opsparingKort(){
 function nytMaal(){const n=document.getElementById('mnavn').value.trim(),b=tal('mbelob');if(!n||!b){alert('Skriv hvad du sparer op til og hvor meget');return}D.budget.maal.push({id:id(),navn:n,emoji:maalEmoji(n),maal:b,ind:[]});save();vis();toast('Nyt sparemål: '+n+' 🐷')}
 function spar(gid,fortegn){const g=D.budget.maal.find(x=>x.id===gid),b=tal('ms-'+gid);if(!b){alert('Skriv et beløb');return}const s=snap(),har=g.ind.reduce((a,x)=>a+x.belob,0);if(fortegn<0&&b>har){alert('Der er kun '+kr(har)+' på opsparingen');return}
   g.ind.push({dato:datoIMd(),belob:fortegn*b});save();vis();const ny=har+fortegn*b;toast(fortegn>0?(ny>=g.maal?'🎉 Du har nået dit mål!':'+'+kr(b)+' til '+g.navn+' 🐷'):kr(b)+' taget ud',fortrydTil(s))}
-function sletMaal(gid){const s=snap();D.budget.maal=D.budget.maal.filter(x=>x.id!==gid);save();vis();toast('Sparemålet er slettet',fortrydTil(s))}
+function sletMaal(gid){const p=D.budget.maal.find(y=>y.id===gid);if(!sikker(p&&p.navn))return;const s=snap();D.budget.maal=D.budget.maal.filter(x=>x.id!==gid);save();vis();toast('Sparemålet er slettet',fortrydTil(s))}
 // Lager -> opskrifter
 function kanLave(){
   if(!D.lager.length)return '';
@@ -651,7 +654,7 @@ async function kvittering(inp){
     visForslag(k,k.belob!=null?'Fundet på kvitteringen. Tjek at det passer.':'Jeg kunne ikke finde totalen. Skriv beløbet selv.');
   }catch(e){hStatus=e.message==='net'?'Kræver internet første gang. Prøv igen, når du er online.':'Billedet kunne ikke læses. Prøv et skarpere billede.';vis()}
 }
-function sletUdgift(uid){const s=snap();D.budget.udgifter=D.budget.udgifter.filter(x=>x.id!==uid);save();vis();toast('Købet er slettet',fortrydTil(s))}
+function sletUdgift(uid){const p=D.budget.udgifter.find(y=>y.id===uid);if(!sikker(p&&p.tekst))return;const s=snap();D.budget.udgifter=D.budget.udgifter.filter(x=>x.id!==uid);save();vis();toast('Købet er slettet',fortrydTil(s))}
 async function eksport(){const navn='budget-og-mad-kopi-'+iso(new Date())+'.json',blob=new Blob([tilGem()],{type:'application/json'});
   const fil=new File([blob],navn,{type:'application/json'});
   if(navigator.canShare&&navigator.canShare({files:[fil]})){try{await navigator.share({files:[fil],title:'Kopi af Budget og Mad'});localStorage.setItem(KEY+'-sidstkopi',Date.now());toast('Kopien er gemt 💾');vis();return}catch(e){if(e.name==='AbortError')return}}
@@ -756,6 +759,41 @@ function rydDag(k){const s=snap();delete D.madplan[k];save();vis();toast('Dagen 
   m.addEventListener('touchend',e=>{if(!li)return;const dx=(e.changedTouches[0].clientX-x0);li.style.transition='transform .2s';if(dx<-70){li.style.transform='translateX(-110%)';const b=li.querySelector('button.x');setTimeout(()=>b&&b.click(),180)}else{li.style.transform='';li.style.background=''}li=null});
 })();
 visFortrydKnap();
+
+// ---------- Budget: mad i dag, ret poster, sikker sletning (version 16) ----------
+function sikker(navn){return confirm('Er du helt sikker på, at du vil slette »'+(navn||'dette')+'«?\n\nDu kan fortryde bagefter med ↩️ Fortryd.')}
+function madIDagKort(md,erNu,dageIgen){
+  const b=D.budget.maaned||0;
+  if(!erNu)return '';
+  if(!b)return `<div class="card madidag"><b>🍽️ Penge til mad hver dag</b><p class="muted" style="margin:4px 0 8px">Skriv, hvad du vil bruge på mad om måneden. Så viser appen, hvad du kan bruge i dag.</p><div class="row"><input id="mbudget2" class="grow" type="text" inputmode="decimal" placeholder="Fx 2.000 kr"><button class="b" onclick="setBudget2()">Gem</button></div></div>`;
+  const idag=iso(new Date()),man=mandag(new Date());
+  const u=D.budget.udgifter.filter(x=>x.dato.slice(0,7)===md);
+  const brugtIdag=u.filter(x=>x.dato===idag).reduce((s,x)=>s+x.belob,0),brugtFoer=u.filter(x=>x.dato<idag).reduce((s,x)=>s+x.belob,0);
+  const brugtUge=u.filter(x=>new Date(x.dato)>=man&&x.dato<=idag).reduce((s,x)=>s+x.belob,0);
+  const dage=new Date(+md.slice(0,4),+md.slice(5,7),0).getDate(),ugeBudget=b/dage*7;
+  const dagsBudget=Math.max(0,(b-brugtFoer)/dageIgen),rest=dagsBudget-brugtIdag,pct=dagsBudget?Math.min(100,brugtIdag/dagsBudget*100):100;
+  return `<div class="card madidag"><div class="row"><span style="font-size:34px">🍽️</span><div style="flex:1"><div class="muted">Penge til mad i dag</div><div class="big" style="color:${rest<0?'var(--warn)':'var(--acc)'}">${kr(Math.floor(rest))}</div></div></div>
+  <div class="bar"><i class="${rest<0?'over':''}" style="width:${pct}%"></i></div>
+  <div class="row" style="justify-content:space-between;font-size:14px"><span>Brugt i dag: <b>${kr(brugtIdag)}</b></span><span>Denne uge: <b>${kr(brugtUge)}</b> af ${kr(Math.round(ugeBudget))}</span></div>
+  <div class="muted" style="font-size:13px;margin-top:4px">${rest<0?'Du har brugt lidt mere end dagens beløb. Det fordeles ud på resten af måneden.':'Bruger du mindre i dag, får du mere de næste dage.'} Madbudget: ${kr(b)} om måneden.</div></div>`;
+}
+function setBudget2(){const v=tal('mbudget2');if(!v){alert('Skriv et beløb');return}const s=snap();D.budget.maaned=v;save();vis();toast('Madbudget gemt 🍽️',fortrydTil(s))}
+function retPost(type,pid){
+  const liste=type==='ind'?D.budget.ind:type==='fast'?D.budget.faste:D.budget.udgifter,p=liste.find(x=>x.id===pid);if(!p)return;
+  dlgin.innerHTML=`<h2>✏️ Ret ${type==='ind'?'penge ind':type==='fast'?'fast udgift':'køb'}</h2>
+  <label>Tekst</label><input id="rtekst" style="width:100%" value="${esc(p.tekst)}">
+  <label>Beløb (kr)</label><input id="rbelob" type="text" inputmode="decimal" style="width:100%" value="${String(p.belob).replace('.',',')}">
+  ${type==='fast'?`<label>Betales dag i måneden (valgfrit)</label><input id="rdag" type="number" min="1" max="31" style="width:100%" value="${p.dag||''}">`:`<label>Dato</label><input id="rdato" type="date" style="width:100%" value="${p.dato}">`}
+  <div class="row" style="margin-top:14px"><button class="b" style="flex:1" onclick="gemRet('${type}','${pid}')">✓ Gem</button><button class="l" onclick="dlg.close()">Annullér</button></div>`;
+  dlg.showModal();
+}
+function gemRet(type,pid){
+  const liste=type==='ind'?D.budget.ind:type==='fast'?D.budget.faste:D.budget.udgifter,p=liste.find(x=>x.id===pid);if(!p)return;
+  const b=tal('rbelob'),tx=document.getElementById('rtekst').value.trim();if(!b||!tx){alert('Skriv tekst og beløb');return}
+  const s=snap();p.tekst=tx;p.belob=b;
+  if(type==='fast'){const dg=parseInt(document.getElementById('rdag').value)||null;p.dag=dg&&dg>=1&&dg<=31?dg:null}else{const d=document.getElementById('rdato').value;if(d)p.dato=d}
+  save();dlg.close();vis();toast('Rettet ✔',fortrydTil(s));
+}
 
 // ---------- Gemte indkøbslister (version 14) ----------
 function sletHeleListen(){const n=D.indkob.filter(x=>!x.kobt).length;if(!n)return;const s=snap();D.indkob=D.indkob.filter(x=>x.kobt);save();vis();toast(n+' varer slettet 🗑️',fortrydTil(s))}
