@@ -25,7 +25,7 @@ Kylling i karry: Rimsha Noor – https://unsplash.com/photos/tsQhEvzU6MQ
 Spaghetti med kødsovs: Homescreenify – https://unsplash.com/photos/sA3wymYqyaI
 Chili sin carne: micheile henderson – https://unsplash.com/photos/FhMB8pMge5U
 Havregrød: Mae Mu – https://unsplash.com/photos/t-0rX27Xiy0
-Ingen foto endnu (intet passende gratis foto fundet): Æggekage, Hakkebøf, Øllebrød.
+Ingen foto endnu (intet passende gratis foto fundet): Æggekage, Hakkebøf, Øllebrød, Fiskefrikadeller, Stegt flæsk, Kyllingesuppe.
 
 Version 9 – startbillede, ikon og billedgalleri (Unsplash, gratis efter Unsplash-licensen, hentet 24-11-2026):
 Madlavning derhjemme (startbillede og ikon): Odiseo Castrejon – https://unsplash.com/photos/bG5rhvRH0JM
@@ -35,3 +35,19 @@ Madlavning udenfor: Andrii Solok – https://unsplash.com/photos/9JPeuyoINMA
 Fyldt bord: Spencer Davis – https://unsplash.com/photos/vJsj-hgOEG0
 Slik og hygge: Brunno Tozzo – https://unsplash.com/photos/yZCMZcKN3L4
 Frugt og bær: Collab Media – https://unsplash.com/photos/Lsurr0Uhaw0
+
+Version 10 – fotos af nye retter (Unsplash, gratis efter Unsplash-licensen, hentet 24-11-2026):
+Lasagne: Emanuel Ekström – https://unsplash.com/photos/flEUTTwGlJQ
+Tomatsuppe: Ella Olsson – https://unsplash.com/photos/fxJTl_gDh28
+Rød linsesuppe: Karyna Panchenko – https://unsplash.com/photos/2beCqCd8mAc
+Stegte ris: Jay Nlper – https://unsplash.com/photos/XciY4hwqnNk
+Carbonara: Karolina Kołodziejczak – https://unsplash.com/photos/dvgjof0_TP8
+Shakshuka: AN Photography – https://unsplash.com/photos/KD93b4XevCQ
+Tacos: Joshua Soliz – https://unsplash.com/photos/4xwEQ6IIubA
+Pizza: Chad Montano – https://unsplash.com/photos/MqT0asuoIcU
+Kyllingewraps: Leanna Myers – https://unsplash.com/photos/0Pr5YeRW3Z4
+Pasta med pesto: Helen Van – https://unsplash.com/photos/2TMqlO-zqNY
+Æblecrumble: Diliara Garifullina – https://unsplash.com/photos/D7X-GMeTV7U
+
+Varedata ved scanning: Open Food Facts (gratis, åben database) – https://world.openfoodfacts.org
+Tilbud: links til søgning på eTilbudsavis – https://etilbudsavis.dk

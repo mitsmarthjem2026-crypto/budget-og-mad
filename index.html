@@ -197,6 +197,12 @@ dialog .dfoto{height:210px;background-size:cover;background-position:center;marg
 .gfoto{position:relative;height:110px;border:3px solid transparent;border-radius:16px;background-size:cover;background-position:center;cursor:pointer;overflow:hidden;padding:0}
 .gfoto.on{border-color:var(--acc);box-shadow:0 0 0 3px var(--acc2)}
 .gfoto span{position:absolute;left:0;right:0;bottom:0;padding:6px 8px;background:linear-gradient(transparent,rgba(0,0,0,.7));color:#fff;font:inherit;font-size:13px;font-weight:700;text-align:left}
+
+.infobar{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:12px 0 4px;text-align:center}
+.infobar span{background:var(--felt);border-radius:16px;padding:10px 6px;line-height:1.25}.infobar small{color:var(--muted);font-size:12px}
+a.tilbud{font-size:12px;font-weight:700;color:var(--acc);text-decoration:none;background:var(--acc2);padding:2px 8px;border-radius:10px;margin-left:6px;white-space:nowrap}
+.hjknap{width:100%;margin-top:14px;border:0;border-radius:22px;padding:16px;display:grid;grid-template-columns:auto 1fr;grid-template-rows:auto auto;column-gap:14px;align-items:center;text-align:left;background:linear-gradient(135deg,#a855f7,#ff4d8d);color:#fff;font:inherit;cursor:pointer;box-shadow:0 8px 22px rgba(168,85,247,.35);transition:transform .12s}
+.hjknap:active{transform:scale(.97)}.hjknap span{grid-row:1/3;font-size:32px}.hjknap b{font-size:19px}.hjknap small{opacity:.9}
 /* Version 8: fotofarver og forside */
 :root{--bg:#fff6ef;--acc:#e8553e;--acc2:#ffe7df;--grad:linear-gradient(135deg,#ff8a3d 0%,#e8364f 100%);--felt:#fff1e9;--line:#f1e2d8}
 @media (prefers-color-scheme:dark){:root{--bg:#140d0a;--card:#211612;--acc:#ff8a5c;--acc2:#3a1d14;--felt:#1a110d;--line:#3a2a22}}
@@ -244,7 +250,7 @@ button.b,label.b{box-shadow:0 6px 16px rgba(232,85,62,.3)}
 <dialog id="dlg"><div class="in" id="dlgin"></div></dialog>
 
 <script>
-const KEY='madapp-v1';const APP_VERSION=9, EJER='Søren';
+const KEY='madapp-v1';const APP_VERSION=10, EJER='Søren';
 let D=JSON.parse(localStorage.getItem(KEY)||'null')||{opskrifter:[],indkob:[],lager:[],madplan:{},budget:{maaned:0,udgifter:[]}};
 
 // Faste opskrifter (klassiske, billige retter). Fotos: se kilder.txt
@@ -296,11 +302,53 @@ const STD_OPSKRIFTER=[
  trin:['Kog risene efter pakken.','Hak løg og hvidløg. Skær peberfrugt og gulerødder i små tern.','Svits grøntsagerne i olie i 5 minutter. Rør chili og spidskommen i.','Kom tomater, skyllede bønner og majs i.','Lad det simre i 20 minutter. Smag til med salt.','Server med ris og gerne lidt yoghurt naturel.']},
 {id:'std-havregroed',navn:'Havregrød',foto:'fotos/retter/havregrod.jpg',tid:10,portioner:2,tags:['dansk','vegetar','hurtig'],
  ing:['2 dl havregryn','4 dl vand','1 knsp salt','1 æble','2 dl mælk'],
- trin:['Kom havregryn og vand i en gryde.','Kog op under omrøring, og lad grøden simre 3–5 minutter.','Rør salt i.','Top med æble i tern og kold mælk. Kanel er også godt.']}
+ trin:['Kom havregryn og vand i en gryde.','Kog op under omrøring, og lad grøden simre 3–5 minutter.','Rør salt i.','Top med æble i tern og kold mælk. Kanel er også godt.']},
+{id:'std-lasagne',navn:'Lasagne',foto:'fotos/retter/lasagne.jpg',tid:75,portioner:4,tags:[],
+ ing:['500 g hakket oksekød','1 løg','2 fed hvidløg','2 gulerødder','2 dåser hakkede tomater','2 spsk tomatpuré','1 tsk oregano','250 g lasagneplader','50 g smør','4 spsk hvedemel','7 dl mælk','100 g revet ost','1 tsk salt','1 knsp peber'],
+ trin:['Brun kødet i en gryde. Kom hakket løg, hvidløg og revne gulerødder i.','Tilsæt tomater, tomatpuré og oregano. Lad kødsovsen simre 15 minutter. Smag til med salt og peber.','Lav hvid sovs: Smelt smørret, rør melet i, og pisk mælken i lidt ad gangen. Kog 3 minutter under omrøring.','Læg lag i et ovnfast fad: kødsovs, lasagneplader, hvid sovs. Gentag, og slut med hvid sovs.','Drys osten over. Bag ved 200 °C i ca. 35 minutter, til pladerne er møre.']},
+{id:'std-tomatsuppe',navn:'Tomatsuppe',foto:'fotos/retter/tomatsuppe.jpg',tid:30,portioner:4,tags:['vegetar','hurtig'],
+ ing:['1 løg','2 fed hvidløg','2 spsk olie','2 dåser hakkede tomater','1 l vand','1 stk bouillonterning','1 dl madlavningsfløde','1 tsk sukker','1 tsk salt','1 knsp peber'],
+ trin:['Hak løg og hvidløg, og svits dem i olie i 3 minutter.','Kom tomater, vand og bouillon i. Kog i 15 minutter.','Blend suppen glat.','Rør fløde og sukker i, og smag til med salt og peber.','Server med brød – eller kogte makaroner i suppen.']},
+{id:'std-linsesuppe',navn:'Rød linsesuppe',foto:'fotos/retter/linsesuppe.jpg',tid:30,portioner:4,tags:['vegetar','hurtig'],
+ ing:['250 g røde linser','1 løg','2 gulerødder','2 fed hvidløg','2 spsk olie','2 tsk karry','1 dåse hakkede tomater','1 l vand','1 stk bouillonterning','1 tsk salt'],
+ trin:['Hak løg og hvidløg, og skær gulerødderne i små tern.','Svits grøntsagerne i olie med karry i 3 minutter.','Skyl linserne, og kom dem i gryden med tomater, vand og bouillon.','Kog i 15–20 minutter, til linserne er helt møre.','Blend suppen, eller lad den være grov. Smag til med salt.']},
+{id:'std-stegt-ris',navn:'Stegte ris med æg',foto:'fotos/retter/stegtris.jpg',tid:20,portioner:2,tags:['vegetar','hurtig','rester'],
+ ing:['5 dl kogte ris','3 æg','1 løg','200 g frosne ærter','2 spsk olie','3 spsk soja'],
+ trin:['Brug gerne ris fra i går – de bliver bedst.','Hak løget, og steg det i olie på en stor pande.','Kom ris og ærter på, og steg ved høj varme i 5 minutter.','Skub risene til side, slå æggene ud på panden, og rør dem til de stivner.','Bland det hele, og smag til med soja.']},
+{id:'std-carbonara',navn:'Pasta carbonara',foto:'fotos/retter/carbonara.jpg',tid:20,portioner:4,tags:['hurtig'],
+ ing:['400 g spaghetti','200 g bacon','3 æg','100 g revet parmesan','1 knsp peber','1 tsk salt'],
+ trin:['Kog spaghettien i saltet vand efter pakken. Gem 1 dl af kogevandet.','Steg baconen sprød i tern.','Pisk æg og ost sammen i en skål.','Hæld vandet fra pastaen, og kom den på panden med baconen. Tag panden af varmen.','Rør æggeblandingen og lidt kogevand i, så det bliver cremet. Drys med peber.']},
+{id:'std-shakshuka',navn:'Shakshuka',foto:'fotos/retter/shakshuka.jpg',tid:25,portioner:2,tags:['vegetar','hurtig'],
+ ing:['1 løg','1 stk rød peberfrugt','2 fed hvidløg','2 spsk olie','1 tsk spidskommen','1 tsk paprika','1 dåse hakkede tomater','4 æg','1 tsk salt'],
+ trin:['Hak løg, peberfrugt og hvidløg, og steg dem bløde i olie.','Rør krydderierne i, og kom tomaterne på. Lad det simre 8 minutter.','Lav 4 huller i sovsen, og slå et æg ud i hvert.','Læg låg på, og lad æggene stivne i 5–7 minutter.','Server med brød direkte fra panden.']},
+{id:'std-tacos',navn:'Tacos',foto:'fotos/retter/tacos.jpg',tid:25,portioner:4,tags:['hurtig'],
+ ing:['500 g hakket oksekød','1 løg','2 tsk chilipulver','1 tsk spidskommen','1 dåse hakkede tomater','8 stk tortillas','1 stk iceberg','2 tomater','100 g revet ost','1 tsk salt'],
+ trin:['Brun kødet med hakket løg.','Rør krydderier og tomater i, og lad det simre 10 minutter. Smag til med salt.','Snit salat og tomater.','Varm tortillas på en tør pande.','Fyld tortillas med kød, salat, tomat og ost.']},
+{id:'std-pizza',navn:'Hjemmelavet pizza',foto:'fotos/retter/pizza.jpg',tid:60,portioner:4,tags:['vegetar'],
+ ing:['5 dl hvedemel','2,5 dl vand','25 g gær','2 spsk olie','1 tsk salt','1 dåse hakkede tomater','1 tsk oregano','200 g revet mozzarella'],
+ trin:['Rør gæren ud i lunkent vand. Tilsæt olie, salt og mel, og ælt dejen smidig.','Lad dejen hæve tildækket i 30 minutter.','Rul dejen ud på en bageplade med bagepapir.','Smør tomat med oregano på, og drys osten over. Kom gerne rester af grøntsager på.','Bag ved 225 °C i 12–15 minutter.']},
+{id:'std-fiskefrikadeller',navn:'Fiskefrikadeller',foto:'',tid:35,portioner:4,tags:['dansk'],
+ ing:['500 g fiskefars','1 løg','1 æg','2 spsk hvedemel','1 dl mælk','2 spsk smør','1 kg kartofler','1 stk citron','1 tsk salt'],
+ trin:['Kog kartoflerne møre i ca. 20 minutter.','Rør fiskefarsen med revet løg, æg, mel og mælk. Smag til med salt.','Form frikadeller med en spiseske.','Steg dem i smør ved middel varme i ca. 4 minutter på hver side.','Server med kartofler, citronbåde og gerne remoulade.']},
+{id:'std-stegt-flaesk',navn:'Stegt flæsk med persillesovs',foto:'',tid:45,portioner:4,tags:['dansk'],
+ ing:['800 g skiver af stegeflæsk','1 kg kartofler','30 g smør','3 spsk hvedemel','5 dl mælk','1 bundt persille','1 tsk salt','1 knsp peber'],
+ trin:['Kog kartoflerne møre i ca. 20 minutter.','Drys flæsket med salt, og steg det sprødt på en pande eller i ovnen ved 200 °C i ca. 25 minutter.','Lav sovsen: Smelt smørret, rør melet i, og pisk mælken i lidt ad gangen. Kog 5 minutter.','Rør hakket persille i sovsen, og smag til med salt og peber.','Server flæsk med kartofler og persillesovs.']},
+{id:'std-wraps',navn:'Kyllingewraps',foto:'fotos/retter/wraps.jpg',tid:25,portioner:4,tags:['hurtig'],
+ ing:['400 g kyllingebryst','1 spsk olie','1 tsk paprika','8 stk tortillas','1 stk iceberg','2 tomater','1 agurk','2 dl creme fraiche','1 tsk salt'],
+ trin:['Skær kyllingen i strimler, krydr med paprika og salt, og steg dem gennem i olie.','Snit salat, tomat og agurk.','Varm tortillas kort på en tør pande.','Smør creme fraiche på, og fyld med kylling og grønt.','Rul dem sammen – perfekt som madpakke.']},
+{id:'std-pasta-pesto',navn:'Pasta med pesto',foto:'fotos/retter/pesto.jpg',tid:15,portioner:4,tags:['vegetar','hurtig'],
+ ing:['400 g pasta','1 glas grøn pesto','200 g frosne ærter','50 g revet parmesan','1 tsk salt'],
+ trin:['Kog pastaen i saltet vand efter pakken. Kom ærterne i de sidste 2 minutter.','Gem lidt kogevand, og hæld resten fra.','Rør pesto og lidt kogevand i pastaen.','Drys osten over og server.']},
+{id:'std-kyllingesuppe',navn:'Kyllingesuppe med nudler',foto:'',tid:35,portioner:4,tags:[],
+ ing:['400 g kyllingebryst','1 løg','3 gulerødder','2 stilke selleri','1,5 l vand','2 stk bouillonterning','150 g nudler','1 tsk salt'],
+ trin:['Hak løget, og skær gulerødder og selleri i skiver.','Kog vand og bouillon op, og kom grøntsagerne i. Kog 10 minutter.','Skær kyllingen i tern, kom den i, og kog i 10 minutter, til den er gennemkogt.','Kom nudlerne i de sidste 4 minutter.','Smag til med salt.']},
+{id:'std-aeblecrumble',navn:'Æblecrumble',foto:'fotos/retter/aeblecrumble.jpg',tid:40,portioner:4,tags:['vegetar'],
+ ing:['6 æbler','2 spsk sukker','1 tsk kanel','100 g hvedemel','100 g havregryn','100 g sukker','100 g smør'],
+ trin:['Skræl æblerne, skær dem i både, og læg dem i et ovnfast fad. Drys med sukker og kanel.','Smuldr mel, havregryn, sukker og smør sammen med fingrene.','Fordel smuldret over æblerne.','Bag ved 200 °C i ca. 25 minutter, til toppen er gylden.','Server lun – gerne med lidt yoghurt.']}
 ];
 const BASIS=['salt','peber','vand'];
 const norm=s=>String(s||'').toLowerCase().replace(/[^a-zæøå ]/g,' ').replace(/\s+/g,' ').trim();
-const STOP=['hakket','hakkede','kogte','kogt','frisk','friske','stk','og','af','til','rester','gerne'];
+const STOP=['hakket','hakkede','kogte','kogt','frisk','friske','frosne','stk','og','af','til','rester','gerne','skiver','glas','revet','revne','grøn','rød'];
 const tok=s=>norm(s).split(' ').filter(w=>w.length>1&&!STOP.includes(w));
 function iLager(navn){const n=norm(navn);if(BASIS.includes(n))return{basis:true};const w=tok(navn);if(!w.length)return null;return D.lager.find(l=>{const a=tok(l.navn);return a.length&&(a.every(x=>w.includes(x))||w.every(x=>a.includes(x)))})}
 const ENH={g:['m',1],kg:['m',1000],ml:['v',1],cl:['v',10],dl:['v',100],l:['v',1000]};
@@ -377,10 +425,10 @@ madplan(){
 },
 indkob(){
   const ikke=D.indkob.filter(x=>!x.kobt),kobt=D.indkob.filter(x=>x.kobt);
-  const li=x=>`<li class="${x.kobt?'done':''}"><input type="checkbox" ${x.kobt?'checked':''} onchange="kobt('${x.id}',this.checked)" style="width:22px;height:22px"><span class="n">${esc(ingTekst(x))}</span><input type="number" min="0" step="0.01" placeholder="pris kr" value="${x.pris??''}" style="width:100px" onchange="setPris('${x.id}',this.value)"><button class="x" title="Slet" onclick="sletVare('${x.id}')">✕</button></li>`;
+  const li=x=>`<li class="${x.kobt?'done':''}"><input type="checkbox" ${x.kobt?'checked':''} onchange="kobt('${x.id}',this.checked)" style="width:22px;height:22px"><span class="n">${esc(ingTekst(x))}${x.kobt?'':` <a class="tilbud" href="https://etilbudsavis.dk/soeg/${encodeURIComponent(x.navn)}" target="_blank" rel="noopener">🔎 tilbud</a>`}</span><input type="number" min="0" step="0.01" placeholder="pris kr" value="${x.pris??''}" style="width:100px" onchange="setPris('${x.id}',this.value)"><button class="x" title="Slet" onclick="sletVare('${x.id}')">✕</button></li>`;
   return `<h2>Indkøb</h2>
   <div class="card"><div class="row"><input class="grow" id="nyvare" placeholder="Fx 1 l mælk"><button class="b" onclick="tilfojVare()">Tilføj</button><button class="l" onclick="del('indkob')">📤 Del listen</button></div></div>
-  <div class="card"><ul class="list">${ikke.length?ikke.map(li).join(''):'<li class="empty" style="justify-content:center">Indkøbslisten er tom.</li>'}</ul>${(()=>{const p=ikke.filter(x=>x.pris);return p.length?`<p class="muted" style="margin:10px 0 0">💡 Ca. ${kr(p.reduce((s,x)=>s+x.pris,0))} for ${p.length} af ${ikke.length} varer – ud fra dine egne priser.</p>`:''})()}</div>
+  <div class="card"><ul class="list">${ikke.length?ikke.map(li).join(''):'<li class="empty" style="justify-content:center">Indkøbslisten er tom.</li>'}</ul><p class="muted" style="margin:10px 0 0;font-size:14px">🔎 »tilbud« viser ugens rigtige tilbud på varen hos eTilbudsavis.</p>${(()=>{const p=ikke.filter(x=>x.pris);return p.length?`<p class="muted" style="margin:10px 0 0">💡 Ca. ${kr(p.reduce((s,x)=>s+x.pris,0))} for ${p.length} af ${ikke.length} varer – ud fra dine egne priser.</p>`:''})()}</div>
   ${kobt.length?`<div class="card"><b>Købt (${kobt.length})</b><ul class="list">${kobt.map(li).join('')}</ul>
   <div class="row" style="margin-top:10px"><button class="b" onclick="kobtTilLager()">🥫 Flyt købte til lager</button></div>
   <p class="muted">Priser du har skrevet, bliver lagt i budgettet.</p></div>`:''}`;
@@ -389,7 +437,9 @@ lager(){
   const idag=new Date();idag.setHours(0,0,0,0);
   const s=[...D.lager].sort((a,b)=>(a.udlob||'9999').localeCompare(b.udlob||'9999')||a.navn.localeCompare(b.navn,'da'));
   return `<h2>Lager</h2>
-  <div class="card"><div class="row"><input class="grow" id="nylager" placeholder="Fx 500 g pasta"><label style="margin:0">Holdbar til</label><input type="date" id="nyudlob"><button class="b" onclick="tilfojLager()">Tilføj</button></div></div>
+  <div class="card"><div class="row"><input class="grow" id="nylager" placeholder="Fx 500 g pasta"><label style="margin:0">Holdbar til</label><input type="date" id="nyudlob"><button class="b" onclick="tilfojLager()">Tilføj</button></div>
+  <div class="row" style="margin-top:10px"><button class="b" style="flex:1;background:linear-gradient(135deg,#a855f7,#ff4d8d)!important" onclick="scanStregkode()">📷 Scan stregkode</button><label class="b" style="flex:1;text-align:center;cursor:pointer;margin:0;color:#fff;padding:10px 16px;border-radius:14px">🧾 Foto af kvittering<input type="file" accept="image/*" capture="environment" hidden onchange="kvitteringTilLager(this)"></label></div>
+  <div id="lstatus" class="muted" style="margin-top:6px"></div></div>
   <div class="card"><ul class="list">${s.length?s.map(x=>{const dage=x.udlob?Math.round((new Date(x.udlob)-idag)/864e5):null;const soon=dage!=null&&dage<=3;
     return `<li class="${soon?'soon':''}"><span class="n">${esc(ingTekst(x))}</span>
     <span class="exp muted">${x.udlob?(dage<0?'Udløbet':dage===0?'Udløber i dag':'Holdbar til '+new Date(x.udlob).toLocaleDateString('da-DK',{day:'numeric',month:'short'})):''}</span>
@@ -461,9 +511,13 @@ function visOpskrift(oid,p){
   dlgin.innerHTML=`${o.foto?`<div class="dfoto" style="background-image:url(${o.foto})"></div>`:''}<h2>${esc(o.navn)}</h2>
   <div>${o.tid?`<span class="tag">⏱️ ${o.tid} min</span>`:''}${(o.tags||[]).map(x=>`<span class="tag">${x}</span>`).join('')}${D.lager.length?`<span class="tag">🥫 Du har ${mt.har}/${mt.af}</span>`:''}</div>
   ${o.portioner?`<div class="port" style="margin-top:12px"><button class="l" onclick="visOpskrift('${o.id}',${Math.max(1,p-1)})">−</button><b>${p} personer</b><button class="l" onclick="visOpskrift('${o.id}',${p+1})">+</button></div>`:''}
-  <h3>Ingredienser</h3><ul class="ingl">${ing.map(i=>{const h=iLager(i.navn);return `<li>${h?'✅':'▫️'} ${esc(ingTekst(i))}</li>`}).join('')||'<li class="muted">Ingen</li>'}</ul>
+  ${(()=>{const har=ing.filter(i=>iLager(i.navn)),mangler=ing.filter(i=>!iLager(i.navn)),pr=prisOverslag(mangler.length?mangler:ing,p);
+   return `<div class="infobar"><span>⏱️ <b>${o.tid?o.tid+' min':'–'}</b><br><small>tid</small></span><span>👥 <b>${p}</b><br><small>personer</small></span><span>💰 <b>${pr.sum?'ca. '+kr(pr.sum):'?'}</b><br><small>${pr.sum?'at købe':'ingen priser endnu'}</small></span></div>
+   ${pr.sum?`<p class="muted" style="font-size:13px;margin:4px 0 0">Det er ca. prisen for ${pr.n} af de ${pr.af} varer, du skal købe – hele pakker, ud fra de priser, du selv har skrevet. Du får rester med hjem til næste gang.</p>`:`<p class="muted" style="font-size:13px;margin:4px 0 0">Skriv priser på dine indkøb, så regner appen prisen ud her. Jeg gætter aldrig priser.</p>`}
+   ${mangler.length?`<h3>🛒 Du mangler (${mangler.length})</h3><ul class="ingl">${mangler.map(i=>`<li>▫️ ${esc(ingTekst(i))} <a class="tilbud" href="https://etilbudsavis.dk/soeg/${encodeURIComponent(i.navn)}" target="_blank" rel="noopener">tilbud ↗</a></li>`).join('')}</ul>`:''}
+   ${har.length?`<h3>✅ Du har på lager (${har.length})</h3><ul class="ingl">${har.map(i=>`<li>✅ ${esc(ingTekst(i))}</li>`).join('')}</ul>`:''}`})()}
   ${o.trin&&o.trin.length?`<h3>Sådan gør du</h3><ol class="trin">${o.trin.map(x=>`<li>${esc(x)}</li>`).join('')}</ol>`:o.frem?`<h3>Sådan gør du</h3><div style="white-space:pre-wrap">${esc(o.frem)}</div>`:''}
-  <div class="row" style="margin-top:16px"><button class="b" onclick="opskriftTilIndkob('${o.id}')">🛒 På indkøbslisten</button><button class="b" onclick="document.getElementById('vdag').hidden=false">📅 På madplan</button><button class="b" onclick="lavRet('${o.id}')">👩‍🍳 Jeg har lavet den</button></div>
+  <div class="row" style="margin-top:16px"><button class="b" onclick="opskriftTilIndkob('${o.id}')">🛒 Det, jeg mangler, på listen</button><button class="b" onclick="document.getElementById('vdag').hidden=false">📅 På madplan</button><button class="b" onclick="lavRet('${o.id}')">👩‍🍳 Jeg har lavet den</button></div>
   <div id="vdag" hidden><p class="muted" style="margin:10px 0 6px">Hvilken dag?</p><div class="chips">${dage.map(d=>`<button class="chip" onclick="setPlan('${iso(d)}','opskrift','${o.id}');dlg.close();toast('${esc(o.navn)} er sat på ${d.toLocaleDateString('da-DK',{weekday:'long'})}')">${d.toLocaleDateString('da-DK',{weekday:'short',day:'numeric'})}</button>`).join('')}</div></div>
   <div class="row" style="margin-top:10px"><button class="l" onclick="del('opskrift:${o.id}')">📤 Del</button><button class="l" onclick="redigerOpskrift('${o.id}')">Ret</button><button class="l" onclick="sletOpskrift('${o.id}')">Slet</button><button class="l" onclick="dlg.close()">Luk</button></div>
   <p class="muted" style="font-size:13px">✅ = det har du på lager. Salt, peber og vand regner vi med, at du har.</p>`;
@@ -689,6 +743,61 @@ SIDER.forside=function(){
   ${hjaelpKort()}`;
 };
 
+// ---------- Pris ud fra egne priser (version 10) ----------
+function prisOverslag(ing,p){let sum=0,n=0;ing.forEach(i=>{const pr=D.priser[norm(i.navn)];if(pr){sum+=pr;n++}});return{sum:Math.round(sum),n,af:ing.length}}
+// ---------- Scan stregkode -> lager (Open Food Facts, gratis) ----------
+function hentZXing(){return window.ZXingBrowser?Promise.resolve():new Promise((ok,fejl)=>{const s=document.createElement('script');s.src='https://cdn.jsdelivr.net/npm/@zxing/browser@0.1.5/umd/zxing-browser.min.js';s.onload=ok;s.onerror=()=>fejl(new Error('net'));document.head.appendChild(s)})}
+let scanStop=null;
+async function scanStregkode(){
+  dlgin.innerHTML=`<h2>📷 Scan stregkode</h2><p class="muted" style="margin-top:-6px">Hold stregkoden på varen foran kameraet.</p><video id="scanvid" playsinline muted style="width:100%;border-radius:16px;background:#000;max-height:50vh"></video><div id="scanstat" class="muted" style="margin:8px 0">Starter kameraet…</div>
+  <div class="row"><input id="scankode" class="grow" inputmode="numeric" placeholder="…eller skriv tallene under stregkoden"><button class="b" onclick="slaaOp(document.getElementById('scankode').value)">Søg</button></div>
+  <div class="row" style="margin-top:10px"><button class="l" style="flex:1" onclick="stopScan();dlg.close()">Luk</button></div>`;
+  dlg.showModal();
+  const vid=document.getElementById('scanvid'),st=document.getElementById('scanstat');
+  try{
+    if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia)throw new Error('kamera');
+    if('BarcodeDetector' in window){
+      const strom=await navigator.mediaDevices.getUserMedia({video:{facingMode:'environment'}});vid.srcObject=strom;await vid.play();st.textContent='Leder efter stregkode…';
+      const bd=new BarcodeDetector({formats:['ean_13','ean_8','upc_a','upc_e']});let kor=true;scanStop=()=>{kor=false;strom.getTracks().forEach(x=>x.stop())};
+      const loop=async()=>{if(!kor)return;try{const r=await bd.detect(vid);if(r.length){stopScan();slaaOp(r[0].rawValue);return}}catch(e){}requestAnimationFrame(loop)};loop();
+    }else{
+      await hentZXing();st.textContent='Leder efter stregkode…';
+      const ctrl=await new ZXingBrowser.BrowserMultiFormatReader().decodeFromConstraints({video:{facingMode:'environment'}},vid,(res)=>{if(res){stopScan();slaaOp(res.getText())}});
+      scanStop=()=>ctrl.stop();
+    }
+  }catch(e){st.textContent=e.message==='net'?'Scanneren kræver internet første gang. Du kan skrive tallene herunder.':'Kameraet kunne ikke starte. Giv lov til kameraet, eller skriv tallene under stregkoden.'}
+}
+function stopScan(){if(scanStop){try{scanStop()}catch(e){}scanStop=null}}
+async function slaaOp(kode){
+  kode=String(kode||'').replace(/\D/g,'');const st=document.getElementById('scanstat');if(kode.length<8){if(st)st.textContent='Skriv hele tallet under stregkoden (8–13 cifre).';return}
+  if(st)st.textContent='Slår varen op…';
+  try{
+    const r=await fetch('https://world.openfoodfacts.org/api/v2/product/'+kode+'.json?fields=product_name,product_name_da,brands,quantity').then(r=>r.json());
+    const p=r.product||{},navn=(p.product_name_da||p.product_name||'').trim();
+    if(!navn){if(st)st.textContent='Varen ('+kode+') findes ikke i Open Food Facts endnu. Skriv navnet selv i feltet.';dlg.close();gaaTil('lager');document.getElementById('nylager').focus();toast('Varen blev ikke fundet – skriv navnet selv');return}
+    const tekst=((p.quantity?p.quantity.replace(/\s+/g,' ').replace(/\s*[e℮]\s*$/,'')+' ':'')+navn+(p.brands?' ('+p.brands.split(',')[0].trim()+')':'')).trim();
+    dlg.close();gaaTil('lager');const e=document.getElementById('nylager');e.value=tekst;e.focus();document.getElementById('lstatus').textContent='Fundet: '+tekst+'. Tjek det, og tryk Tilføj.';
+  }catch(e){if(st)st.textContent='Kunne ikke slå varen op. Er du på internettet?'}
+}
+// ---------- Kvittering -> lager ----------
+async function kvitteringTilLager(inp){
+  const fl=inp.files[0];if(!fl)return;const st=document.getElementById('lstatus');st.textContent='Læser kvitteringen… (første gang tager det lidt længere)';
+  try{
+    await hentTesseract();
+    const r=await Tesseract.recognize(fl,'dan',{logger:m=>{if(m.status==='recognizing text')st.textContent='Læser kvitteringen… '+Math.round(m.progress*100)+' %'}});
+    const linjer=r.data.text.split('\n').map(l=>l.trim()).filter(Boolean);
+    const varer=[];for(const l of linjer){if(/(total|i alt|ialt|at betale|moms|kort|byttepenge|rabat|dankort|visa|mastercard|kvittering|cvr|tlf|bon|subtotal)/i.test(l))continue;
+      const m=l.match(/^(.*?[a-zæøå]{2,}.*?)\s+(-?\d{1,4}[,.]\d{2})\s*$/i);if(m){const navn=m[1].replace(/[^a-zæøå0-9 %\-]/gi,' ').replace(/\s+/g,' ').trim();if(navn.length>=2)varer.push({navn:navn.charAt(0).toUpperCase()+navn.slice(1).toLowerCase(),pris:parseFloat(m[2].replace(',','.'))})}}
+    st.textContent='';
+    if(!varer.length){toast('Jeg kunne ikke finde varer på billedet. Prøv et skarpere billede.');return}
+    dlgin.innerHTML=`<h2>🧾 Varer fra kvitteringen</h2><p class="muted" style="margin-top:-6px">Fjern fluebenet ved det, der ikke skal på lager. Du kan rette navnene.</p>
+    <ul class="ingl">${varer.map((v,i)=>`<li class="row" style="flex-wrap:nowrap"><input type="checkbox" checked id="kv${i}" style="width:22px;height:22px"><input id="kn${i}" value="${esc(v.navn)}" style="flex:1"><span class="muted">${kr(v.pris)}</span></li>`).join('')}</ul>
+    <div class="row" style="margin-top:12px"><button class="b" style="flex:1" id="kvok">🥫 Læg på lager</button><button class="l" onclick="dlg.close()">Annullér</button></div>`;
+    dlg.showModal();
+    document.getElementById('kvok').onclick=()=>{const s=snap();let n=0;varer.forEach((v,i)=>{if(!document.getElementById('kv'+i).checked)return;const navn=document.getElementById('kn'+i).value.trim();if(!navn)return;D.lager.push({id:id(),navn,maengde:null,enhed:'',udlob:''});if(v.pris>0)D.priser[norm(navn)]=v.pris;n++});save();dlg.close();vis();toast(n+' varer lagt på lager 🥫',fortrydTil(s))};
+  }catch(e){st.textContent=e.message==='net'?'Kræver internet første gang.':'Billedet kunne ikke læses. Prøv et skarpere billede.'}
+}
+
 // ---------- Billedgalleri (version 9) ----------
 const GALLERI=[['madlavning','Madlavning derhjemme'],['koekken','Venner i køkkenet'],['picnic','Picnic med venner'],['udenfor','Madlavning udenfor'],['bord','Fyldt bord'],['salat','Slik og hygge'],['frugt','Frugt og bær']];
 const STANDARD_FOTO='fotos/galleri/madlavning.jpg';
@@ -791,19 +900,25 @@ function modtagDel(){
 modtagDel();
 
 // ---------- Skriv til hjælperen ----------
-let hjaelpFil=null;
+let hjaelpFiler=[];
 async function sendHjaelp(){
-  const tekst=document.getElementById('hjtekst').value.trim();if(!tekst&&!hjaelpFil){alert('Skriv hvad du har brug for hjælp til');return}
+  const tekst=document.getElementById('hjtekst').value.trim();if(!tekst&&!hjaelpFiler.length){alert('Skriv hvad du har brug for hjælp til');return}
   const msg='Hej '+EJER+'! Jeg har brug for hjælp med Budget og Mad (version '+APP_VERSION+'):\n\n'+tekst;
-  if(navigator.share){const d={title:'Hjælp til Budget og Mad',text:msg};if(hjaelpFil&&navigator.canShare&&navigator.canShare({files:[hjaelpFil]}))d.files=[hjaelpFil];try{await navigator.share(d);return}catch(e){if(e.name==='AbortError')return}}
-  location.href='mailto:?subject='+encodeURIComponent('Hjælp til Budget og Mad')+'&body='+encodeURIComponent(msg+(hjaelpFil?'\n\n(Husk at vedhæfte dit skærmbillede)':''));
+  if(navigator.share){const d={title:'Hjælp til Budget og Mad',text:msg};if(hjaelpFiler.length&&navigator.canShare&&navigator.canShare({files:hjaelpFiler}))d.files=hjaelpFiler;try{await navigator.share(d);dlg.close();return}catch(e){if(e.name==='AbortError')return}}
+  location.href='mailto:?subject='+encodeURIComponent('Hjælp til Budget og Mad')+'&body='+encodeURIComponent(msg+(hjaelpFiler.length?'\n\n(Husk at vedhæfte dine billeder)':''));
 }
-function hjaelpKort(){
-  return `<div class="card" style="margin-top:14px"><b>💬 Brug for hjælp?</b><p class="muted" style="margin:4px 0 8px">Skriv til ${esc(EJER)}. Du kan sætte et skærmbillede på. Det er kun det, du selv skriver og vælger, der bliver sendt – appen sender aldrig noget af sig selv.</p>
-  <textarea id="hjtekst" placeholder="Hvad driller?" style="min-height:70px"></textarea>
-  <div class="row" style="margin-top:8px"><label class="l" style="margin:0;cursor:pointer;color:inherit;background:var(--felt);border-radius:14px;padding:9px 14px;font-weight:600">📷 Skærmbillede<input type="file" accept="image/*" hidden onchange="hjaelpFil=this.files[0]||null;document.getElementById('hjfil').textContent=hjaelpFil?'✔ '+hjaelpFil.name:''"></label><span id="hjfil" class="muted"></span><button class="b" style="margin-left:auto" onclick="sendHjaelp()">Send ➜</button></div></div>
-  <div class="card"><b>ℹ️ Om appen</b><p class="muted" style="margin:6px 0 0">Budget og Mad – version ${APP_VERSION}. © ${esc(EJER)}. Appen tilhører ${esc(EJER)}, og kun ${esc(EJER)} kan sende opdateringer. Den må ikke kopieres eller deles videre uden tilladelse. Dine tal ligger kun på din egen telefon. Fotos fra Unsplash.</p></div>`;
+function visHjaelp(){
+  hjaelpFiler=[];
+  dlgin.innerHTML=`<h2>💬 Brug for hjælp?</h2><p class="muted" style="margin-top:-6px">Skriv til ${esc(EJER)}. Du kan sætte billeder på, som du selv har taget, fx skærmbilleder.</p>
+  <textarea id="hjtekst" placeholder="Hvad driller?" style="min-height:90px"></textarea>
+  <label class="l" style="display:block;text-align:center;margin:10px 0 0;cursor:pointer;color:inherit;background:var(--felt);border-radius:14px;padding:12px;font-weight:700">🖼️ Vælg billeder<input type="file" accept="image/*" multiple hidden onchange="hjaelpFiler=[...this.files];document.getElementById('hjfil').innerHTML=hjaelpFiler.map(f=>'✔ '+esc(f.name)).join('<br>')"></label>
+  <div id="hjfil" class="muted" style="margin-top:6px"></div>
+  <div class="row" style="margin-top:12px"><button class="b" style="flex:1" onclick="sendHjaelp()">Send ➜</button><button class="l" onclick="dlg.close()">Luk</button></div>
+  <p class="muted" style="font-size:13px">Det er kun det, du selv skriver og vælger, der bliver sendt. Appen sender aldrig noget af sig selv.</p>
+  <div style="background:var(--felt);border-radius:14px;padding:12px;margin-top:10px"><b>ℹ️ Om appen</b><p class="muted" style="margin:6px 0 0;font-size:14px">Budget og Mad – version ${APP_VERSION}. © ${esc(EJER)}. Appen tilhører ${esc(EJER)}, og kun ${esc(EJER)} kan sende opdateringer. Den må ikke kopieres eller deles videre uden tilladelse. Dine tal ligger kun på din egen telefon. Fotos fra Unsplash. Varedata fra Open Food Facts.</p></div>`;
+  if(!dlg.open)dlg.showModal();
 }
+function hjaelpKort(){return `<button class="hjknap" onclick="visHjaelp()"><span>💬</span><b>Brug for hjælp?</b><small>Skriv til ${esc(EJER)}</small></button>`}
 
 localStorage.removeItem(KEY+'-test'); // appen startede fint
 </script>
