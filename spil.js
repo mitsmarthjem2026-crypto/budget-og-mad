@@ -40,7 +40,7 @@ function spilSide(){const s=SP(),idag=iso(new Date()),dag=s.dag[idag];
     </div>
     <button class="b spstor" onclick="spNyt(false)">▶️ Spil</button>
     <button class="b spstor sp2" onclick="spNyt(true)">📅 Dagens udfordring</button>
-    <p class="muted" style="font-size:14px;margin:6px 2px 0">Dagens udfordring er ens for alle i dag. Spil den og se, om dine venner kan slå dig.</p>
+    <p class="muted" style="font-size:14px;margin:6px 2px 0">Dagens udfordring er ens hele dagen. Prøv igen og slå din egen score.</p>
     <div class="sptal"><div><b>${s.best.toLocaleString('da-DK')}</b><span>Rekord</span></div><div><b>${dag?dag.toLocaleString('da-DK'):'–'}</b><span>I dag</span></div><div><b>${s.retter.toLocaleString('da-DK')}</b><span>Retter i alt</span></div></div>
     <label class="splyd"><input type="checkbox" ${s.lyd?'checked':''} onchange="SP().lyd=this.checked;save()"> 🔊 Lyd</label>
   </div>
@@ -181,10 +181,6 @@ function spSlut(){const v=spV;v.slut=true;spTegn();const s=SP();s.spillet++;s.re
     <div class="stort">${v.point.toLocaleString('da-DK')} p</div>
     <div style="font-size:17px">Du lavede <b>${v.retter}</b> ${v.retter===1?'ret':'retter'}${v.dagens?' i Dagens udfordring':''}</div>
     <button class="b" onclick="spNyt(${v.dagens})">🔁 Spil igen</button>
-    <button class="b" onclick="spDel(${v.point},${v.retter},${v.dagens})">📤 Udfordr en ven</button>
     <button class="l" onclick="spLuk()">Tilbage</button></div>`;o.hidden=false}
 
 function spLuk(){spV=null;document.onkeydown=null;vis()}
-async function spDel(p,r,dagens){const tx=`Jeg fik ${p.toLocaleString('da-DK')} point og lavede ${r} ${r===1?'ret':'retter'} i Kurv-Kaos${dagens?' (Dagens udfordring '+new Date().toLocaleDateString('da-DK')+')':''} i Budget og Mad. Kan du slå mig? 🧺`;
-  if(navigator.share){try{await navigator.share({text:tx});return}catch(e){if(e.name==='AbortError')return}}
-  try{await navigator.clipboard.writeText(tx);toast('Teksten er kopieret – sæt den ind i en besked')}catch(e){prompt('Kopier teksten:',tx)}}
