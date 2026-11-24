@@ -62,7 +62,7 @@ function juraPrivat() {
 <p>Appen bruger ikke cookies til sporing eller reklamer. Den gemmer kun det på telefonen, som skal til for, at appen virker.</p>
 <h3>Det, der bliver sendt ud</h3>
 <ul>
-<li><b>Din kode (Supabase):</b> Når du logger ind, sendes koden til Supabase, som svarer ja eller nej. På serveren står kun koderne, det navn Søren har givet koden, og om den er tændt. Formålet er, at kun folk med en kode kan bruge appen. Koden gemmes, til Søren sletter den. Som alle servere ser Supabase din IP-adresse, og deres netværk (Cloudflare) sætter en kort teknisk cookie for at stoppe angreb.</li>
+<li><b>Din kode (Supabase):</b> Når du logger ind, sendes koden til Supabase (server i EU, Irland), som svarer ja eller nej. På serveren står kun koderne, det navn Søren har givet koden, og om den er tændt. Formålet er, at kun folk med en kode kan bruge appen. Koden gemmes, til Søren sletter den. Som alle servere ser Supabase din IP-adresse, og deres netværk (Cloudflare) sætter en kort teknisk cookie for at stoppe angreb.</li>
 <li><b>Selve appen (GitHub Pages):</b> Appen hentes fra GitHub. GitHub ser din IP-adresse, som alle hjemmesider gør.</li>
 <li><b>Stregkode, bon og køleskab:</b> Når du bruger dem første gang, henter appen gratis hjælpeprogrammer fra nettet (bl.a. jsDelivr). Selve billederne bliver behandlet på din telefon og bliver ikke sendt ud.</li>
 <li><b>Vareinfo (Open Food Facts):</b> Scanner du en vare, sendes kun stregkodens nummer for at finde varens navn.</li>
