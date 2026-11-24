@@ -270,7 +270,8 @@ button.b,label.b{box-shadow:0 6px 16px rgba(232,85,62,.3)}
 @media (max-width:350px){nav button{font-size:9.5px}.tile{height:135px}.tn{font-size:19px}}
 </style>
 <style>@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}</style>
-<style>#nav{justify-content:space-between}#nav button{flex:0 0 auto;min-width:96px;padding-left:14px;padding-right:14px}
+<style>.tile .te,.tile .tskift{display:none!important}
+#nav{justify-content:space-between}#nav button{flex:0 0 auto;min-width:96px;padding-left:14px;padding-right:14px}
 header{display:none!important}
 body{padding-top:env(safe-area-inset-top)}
 #nav{align-items:center}
@@ -333,7 +334,7 @@ body{padding-top:env(safe-area-inset-top)}
 <dialog id="dlg"><div class="in" id="dlgin"></div></dialog>
 
 <script>
-const KEY='madapp-v1';const ENHED=(()=>{let e=localStorage.getItem('madapp-v1-enhed');if(!e){e=(crypto.randomUUID?crypto.randomUUID():Date.now().toString(36)+Math.random().toString(36).slice(2));localStorage.setItem('madapp-v1-enhed',e)}return e})();const APP_VERSION=50, EJER='Søren';
+const KEY='madapp-v1';const ENHED=(()=>{let e=localStorage.getItem('madapp-v1-enhed');if(!e){e=(crypto.randomUUID?crypto.randomUUID():Date.now().toString(36)+Math.random().toString(36).slice(2));localStorage.setItem('madapp-v1-enhed',e)}return e})();const APP_VERSION=51, EJER='Søren';
 let D;try{D=JSON.parse(localStorage.getItem(KEY)||'null')}catch(e){D=null;try{localStorage.setItem(KEY+'-skadet-'+Date.now(),localStorage.getItem(KEY))}catch(x){}}
 if(!D||typeof D!=='object')D={};
 ['opskrifter','indkob','lager','stdSlettet','gemteLister'].forEach(k=>{if(!Array.isArray(D[k]))D[k]=[]});
@@ -758,7 +759,7 @@ function importer(inp){const f=inp.files[0];if(!f)return;f.text().then(tx=>{let 
 
 // Forside med fotoknapper (version 8)
 const FOTO={budget:['fotos/budget.jpg','💰','Budget'],opskrifter:['fotos/opskrifter.jpg','📖','Opskrifter'],madplan:['fotos/madplan.jpg','📅','Madplan'],indkob:['fotos/indkob.jpg','🛒','Indkøb'],lager:['fotos/lager.jpg','🥫','Lager']};
-function gaaTil(p){side=p;localStorage.setItem(KEY+'-side',p);vis();scrollTo(0,0)}
+function gaaTil(p){if(typeof styringMaa==='function'&&!styringMaa(p)){styringIkke(p);return}side=p;localStorage.setItem(KEY+'-side',p);vis();scrollTo(0,0)}
 function banner(p){const f=FOTO[p];return f?`<div class="banner" style="background-image:url(${knapFoto(p)})"><span>${f[1]} ${f[2]}</span><button class="tskift bskift" title="Skift billede" onclick="vaelgKnapFoto('${p}')">🖼️ Skift</button></div>`:''}
 SIDER.forside=function(){
   const nu=new Date(),md=iso(nu).slice(0,7),idag=new Date(nu);idag.setHours(0,0,0,0);
@@ -768,8 +769,9 @@ SIDER.forside=function(){
   const info={budget:b.ind?'Tilbage: '+kr(b.tilbage):'Skriv din løn ind',opskrifter:D.opskrifter.length?D.opskrifter.length+' opskrifter':'Gem din første ret',madplan:ret?'I dag: '+ret:'Hvad skal du spise i dag?',indkob:paaListe?paaListe+' ting på listen':'Listen er tom',lager:D.lager.length?D.lager.length+' varer'+(snart?' · '+snart+' udløber snart':''):'Hvad har du derhjemme?'};
   info.kalender=kalInfo();const h=nu.getHours(),hilsen=h<10?'Godmorgen':h<17?'Hej':'Godaften';
   return `<div class="fhero" style="background-image:url('${valgtFoto()}')"><div><div class="fh1">${hilsen} 👋</div><div class="fh2">Hvad skal vi i dag?</div></div></div>
-  <div class="tiles">${Object.entries(FOTO).map(([k,f])=>`<button class="tile t-${k}" onclick="gaaTil('${k}')" style="background-image:url(${knapFoto(k)})"><span class="te">${f[1]}</span><span class="tskift" role="button" title="Skift billede" onclick="event.stopPropagation();vaelgKnapFoto('${k}')">🖼️</span><span class="tn">${f[2]}</span><span class="ti">${esc(info[k])}</span></button>`).join('')}</div>
-  ${typeof motionKort==='function'?motionKort():''}
+  ${typeof styringForside==='function'?styringForside():''}
+  <div class="tiles">${Object.entries(FOTO).filter(([k])=>typeof styringMaa!=='function'||styringMaa(k)).map(([k,f])=>`<button class="tile t-${k}" onclick="gaaTil('${k}')" style="background-image:url(${knapFoto(k)})"><span class="te">${f[1]}</span><span class="tskift" role="button" title="Skift billede" onclick="event.stopPropagation();vaelgKnapFoto('${k}')">🖼️</span><span class="tn">${f[2]}</span><span class="ti">${esc(info[k])}</span></button>`).join('')}</div>
+  ${typeof motionKort==='function'&&(typeof styringMaa!=='function'||styringMaa('motion'))?motionKort():''}
   ${erEjer()?'<button class="b" style="width:100%;font-size:19px;padding:16px;margin:14px 0 4px" onclick="visAndreBrugere()">👥 Til andre app brugere</button>':''}
   ${forsideTips()}
   ${hjaelpKort()}`;
@@ -1554,10 +1556,18 @@ function loginGemt(){try{return JSON.parse(localStorage.getItem(KEY+'-login')||'
 async function rpc(navn,data){
   const h={'Content-Type':'application/json',apikey:LOGIN.noegle};if(LOGIN.noegle.startsWith('eyJ'))h.Authorization='Bearer '+LOGIN.noegle;
   const r=await fetch(LOGIN.url.replace(/\/+$/,'')+'/rest/v1/rpc/'+navn,{method:'POST',headers:h,body:JSON.stringify(data),cache:'no-store'});
-  if(!r.ok)throw new Error('server '+r.status);
+  if(!r.ok){let m='';try{m=(await r.json()).message||''}catch(x){}throw new Error(m||('server '+r.status))}
   const t=await r.text();return t?JSON.parse(t):null;
 }
-async function tjekKode(k){return (await rpc('tjek_kode',{k}))===true}
+function enhedSlags(){const u=navigator.userAgent,app=(window.matchMedia&&matchMedia('(display-mode: standalone)').matches)||navigator.standalone===true;
+  const t=/iPhone/.test(u)?'iPhone':(/iPad/.test(u)||(/Macintosh/.test(u)&&navigator.maxTouchPoints>1))?'iPad':/Android/.test(u)?(/Mobile/.test(u)?'Android-telefon':'Android-tablet'):/Windows/.test(u)?'Windows-PC':/Macintosh/.test(u)?'Mac':/Linux/.test(u)?'Linux-PC':'Ukendt';
+  return t+(app?' (app)':' (browser)')}
+// true = ok, false = forkert kode; kaster 'anden telefon', hvis koden er i brug et andet sted
+async function tjekKode(k){const r=await rpc('tjek_kode',{k,enhed:ENHED,slags:enhedSlags()});if(r===null)throw new Error('anden telefon');return r===true}
+function loginFejl(e){const m=String(e&&e.message||'');
+  if(m.includes('anden telefon'))return 'Koden er nu lukket, fordi den blev brugt på en anden telefon eller PC. En kode er kun til én person. Kontakt '+EJER+'.';
+  if(m.includes('for mange'))return 'Du har prøvet for mange forkerte koder. Vent '+(m.includes('1440')?'til i morgen':'15 minutter')+' og prøv igen.';
+  return navigator.onLine===false?'Du har ikke internet. Prøv igen, når du har net.':'Kan ikke tjekke koden lige nu. Prøv igen om lidt.'}
 function erEjer(){try{const g=LOGIN_TIL&&loginGemt();return !!(g&&g.ejer===true)}catch(e){return false}}
 async function opdaterEjer(){const g=loginGemt();if(!g||!g.kode)return;let e=false;try{e=(await rpc('ejer_tjek',{k:g.kode}))===true}catch(x){return}
   if(e!==(g.ejer===true)){g.ejer=e;localStorage.setItem(KEY+'-login',JSON.stringify(g));if(side==='forside')vis()}}
@@ -1589,18 +1599,18 @@ async function logInd(){
   try{
     if(await tjekKode(k)){
       localStorage.setItem(KEY+'-login',JSON.stringify({kode:k,tid:Date.now()}));
-      LAAST=false;d.close();toast('Velkommen 👋');opdaterEjer();
+      LAAST=false;d.close();toast('Velkommen 👋');opdaterEjer();if(typeof styringStart==='function')styringStart();
       if(dlgVenter){dlgVenter=false;_visDlg()}else if(guideEfter){guideEfter=false;setTimeout(visGuide,600)}
       return;
     }
     b.textContent='Koden virker ikke. Tjek at den er skrevet rigtigt.';
-  }catch(e){b.textContent=navigator.onLine===false?'Du har ikke internet. Prøv igen, når du har net.':'Kan ikke tjekke koden lige nu. Prøv igen om lidt.'}
+  }catch(e){b.textContent=loginFejl(e)}
   knap.disabled=false;knap.textContent='Åbn appen';
 }
 if(LOGIN_TIL){
   const g=loginGemt();
   if(!g||!g.kode)visLogin();
-  else if(navigator.onLine!==false)tjekKode(g.kode).then(ok=>{if(ok)opdaterEjer();if(!ok){localStorage.removeItem(KEY+'-login');if(dlg.open)dlg.close();visLogin('Din kode virker ikke længere. Spørg efter en ny kode.')}}).catch(()=>{});
+  else if(navigator.onLine!==false)tjekKode(g.kode).then(ok=>{if(ok)opdaterEjer();if(!ok){localStorage.removeItem(KEY+'-login');if(dlg.open)dlg.close();visLogin('Din kode er lukket. Kontakt '+EJER+', hvis du skal bruge appen igen.')}}).catch(e=>{if(String(e&&e.message).includes('anden telefon')){localStorage.removeItem(KEY+'-login');if(dlg.open)dlg.close();visLogin(loginFejl(e))}});
 }
 
 
@@ -1615,6 +1625,7 @@ async function visAndreBrugere(){
   dlgin.innerHTML=`<h2>👥 Til andre app brugere</h2><p class="muted" style="margin-top:-6px">Kun du kan se denne side.</p><p class="muted">Henter listen…</p>`;
   if(!dlg.open)dlg.showModal();
   try{ejerListe=await rpc('ejer_koder',{k:ejerKode()})||[]}catch(e){ejerListe=null}
+  if(typeof styringHent==='function')await styringHent();
   tegnAndreBrugere();
 }
 function tegnAndreBrugere(){
@@ -1623,8 +1634,11 @@ function tegnAndreBrugere(){
    ejerListe.map(x=>`<div style="background:var(--felt);border-radius:14px;padding:12px;margin:8px 0;${x.aktiv?'':'opacity:.6'}">
      <div style="display:flex;justify-content:space-between;gap:8px;align-items:center"><b style="font-size:17px">${esc(x.navn||'Uden navn')}</b><span style="font-weight:700;color:${x.aktiv?'#1e8e4e':'#c0392b'}">${x.ejer?'Din kode':x.aktiv?'Tændt':'Slukket'}</span></div>
      <div style="font-size:22px;letter-spacing:3px;font-weight:700;margin:4px 0">${esc(x.kode)}</div>
-     <div class="muted" style="font-size:14px">${x.sidst_brugt?'Sidst brugt '+dato(x.sidst_brugt):'Ikke brugt endnu'}</div>
-     <div class="row" style="margin-top:8px;flex-wrap:wrap">${x.ejer?'':`<button class="b" style="flex:1" onclick="sendKode('${esc(x.kode)}')">📤 Send</button>`}<button class="l" onclick="navnKode('${esc(x.kode)}')">✏️ Navn</button>${x.ejer?'':`<button class="l" onclick="slaaKode('${esc(x.kode)}',${!x.aktiv})">${x.aktiv?'⛔ Sluk':'✅ Tænd'}</button>`}</div></div>`).join('');
+     <div class="muted" style="font-size:14px">${x.sidst_brugt?'Sidst brugt '+dato(x.sidst_brugt):'Ikke brugt endnu'}${x.ejer?' · virker overalt':''}</div>
+     ${!x.ejer&&x.hvilke?`<div style="font-size:14px;margin-top:4px">📱 Låst til: ${esc(x.hvilke)} <span class="muted">(${x.enheder} af 2)</span></div>`:''}
+     ${!x.ejer&&x.afvist?`<div style="font-size:14px;margin-top:4px;color:#c0392b;font-weight:700">⚠️ ${x.aktiv?'Prøvet':'Lukket, fordi koden blev prøvet'} på en anden enhed ${x.afvist} ${x.afvist===1?'gang':'gange'}${x.afvist_slags?' ('+esc(x.afvist_slags)+')':''}${x.afvist_sidst?', sidst '+dato(x.afvist_sidst):''}. Måske er koden givet videre.${x.aktiv?'':' Tryk ✅ Tænd og 🔓 Frigiv for at åbne den igen.'}</div>`:''}
+     ${typeof styringKodeHTML==='function'?styringKodeHTML(x):''}
+     <div class="row" style="margin-top:8px;flex-wrap:wrap">${x.ejer?'':`<button class="b" style="flex:1" onclick="sendKode('${esc(x.kode)}')">📤 Send</button>`}<button class="l" onclick="navnKode('${esc(x.kode)}')">✏️ Navn</button>${!x.ejer&&typeof styringAdgang==='function'?`<button class="l" onclick="styringAdgang('${esc(x.kode)}')">⚙️ Adgang</button>`:''}${!x.ejer&&x.enheder?`<button class="l" onclick="frigivKode('${esc(x.kode)}')">🔓 Frigiv</button>`:''}${x.ejer?'':`<button class="l" onclick="slaaKode('${esc(x.kode)}',${!x.aktiv})">${x.aktiv?'⛔ Sluk':'✅ Tænd'}</button>`}</div></div>`).join('');
   dlgin.innerHTML=`<h2>👥 Til andre app brugere</h2><p class="muted" style="margin-top:-6px">Kun du kan se denne side. Her giver du andre en kode til appen. Du kan ikke se deres tal – de bliver på deres egen telefon.</p>
   <div style="background:var(--acc2);border-radius:14px;padding:12px;margin:10px 0"><b>➕ Giv en ny person adgang</b>
    <input id="nynavn" placeholder="Personens navn" maxlength="60" style="width:100%;margin-top:8px">
@@ -1644,19 +1658,21 @@ function tegnAndreBrugere(){
    </ul>
    <p><b>🔗 Appen</b><br>Linket du sender til folk:<br><span style="word-break:break-all">${APP_LINK}</span></p>
    <p><b>👥 Giv en person adgang</b><br>Skriv navnet her ovenfor → tryk <b>Lav kode</b> → tryk <b>Send</b>. Så får de link og kode i en sms.<br>Vil du lukke for en person: tryk <b>⛔ Sluk</b> ved deres kode. Du kan tænde den igen.</p>
+   <p><b>🔒 Sikkerhed</b><br>En kode virker kun for én person. Første gang den bruges, bliver den låst til den telefon eller PC. På en iPhone tæller Safari og appen på hjemmeskærmen som to, derfor står der »af 2«. Ved hver kode kan du se, hvad den er låst til, fx »iPhone (app)« eller »Windows-PC (browser)«.<br>Giver nogen koden videre og prøver den på en tredje telefon eller PC, lukker koden helt for alle. Du ser en rød linje ved koden. Vil du åbne den igen: tryk <b>✅ Tænd</b> og <b>🔓 Frigiv</b>.<br>Får personen ny telefon: tryk <b>🔓 Frigiv</b> ved deres kode.<br>Prøver nogen mange forkerte koder, bliver de stoppet i 15 minutter (eller et døgn).</p>
    <p><b>🔑 Din egen kode</b><br>Hold den for dig selv. Det er den, der viser denne side.</p>
    <p><b>🗄️ Supabase – her ligger koderne</b><br>Gå til supabase.com → <b>Sign in</b> → <b>Continue with GitHub</b> → vælg projektet → <b>Table Editor</b> → <b>koder</b>. Der kan du også se alle koder.<br>Det er gratis. Bruges appen ikke i en uge, kan Supabase sætte den på pause. Så log ind og tryk <b>Restore project</b>.<br>Del aldrig <b>secret key</b> eller adgangskoden med nogen.</p>
    <p><b>🐙 GitHub – her ligger selve appen</b><br>github.com → log ind → <b>budget-og-mad</b>. Du skal ikke gøre noget der. Nye versioner bliver lagt op, når du har sagt ja.</p>
    <p><b>📲 Læg appen på en iPhone</b><br>Åbn linket i <b>Safari</b> → tryk på <b>Del</b> (firkant med pil op) → <b>Føj til hjemmeskærm</b> → <b>Tilføj</b>.</p>
    <p style="margin-bottom:0"><b>✨ Ny version</b><br>Appen viser selv <b>Ny opdatering</b> → tryk <b>Opdater nu</b>. Kommer den ikke: luk appen helt og åbn den igen.</p>
    </div></details>
+  ${typeof styringEjerHTML==='function'?styringEjerHTML():''}
   <b>Alle koder</b>${liste}
   <div class="row" style="margin-top:12px"><button class="l" style="flex:1" onclick="ejerNy=null;dlg.close()">Luk</button></div>`;
 }
 async function nyKode(){
   const navn=(document.getElementById('nynavn').value||'').trim();
   if(!navn){alert('Skriv personens navn først');return}
-  try{const k=await rpc('ejer_ny_kode',{k:ejerKode(),nyt_navn:navn});ejerNy={kode:k,navn};ejerListe=await rpc('ejer_koder',{k:ejerKode()})||[];tegnAndreBrugere();toast('Ny kode lavet ✔')}
+  try{const k=await rpc('ejer_ny_kode',{k:ejerKode(),nyt_navn:navn});if(!k)throw new Error('ingen kode');ejerNy={kode:k,navn};ejerListe=await rpc('ejer_koder',{k:ejerKode()})||[];tegnAndreBrugere();toast('Ny kode lavet ✔')}
   catch(e){alert('Det virkede ikke. Tjek at du har internet, og prøv igen.')}
 }
 async function sendKode(kode){
@@ -1664,6 +1680,12 @@ async function sendKode(kode){
   const tekst=`Hej${x.navn?' '+x.navn:''}! Her er appen Budget og Mad 🍲\n\nÅbn linket: ${APP_LINK}\nDin kode: ${kode}\n\nSkriv koden, når appen spørger. Dine tal bliver kun gemt på din egen telefon.`;
   if(navigator.share){try{await navigator.share({title:'Budget og Mad',text:tekst});return}catch(e){if(e.name==='AbortError')return}}
   try{await navigator.clipboard.writeText(tekst);toast('Beskeden er kopieret – sæt den ind i en sms')}catch(e){prompt('Kopiér beskeden og send den:',tekst)}
+}
+async function frigivKode(kode){
+  const x=(ejerListe||[]).find(y=>y.kode===kode);if(!x)return;
+  if(!confirm('Frigiv koden for '+(x.navn||kode)+'?\n\nSå kan koden bruges på en ny telefon eller PC. Brug det, hvis personen har fået ny telefon.'))return;
+  try{await rpc('ejer_frigiv',{k:ejerKode(),hvilken:kode});x.enheder=0;x.hvilke=null;x.afvist=0;tegnAndreBrugere();toast('Koden er frigivet ✔')}
+  catch(e){alert('Det virkede ikke. Tjek at du har internet, og prøv igen.')}
 }
 async function navnKode(kode){
   const x=(ejerListe||[]).find(y=>y.kode===kode);if(!x)return;
@@ -1764,6 +1786,7 @@ function hjaelpKort(){return dataKort()}
 try{if(typeof juraVisFoersteGang==='function')juraVisFoersteGang()}catch(e){}
 localStorage.removeItem(KEY+'-test'); // appen startede fint
 </script>
+<script src="styring.js"></script>
 </body>
 </html>
 <!-- BOM-APP-OK -->
