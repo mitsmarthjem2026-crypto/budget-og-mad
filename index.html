@@ -26,6 +26,9 @@
 <link rel="apple-touch-startup-image" href="ikoner/start-1320x2868.png" media="(device-width: 440px) and (device-height: 956px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)">
 <link rel="apple-touch-startup-image" href="ikoner/start-1260x2736.png" media="(device-width: 420px) and (device-height: 912px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)">
 <title>Budget og Mad</title>
+<script>
+addEventListener('error',function(){try{if(localStorage.getItem('madapp-v1-test')&&navigator.serviceWorker&&navigator.serviceWorker.controller){localStorage.removeItem('madapp-v1-test');localStorage.setItem('madapp-v1-fejl','1');navigator.serviceWorker.controller.postMessage('TILBAGE');setTimeout(function(){location.reload()},400)}}catch(e){}});
+</script>
 <style>
 html{background:#2f7d4f}
 :root{--bg:#f6f4ef;--card:#fff;--txt:#222;--muted:#666;--line:#e2ddd3;--acc:#2f7d4f;--acc2:#e8f3ec;--warn:#b54a1c;--warnbg:#fdeee6}
@@ -105,10 +108,125 @@ label{display:block;font-size:15px;color:var(--muted);margin:10px 0 4px}
   .card{padding:12px}
 }
 </style>
+<style id="ungt-look">
+/* Version 7: ungt og smart udseende – kun udseende, ingen knapper flyttet */
+:root{--bg:#f2f7f4;--card:#ffffff;--txt:#13201a;--muted:#66766e;--line:#e4ece7;--acc:#0fa968;--acc2:#e4f7ee;--warn:#e11d48;--warnbg:#ffe8ee;
+ --grad:linear-gradient(135deg,#10b981 0%,#06b6d4 100%);--grad2:linear-gradient(135deg,#a3e635,#10b981);--pink:#ff4d8d;--skygge:0 8px 28px rgba(15,60,40,.08);--felt:#f4f8f6}
+@media (prefers-color-scheme:dark){:root{--bg:#0b1310;--card:#141f1a;--txt:#eef6f1;--muted:#93a69c;--line:#23332b;--acc:#34d399;--acc2:#12352a;--warnbg:#3a1520;--felt:#0f1915;--skygge:0 8px 28px rgba(0,0,0,.35)}}
+body{font-family:ui-rounded,"SF Pro Rounded","Nunito","Segoe UI",system-ui,sans-serif;background:radial-gradient(900px 500px at 100% -10%,rgba(6,182,212,.12),transparent 60%),radial-gradient(700px 400px at -10% 30%,rgba(163,230,53,.12),transparent 60%),var(--bg);background-attachment:fixed;letter-spacing:.1px}
+header{background:var(--grad);box-shadow:0 6px 20px rgba(6,120,100,.25)}
+header h1{font-weight:800;letter-spacing:-.3px}
+header h1 img{box-shadow:0 0 0 2px rgba(255,255,255,.8);border-radius:.45em!important}
+header .ver{background:rgba(255,255,255,.2);padding:3px 9px;border-radius:20px}
+#instknap{background:rgba(255,255,255,.22)!important;border:0!important;border-radius:20px!important;font-weight:700}
+h2{font-weight:800;letter-spacing:-.4px}
+nav{background:color-mix(in srgb,var(--card) 85%,transparent);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-color:var(--line)}
+nav button{border-radius:16px;font-weight:600;transition:transform .15s,background .2s,color .2s;color:var(--muted)}
+nav button.on{background:var(--grad);color:#fff;box-shadow:0 6px 16px rgba(16,185,129,.35)}
+nav button.on .ic{animation:hop .45s ease}
+nav button:active{transform:scale(.92)}
+.card{border:0;border-radius:22px;box-shadow:var(--skygge);animation:op .35s ease both}
+main>.card:nth-child(2){animation-delay:.03s}main>.card:nth-child(3){animation-delay:.06s}main>.card:nth-child(4){animation-delay:.09s}main>.card:nth-child(5){animation-delay:.12s}main>.card:nth-child(6){animation-delay:.15s}
+input,textarea,select{border:2px solid transparent;border-radius:14px;background:var(--felt);color:var(--txt);transition:border-color .2s,box-shadow .2s}
+input:focus,textarea:focus,select:focus{outline:0;border-color:var(--acc);box-shadow:0 0 0 4px var(--acc2)}
+button.b,label.b{background:var(--grad)!important;border-radius:14px!important;font-weight:700;box-shadow:0 6px 16px rgba(16,185,129,.3);transition:transform .12s,box-shadow .2s}
+button.b:active,label.b:active,button.l:active{transform:scale(.95)}
+button.l{border:0;border-radius:14px;background:var(--felt);color:var(--txt);font-weight:600}
+button.x{border-radius:50%;width:34px;height:34px;padding:0}
+button.x:hover{background:var(--warnbg);color:var(--warn)}
+.list li{border-bottom:1px dashed var(--line)}
+.big{font-weight:800;letter-spacing:-1px}
+/* Det store »Tilbage«-kort */
+.card[style*="text-align:center"]{background:var(--grad);color:#fff;position:relative;overflow:hidden}
+.card[style*="text-align:center"]::after{content:"";position:absolute;width:220px;height:220px;right:-70px;top:-90px;border-radius:50%;background:rgba(255,255,255,.14)}
+.card[style*="text-align:center"] .muted{color:rgba(255,255,255,.88)}
+.card[style*="text-align:center"] .big{color:#fff!important;font-size:52px!important;text-shadow:0 4px 18px rgba(0,0,0,.15)}
+.card[style*="text-align:center"] .row span{background:rgba(255,255,255,.2);padding:6px 12px;border-radius:20px}
+.card[style*="text-align:center"]:has(.big[style*="warn"]){background:linear-gradient(135deg,#f43f5e,#fb923c)}
+/* Hurtigt-kortet med regnbuekant */
+.card[style*="border:2px solid"]{border:2px solid transparent!important;background:linear-gradient(var(--card),var(--card)) padding-box,linear-gradient(135deg,#10b981,#06b6d4,#a855f7,#ff4d8d) border-box!important}
+#mic,label.b{font-size:17px}
+#mic[style],#mic{background:linear-gradient(135deg,#a855f7,#ff4d8d)!important;box-shadow:0 6px 16px rgba(168,85,247,.3)}
+/* Gode råd */
+.card[style*="fffbea"]{background:linear-gradient(135deg,#fff6d5,#ffe6f0)!important;border:0!important}
+@media (prefers-color-scheme:dark){.card[style*="fffbea"]{background:linear-gradient(135deg,#2b2614,#2e1824)!important}}
+.soon{background:var(--warnbg);border-radius:12px}
+.bar{height:12px;border-radius:8px;background:var(--felt)}.bar i{background:var(--grad);border-radius:8px}
+.day{border:0;border-radius:18px;background:var(--card);box-shadow:var(--skygge)}
+.day.today{box-shadow:0 0 0 2px var(--acc),var(--skygge)}
+.rc{transition:transform .15s}.rc:hover{transform:translateY(-3px)}
+.rc h3::before{content:"🍽️ "}
+.toast{border-radius:30px;background:#13201a;box-shadow:0 10px 30px rgba(0,0,0,.25);animation:op .25s ease}
+.toast button{border-radius:20px}
+dialog{border-radius:26px;background:var(--card);color:var(--txt);animation:pop .25s ease}
+dialog::backdrop{background:rgba(5,25,18,.45);backdrop-filter:blur(3px)}
+@keyframes op{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+@keyframes pop{from{opacity:0;transform:scale(.92)}to{opacity:1;transform:none}}
+@keyframes hop{0%{transform:none}40%{transform:translateY(-5px) scale(1.15)}100%{transform:none}}
+@media (max-width:760px){
+ header{border-radius:0 0 24px 24px}
+ nav{left:10px;right:10px;bottom:max(10px,env(safe-area-inset-bottom));border:1px solid var(--line);border-radius:26px;box-shadow:0 10px 30px rgba(10,40,30,.18);padding:6px}
+ main{padding-bottom:120px}
+ .card[style*="text-align:center"] .big{font-size:46px!important}
+}
+
+
+.chips{display:flex;gap:8px;overflow-x:auto;padding:2px 2px 8px;margin-bottom:6px;-webkit-overflow-scrolling:touch}
+.chip{border:0;border-radius:20px;padding:9px 15px;background:var(--card);box-shadow:var(--skygge);font:inherit;font-weight:700;white-space:nowrap;cursor:pointer;color:var(--txt);transition:transform .12s}
+.chip:active{transform:scale(.94)}.chip.on{background:var(--grad);color:#fff}
+.rkort{padding:0!important;overflow:hidden}.rkort h3::before{content:none!important}
+.rfoto{display:block;height:150px;background-size:cover;background-position:center;position:relative}
+.rfoto.tom{display:flex;align-items:center;justify-content:center;font-size:54px;background:linear-gradient(135deg,#ffd6a8,#ffb3c1)}
+.rinfo{padding:12px 14px 14px}
+.tag{display:inline-block;font-size:12px;font-weight:700;padding:3px 9px;border-radius:10px;background:var(--acc2);color:var(--acc);margin:6px 4px 0 0}
+.harbadge{position:absolute;top:10px;right:10px;background:rgba(255,255,255,.93);color:#13201a;border-radius:14px;padding:4px 9px;font-size:13px;font-weight:800}
+dialog .dfoto{height:210px;background-size:cover;background-position:center;margin:-18px -18px 14px;border-radius:26px 26px 0 0}
+.trin{counter-reset:t;list-style:none;padding:0}.trin li{counter-increment:t;position:relative;padding:12px 12px 12px 50px;margin:8px 0;background:var(--felt);border-radius:16px}
+.trin li::before{content:counter(t);position:absolute;left:11px;top:10px;width:28px;height:28px;border-radius:50%;background:var(--grad);color:#fff;font-weight:800;display:flex;align-items:center;justify-content:center;font-size:14px}
+.ingl{padding:0;margin:0}.ingl li{list-style:none;padding:7px 0;border-bottom:1px dashed var(--line)}
+.port{display:flex;align-items:center;gap:12px}.port .l{width:42px;height:42px;padding:0;font-size:22px;border-radius:50%}
+.maal{background:var(--felt);border-radius:18px;padding:12px;margin-top:10px}
+.dimg{height:70px;border-radius:12px;background-size:cover;background-position:center;margin-top:8px;cursor:pointer}
+.mini{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;margin-top:10px}
+.minikort{border:0;background:var(--felt);border-radius:16px;overflow:hidden;padding:0 0 10px;text-align:left;font:inherit;color:var(--txt);cursor:pointer;display:flex;flex-direction:column;gap:4px}
+.minikort .rfoto{height:90px}.minikort b,.minikort .muted{padding:0 10px}.minikort .muted{font-size:12px}
+.opd{position:fixed;left:12px;right:12px;top:max(12px,env(safe-area-inset-top));z-index:30;background:var(--card);color:var(--txt);border-radius:22px;box-shadow:0 14px 40px rgba(0,0,0,.28);padding:16px;animation:pop .3s ease;max-width:560px;margin:0 auto}
+/* Version 8: fotofarver og forside */
+:root{--bg:#fff6ef;--acc:#e8553e;--acc2:#ffe7df;--grad:linear-gradient(135deg,#ff8a3d 0%,#e8364f 100%);--felt:#fff1e9;--line:#f1e2d8}
+@media (prefers-color-scheme:dark){:root{--bg:#140d0a;--card:#211612;--acc:#ff8a5c;--acc2:#3a1d14;--felt:#1a110d;--line:#3a2a22}}
+body{background:radial-gradient(900px 500px at 100% -10%,rgba(255,138,61,.14),transparent 60%),radial-gradient(700px 400px at -10% 30%,rgba(79,138,60,.12),transparent 60%),var(--bg)}
+header{background:linear-gradient(rgba(25,14,8,.55),rgba(25,14,8,.55)),url(ikoner/foto-pizza.jpg) center 32%/cover!important}
+nav button.on{box-shadow:0 6px 16px rgba(232,54,79,.35)}
+button.b,label.b{box-shadow:0 6px 16px rgba(232,85,62,.3)}
+.card[style*="text-align:center"]{background:linear-gradient(135deg,rgba(232,54,79,.82),rgba(255,138,61,.72)),url(fotos/budget.jpg) center 30%/cover}
+.card[style*="text-align:center"]:has(.big[style*="warn"]){background:linear-gradient(135deg,rgba(190,18,60,.9),rgba(120,20,40,.8)),url(fotos/budget.jpg) center 30%/cover}
+.card[style*="border:2px solid"]{background:linear-gradient(var(--card),var(--card)) padding-box,linear-gradient(135deg,#ff8a3d,#e8364f,#a855f7,#4f8a3c) border-box!important}
+.fhero{height:210px;border-radius:26px;background-size:cover;background-position:60% 22%;position:relative;overflow:hidden;display:flex;align-items:flex-end;padding:18px;color:#fff;box-shadow:var(--skygge);animation:op .35s ease both;margin-bottom:14px}
+.fhero::before{content:"";position:absolute;inset:0;background:linear-gradient(to top,rgba(20,10,5,.75),rgba(20,10,5,0) 65%)}
+.fhero>div{position:relative}.fh1{font-size:30px;font-weight:800;letter-spacing:-.5px}.fh2{font-size:17px;opacity:.92;font-weight:600}
+.tiles{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.tile{position:relative;height:160px;border:0;border-radius:24px;background-size:cover;background-position:center;overflow:hidden;color:#fff;text-align:left;padding:14px;display:flex;flex-direction:column;justify-content:flex-end;cursor:pointer;font:inherit;box-shadow:var(--skygge);animation:op .4s ease both;transition:transform .15s}
+.tile::before{content:"";position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.72),rgba(0,0,0,.05) 70%)}
+.tile>*{position:relative}.tile:active{transform:scale(.96)}.tile:hover{transform:translateY(-3px)}
+.t-budget{grid-column:1/-1;height:190px;background-position:center 30%}
+.tiles .tile:nth-child(2){animation-delay:.05s}.tiles .tile:nth-child(3){animation-delay:.1s}.tiles .tile:nth-child(4){animation-delay:.15s}.tiles .tile:nth-child(5){animation-delay:.2s}
+.te{position:absolute!important;top:12px;left:12px;font-size:24px;width:46px;height:46px;display:flex;align-items:center;justify-content:center;border-radius:50%;background:rgba(255,255,255,.28);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
+.tn{font-size:22px;font-weight:800;letter-spacing:-.3px}.ti{font-size:14px;font-weight:600;opacity:.92}
+.banner{height:120px;border-radius:22px;background-size:cover;background-position:center;position:relative;overflow:hidden;display:flex;align-items:flex-end;padding:14px 16px;margin-bottom:14px;box-shadow:var(--skygge);animation:op .3s ease both}
+.banner::before{content:"";position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.65),rgba(0,0,0,0) 75%)}
+.banner span{position:relative;color:#fff;font-size:26px;font-weight:800;letter-spacing:-.4px}
+.banner+h2{display:none}
+@media (min-width:761px){.tiles{grid-template-columns:repeat(3,1fr)}.tile{height:220px}.t-budget{grid-column:auto;height:220px}.fhero{height:280px}.banner{height:160px}}
+@media (max-width:760px){nav button{font-size:11px;padding:6px 1px}nav button .ic{font-size:19px}}
+@media (max-width:760px){.grid{grid-template-columns:1fr 1fr;gap:10px}.rkort .rfoto{height:110px}.rkort .rfoto.tom{font-size:40px}.rkort h3{font-size:16px;margin:0 0 4px}.rinfo{padding:10px}.rinfo .muted{font-size:12px}.rinfo .tag{font-size:11px}.harbadge{font-size:11px;top:6px;right:6px}}
+@media (max-width:350px){nav button{font-size:9.5px}.tile{height:135px}.tn{font-size:19px}}
+</style>
+<style>@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}</style>
 </head>
 <body>
-<header><h1><img src="ikoner/ikon-192.png" alt="" style="width:1.3em;height:1.3em;border-radius:.3em;vertical-align:-.3em;margin-right:.35em">Budget og Mad</h1><button id="instknap" onclick="visGuide()" style="display:none;border:1px solid #fff;background:none;color:#fff;border-radius:10px;padding:6px 10px;font:inherit;font-size:14px;cursor:pointer">📲<span class="itxt"> Installér</span></button><span class="ver">version 6</span></header>
+<header><h1><img src="ikoner/ikon-192.png" alt="" style="width:1.3em;height:1.3em;border-radius:.3em;vertical-align:-.3em;margin-right:.35em">Budget og Mad</h1><button id="instknap" onclick="visGuide()" style="display:none;border:1px solid #fff;background:none;color:#fff;border-radius:10px;padding:6px 10px;font:inherit;font-size:14px;cursor:pointer">📲<span class="itxt"> Installér</span></button><span class="ver" id="ver">version 8</span></header>
 <nav id="nav">
+  <button data-p="forside"><span class="ic">🏠</span>Hjem</button>
   <button data-p="opskrifter"><span class="ic">📖</span>Opskrifter</button>
   <button data-p="madplan"><span class="ic">📅</span>Madplan</button>
   <button data-p="indkob"><span class="ic">🛒</span>Indkøb</button>
@@ -120,11 +238,74 @@ label{display:block;font-size:15px;color:var(--muted);margin:10px 0 4px}
 <dialog id="dlg"><div class="in" id="dlgin"></div></dialog>
 
 <script>
-const KEY='madapp-v1';
+const KEY='madapp-v1';const APP_VERSION=8, EJER='Søren';
 let D=JSON.parse(localStorage.getItem(KEY)||'null')||{opskrifter:[],indkob:[],lager:[],madplan:{},budget:{maaned:0,udgifter:[]}};
-D.budget.ind=D.budget.ind||[];D.budget.faste=D.budget.faste||[];
+
+// Faste opskrifter (klassiske, billige retter). Fotos: se kilder.txt
+const STD_OPSKRIFTER=[
+{id:'std-frikadeller',navn:'Frikadeller',foto:'fotos/retter/frikadeller.jpg',tid:45,portioner:4,tags:['dansk'],
+ ing:['500 g hakket svinekød','1 løg','1 æg','1 dl mælk','3 spsk hvedemel','1 tsk salt','1 knsp peber','2 spsk smør'],
+ trin:['Riv eller hak løget meget fint.','Rør kødet med salt i en skål. Rør løg, æg og mel i.','Rør mælken i lidt ad gangen, til farsen er samlet og lidt blank.','Lad farsen hvile 15 minutter i køleskabet.','Form frikadeller med en spiseske. Dyp skeen i det smeltede smør imellem.','Steg dem ved middel varme ca. 5–6 minutter på hver side, til de er gennemstegte.','Server med kartofler og sovs, rødkål eller kartoffelsalat.']},
+{id:'std-boller-i-karry',navn:'Boller i karry',foto:'fotos/retter/boller.jpg',tid:50,portioner:4,tags:['dansk'],
+ ing:['500 g hakket svinekød','1 løg','1 æg','3 spsk hvedemel','1 dl mælk','1 tsk salt','2 spsk smør','2 spsk karry','3 spsk hvedemel','1 dl madlavningsfløde','3 dl ris'],
+ trin:['Hak løget fint. Rør kød, salt, halvdelen af løget, æg, 3 spsk mel og mælk til en fars.','Kog ca. 1 liter let saltet vand. Form små boller med en teske og kog dem 8–10 minutter. Tag dem op, og gem 7 dl af kogevandet.','Kog risene efter pakken.','Smelt smørret i en gryde. Svits resten af løget og karryen et minut.','Rør 3 spsk mel i. Pisk kogevandet i lidt ad gangen, og lad sovsen koge 5 minutter.','Rør fløden i, og smag til med salt. Kom bollerne i sovsen og varm dem igennem.','Server med ris.']},
+{id:'std-biksemad',navn:'Biksemad',foto:'fotos/retter/biksemad.jpg',tid:30,portioner:4,tags:['dansk','hurtig','rester'],
+ ing:['750 g kogte kartofler','400 g rester af kød eller pølser','2 løg','2 spsk smør','4 æg','1 tsk salt','1 knsp peber'],
+ trin:['Skær kartofler og kød i små tern. Hak løgene.','Steg kartoflerne i smør på en stor pande, til de er gyldne. Det tager ca. 10 minutter.','Kom løg og kød på, og steg 5–8 minutter mere. Smag til med salt og peber.','Steg et spejlæg til hver.','Server med spejlæg, rødbeder og ketchup.']},
+{id:'std-aeggekage',navn:'Æggekage med bacon',foto:'',tid:25,portioner:4,tags:['dansk','hurtig'],
+ ing:['8 æg','2 dl mælk','2 spsk hvedemel','200 g bacon','2 tomater','1 bundt purløg','1 tsk salt','1 knsp peber'],
+ trin:['Steg baconen sprød på en pande. Læg den på køkkenrulle.','Pisk æg, mælk, mel, salt og peber sammen.','Hæld æggemassen på panden med lidt af fedtet. Læg låg på, og lad den stivne ved svag varme i 10–15 minutter.','Skub forsigtigt kanten ind en gang imellem, så den ikke brænder på.','Top med bacon, tomatbåde og klippet purløg. Server med rugbrød.']},
+{id:'std-braendende-kaerlighed',navn:'Brændende kærlighed',foto:'fotos/retter/braendende.jpg',tid:35,portioner:4,tags:['dansk'],
+ ing:['1 kg kartofler','2 dl mælk','50 g smør','250 g bacon','2 løg','1 tsk salt','1 knsp peber'],
+ trin:['Skræl kartoflerne, og kog dem møre i ca. 20 minutter.','Skær bacon i tern og løg i skiver. Steg dem sprøde og gyldne.','Hæld vandet fra kartoflerne. Mos dem med varm mælk og smør. Smag til med salt og peber.','Læg mosen på tallerkenen, og top med bacon og løg.','Server gerne med rødbeder.']},
+{id:'std-millionboef',navn:'Millionbøf med kartoffelmos',foto:'fotos/retter/millionbof.jpg',tid:35,portioner:4,tags:['dansk'],
+ ing:['500 g hakket oksekød','1 løg','2 spsk hvedemel','5 dl vand','1 stk bouillonterning','1 spsk tomatpuré','1 kg kartofler','2 dl mælk','25 g smør','1 tsk salt','1 knsp peber'],
+ trin:['Skræl kartoflerne, og sæt dem over at koge i ca. 20 minutter.','Brun kødet i en gryde, og del det i små stykker. Kom hakket løg i.','Drys melet over, og rør rundt.','Tilsæt vand, bouillonterning og tomatpuré. Lad det simre 15–20 minutter.','Mos kartoflerne med varm mælk og smør.','Smag kødsovsen til med salt og peber, og server den med mosen.']},
+{id:'std-hakkeboef',navn:'Hakkebøf med bløde løg',foto:'',tid:35,portioner:4,tags:['dansk'],
+ ing:['500 g hakket oksekød','3 løg','2 spsk smør','3 dl vand','1 stk bouillonterning','1 kg kartofler','1 tsk salt','1 knsp peber'],
+ trin:['Kog kartoflerne møre i ca. 20 minutter.','Form kødet til 4 bøffer. Drys med salt og peber.','Skær løgene i tynde skiver. Steg dem bløde og gyldne i smør i ca. 15 minutter, og tag dem af panden.','Steg bøfferne 3–4 minutter på hver side.','Kom vand og bouillonterning på panden, og lad det koge op til en sovs.','Server bøfferne med løg, sovs og kartofler.']},
+{id:'std-porresuppe',navn:'Kartoffel-porresuppe',foto:'fotos/retter/porresuppe.jpg',tid:40,portioner:4,tags:['vegetar'],
+ ing:['1 kg kartofler','3 porrer','1 løg','2 spsk smør','1,5 l vand','2 stk bouillonterning','1 dl madlavningsfløde','1 tsk salt','1 knsp peber'],
+ trin:['Rens porrerne, og skær dem i skiver. Skræl kartoflerne, og skær dem i tern. Hak løget.','Svits løg og porrer i smør i 5 minutter.','Kom kartofler, vand og bouillon i. Kog i ca. 20 minutter, til kartoflerne er møre.','Blend suppen, eller mos den med et piskeris.','Rør fløden i, og smag til med salt og peber. Server med brød.']},
+{id:'std-gule-aerter',navn:'Gule ærter',foto:'fotos/retter/gulearter.jpg',tid:90,portioner:4,tags:['dansk'],
+ ing:['500 g gule ærter','1,5 l vand','1 løg','3 gulerødder','2 porrer','400 g medisterpølse','1 tsk timian','1 tsk salt'],
+ trin:['Skyl de flækkede ærter i koldt vand.','Kog ærterne i vandet med det hakkede løg i 45–60 minutter. Fjern skummet undervejs.','Skær gulerødder og porrer i stykker, og kom dem i. Kog 20 minutter mere.','Kog eller steg pølsen, og skær den i skiver.','Smag suppen til med timian og salt. Server med pølsen, sennep og rugbrød.']},
+{id:'std-risengroed',navn:'Risengrød',foto:'fotos/retter/risengrod.jpg',tid:45,portioner:4,tags:['dansk','vegetar'],
+ ing:['2,5 dl grødris','2 dl vand','1 l sødmælk','0,5 tsk salt','2 spsk sukker','1 tsk kanel','25 g smør'],
+ trin:['Kog risene i vandet i 2 minutter.','Hæld mælken i, og bring det i kog under omrøring.','Skru helt ned, læg låg på, og lad grøden simre i 35–40 minutter. Rør tit, så den ikke brænder på.','Rør salt i.','Server med kanelsukker og en klat smør.']},
+{id:'std-oellebroed',navn:'Øllebrød',foto:'',tid:25,portioner:4,tags:['dansk','vegetar','rester'],
+ ing:['300 g rugbrød','5 dl hvidtøl','5 dl vand','50 g sukker','1 stk citron','2 dl mælk'],
+ trin:['Bræk rugbrødet i stykker. Læg det i blød i vand og hvidtøl i nogle timer eller natten over.','Kog det op, og lad det koge ca. 10 minutter under omrøring.','Pisk eller blend det glat.','Smag til med sukker og revet citronskal.','Server med kold mælk. Godt til gammelt rugbrød.']},
+{id:'std-pandekager',navn:'Pandekager',foto:'fotos/retter/pandekager.jpg',tid:30,portioner:4,tags:['vegetar','hurtig'],
+ ing:['3 æg','2,5 dl hvedemel','5 dl mælk','1 spsk sukker','0,5 tsk salt','25 g smør'],
+ trin:['Pisk mel og mælk sammen lidt ad gangen, så der ikke kommer klumper.','Pisk æg, sukker og salt i. Lad dejen hvile 15 minutter.','Smelt lidt smør på en pande ved god varme.','Hæld et tyndt lag dej på, og steg ca. 1 minut på hver side.','Server med sukker, syltetøj eller frugt.']},
+{id:'std-kylling-i-karry',navn:'Kylling i karry',foto:'fotos/retter/kyllingkarry.jpg',tid:35,portioner:4,tags:[],
+ ing:['500 g kyllingebryst','1 løg','2 spsk olie','2 spsk karry','1 æble','2 spsk hvedemel','4 dl vand','1 stk bouillonterning','1 dl madlavningsfløde','3 dl ris'],
+ trin:['Kog risene efter pakken.','Skær kyllingen i tern, og brun den i olie. Tag den op.','Svits hakket løg og karry i gryden i et minut.','Drys melet over, og pisk vand og bouillonterning i.','Kom æble i tern og kyllingen i. Lad det simre ca. 10 minutter, til kyllingen er gennemstegt.','Rør fløden i, smag til, og server med ris.']},
+{id:'std-spaghetti',navn:'Spaghetti med kødsovs',foto:'fotos/retter/spaghetti.jpg',tid:35,portioner:4,tags:[],
+ ing:['500 g hakket oksekød','1 løg','2 fed hvidløg','2 gulerødder','2 dåser hakkede tomater','2 spsk tomatpuré','1 tsk oregano','400 g spaghetti','1 tsk salt','1 knsp peber'],
+ trin:['Brun kødet i en gryde.','Kom hakket løg, hvidløg og revne gulerødder i, og steg et par minutter.','Tilsæt tomater, tomatpuré og oregano. Lad det simre i 20 minutter.','Kog spaghettien efter pakken.','Smag sovsen til med salt og peber. Server med revet ost, hvis du har det.']},
+{id:'std-chili-sin-carne',navn:'Chili sin carne',foto:'fotos/retter/chili.jpg',tid:35,portioner:4,tags:['vegetar'],
+ ing:['1 løg','2 fed hvidløg','1 stk rød peberfrugt','2 gulerødder','2 spsk olie','2 tsk chilipulver','1 tsk spidskommen','2 dåser hakkede tomater','2 dåser kidneybønner','1 dåse majs','3 dl ris','1 tsk salt'],
+ trin:['Kog risene efter pakken.','Hak løg og hvidløg. Skær peberfrugt og gulerødder i små tern.','Svits grøntsagerne i olie i 5 minutter. Rør chili og spidskommen i.','Kom tomater, skyllede bønner og majs i.','Lad det simre i 20 minutter. Smag til med salt.','Server med ris og gerne lidt yoghurt naturel.']},
+{id:'std-havregroed',navn:'Havregrød',foto:'fotos/retter/havregrod.jpg',tid:10,portioner:2,tags:['dansk','vegetar','hurtig'],
+ ing:['2 dl havregryn','4 dl vand','1 knsp salt','1 æble','2 dl mælk'],
+ trin:['Kom havregryn og vand i en gryde.','Kog op under omrøring, og lad grøden simre 3–5 minutter.','Rør salt i.','Top med æble i tern og kold mælk. Kanel er også godt.']}
+];
+const BASIS=['salt','peber','vand'];
+const norm=s=>String(s||'').toLowerCase().replace(/[^a-zæøå ]/g,' ').replace(/\s+/g,' ').trim();
+const STOP=['hakket','hakkede','kogte','kogt','frisk','friske','stk','og','af','til','rester','gerne'];
+const tok=s=>norm(s).split(' ').filter(w=>w.length>1&&!STOP.includes(w));
+function iLager(navn){const n=norm(navn);if(BASIS.includes(n))return{basis:true};const w=tok(navn);if(!w.length)return null;return D.lager.find(l=>{const a=tok(l.navn);return a.length&&(a.every(x=>w.includes(x))||w.every(x=>a.includes(x)))})}
+const ENH={g:['m',1],kg:['m',1000],ml:['v',1],cl:['v',10],dl:['v',100],l:['v',1000]};
+function base(i){const e=ENH[i.enhed];return e?{k:e[0],v:i.maengde*e[1]}:{k:i.enhed,v:i.maengde}}
+function nokPaaLager(l,i){if(l.basis||l.maengde==null||i.maengde==null)return true;const a=base(l),b=base(i);return a.k===b.k&&a.v>=b.v}
+function match(o){const ing=o.ing.filter(i=>!BASIS.includes(norm(i.navn)));const har=ing.filter(i=>iLager(i.navn)).length;return{har,af:ing.length,pct:ing.length?har/ing.length:0}}
+
+D.budget.ind=D.budget.ind||[];D.budget.faste=D.budget.faste||[];D.budget.maal=D.budget.maal||[];D.priser=D.priser||{};D.stdSlettet=D.stdSlettet||[];
+STD_OPSKRIFTER.forEach(s=>{if(!D.opskrifter.some(o=>o.id===s.id)&&!D.stdSlettet.includes(s.id))D.opskrifter.push({...s,ing:s.ing.map(parseIng),trin:[...s.trin],tags:[...s.tags]})});
 let budgetMd=new Date().getFullYear()+'-'+String(new Date().getMonth()+1).padStart(2,'0');
-let side=localStorage.getItem(KEY+'-side')||'opskrifter';if(['#opskrifter','#madplan','#indkob','#lager','#budget'].includes(location.hash))side=location.hash.slice(1);
+let side='forside';if(['#forside','#opskrifter','#madplan','#indkob','#lager','#budget'].includes(location.hash))side=location.hash.slice(1);
 let ugeStart=mandag(new Date());
 const save=()=>localStorage.setItem(KEY,JSON.stringify(D));
 const id=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,6);
@@ -152,11 +333,11 @@ const sammeNavn=(a,b)=>a.trim().toLowerCase()===b.trim().toLowerCase();
 function tilIndkob(ings){
   let n=0;
   ings.forEach(i=>{
-    const paaLager=D.lager.find(l=>sammeNavn(l.navn,i.navn));
-    if(paaLager&&(i.maengde==null||paaLager.maengde==null||(paaLager.enhed===i.enhed&&paaLager.maengde>=i.maengde)))return;
+    const paaLager=iLager(i.navn);
+    if(paaLager&&nokPaaLager(paaLager,i))return;
     const fin=D.indkob.find(x=>!x.kobt&&sammeNavn(x.navn,i.navn)&&x.enhed===i.enhed);
     if(fin){if(fin.maengde!=null&&i.maengde!=null)fin.maengde+=i.maengde}
-    else D.indkob.push({id:id(),navn:i.navn,maengde:i.maengde,enhed:i.enhed,pris:null,kobt:false});
+    else D.indkob.push({id:id(),navn:i.navn,maengde:i.maengde,enhed:i.enhed,pris:D.priser[norm(i.navn)]??null,kobt:false});
     n++;
   });
   return n;
@@ -164,12 +345,18 @@ function tilIndkob(ings){
 
 const SIDER={
 opskrifter(){
-  const q=(window._q||'').toLowerCase();
-  const liste=D.opskrifter.filter(o=>!q||o.navn.toLowerCase().includes(q)||o.ing.some(i=>i.navn.toLowerCase().includes(q)));
+  const q=(window._q||'').toLowerCase(),fl=window._fl||'alle';
+  const F={alle:'Alle',dansk:'🇩🇰 Dansk',vegetar:'🥕 Vegetar',hurtig:'⏱️ Hurtig',kan:'🥫 Kan laves nu',mine:'⭐ Mine'};
+  let liste=D.opskrifter.filter(o=>!q||o.navn.toLowerCase().includes(q)||o.ing.some(i=>i.navn.toLowerCase().includes(q)));
+  if(fl==='kan')liste=liste.filter(o=>match(o).pct>=.6).sort((a,b)=>match(b).pct-match(a).pct);
+  else if(fl==='mine')liste=liste.filter(o=>!String(o.id).startsWith('std-'));
+  else if(fl==='hurtig')liste=liste.filter(o=>(o.tags||[]).includes('hurtig')||(o.tid&&o.tid<=30));
+  else if(fl!=='alle')liste=liste.filter(o=>(o.tags||[]).includes(fl));
   return `<h2>Opskrifter</h2>
-  <div class="row" style="margin-bottom:14px"><input class="grow" id="soeg" placeholder="Søg i opskrifter eller ingredienser" value="${esc(window._q||'')}"><button class="b" onclick="redigerOpskrift()">+ Ny opskrift</button></div>
-  ${liste.length?`<div class="grid">${liste.map(o=>`<div class="card rc" onclick="visOpskrift('${o.id}')"><h3>${esc(o.navn)}</h3><div class="muted">${o.portioner?o.portioner+' portioner · ':''}${o.ing.length} ingredienser</div></div>`).join('')}</div>`
-  :`<div class="card empty">${D.opskrifter.length?'Ingen opskrifter passer til søgningen.':'Du har ingen opskrifter endnu. Tryk på »+ Ny opskrift«.'}</div>`}`;
+  <div class="row" style="margin-bottom:12px"><input class="grow" id="soeg" placeholder="Søg i opskrifter eller ingredienser" value="${esc(window._q||'')}"><button class="b" onclick="redigerOpskrift()">+ Ny opskrift</button></div>
+  <div class="chips">${Object.entries(F).map(([k,v])=>`<button class="chip ${fl===k?'on':''}" onclick="window._fl='${k}';vis()">${v}</button>`).join('')}</div>
+  ${liste.length?`<div class="grid">${liste.map(o=>{const mt=match(o);return `<div class="card rc rkort" onclick="visOpskrift('${o.id}')"><div class="rfoto ${o.foto?'':'tom'}" ${o.foto?`style="background-image:url(${o.foto})"`:''}>${o.foto?'':'🍽️'}${D.lager.length&&mt.har?`<span class="harbadge">✅ ${mt.har}/${mt.af}</span>`:''}</div><div class="rinfo"><h3>${esc(o.navn)}</h3><div class="muted">${o.tid?'⏱️ '+o.tid+' min · ':''}${o.portioner?o.portioner+' pers. · ':''}${o.ing.length} ingredienser</div><div>${(o.tags||[]).map(x=>`<span class="tag">${x}</span>`).join('')}</div></div></div>`}).join('')}</div>`
+  :`<div class="card empty">${fl==='kan'?'Læg det, du har derhjemme, på Lager – så viser jeg, hvad du kan lave.':D.opskrifter.length?'Ingen opskrifter passer.':'Du har ingen opskrifter endnu. Tryk på »+ Ny opskrift«.'}</div>`}`;
 },
 madplan(){
   const dage=[...Array(7)].map((_,i)=>{const d=new Date(ugeStart);d.setDate(d.getDate()+i);return d});
@@ -178,16 +365,16 @@ madplan(){
   <div class="row" style="margin-bottom:14px"><button class="l" onclick="skiftUge(-1)">‹ Forrige</button><b style="flex:1;text-align:center">Uge ${uge} · ${dage[0].toLocaleDateString('da-DK',{day:'numeric',month:'short'})} – ${dage[6].toLocaleDateString('da-DK',{day:'numeric',month:'short'})}</b><button class="l" onclick="skiftUge(1)">Næste ›</button></div>
   <div class="week">${dage.map((d,i)=>{const k=iso(d),v=D.madplan[k]||{};return `<div class="day ${k===idag?'today':''}"><b>${DAGE[i]}</b><span class="muted">${d.toLocaleDateString('da-DK',{day:'numeric',month:'short'})}</span>
     <select onchange="setPlan('${k}','opskrift',this.value)"><option value="">– vælg opskrift –</option>${D.opskrifter.map(o=>`<option value="${o.id}" ${v.opskrift===o.id?'selected':''}>${esc(o.navn)}</option>`).join('')}</select>
-    <input placeholder="eller skriv selv" value="${esc(v.tekst||'')}" onchange="setPlan('${k}','tekst',this.value)"></div>`}).join('')}</div>
-  <div class="row" style="margin-top:14px"><button class="b" onclick="ugeTilIndkob()">🛒 Læg ugens ingredienser på indkøbslisten</button></div>
+    <input placeholder="eller skriv selv" value="${esc(v.tekst||'')}" onchange="setPlan('${k}','tekst',this.value)">${(()=>{const o=v.opskrift&&D.opskrifter.find(x=>x.id===v.opskrift);return o&&o.foto?`<div class="dimg" style="background-image:url(${o.foto})" onclick="visOpskrift('${o.id}')"></div>`:''})()}</div>`}).join('')}</div>
+  <div class="row" style="margin-top:14px"><button class="b" onclick="ugeTilIndkob()">🛒 Læg ugens ingredienser på indkøbslisten</button><button class="b" style="background:linear-gradient(135deg,#a855f7,#ff4d8d)!important" onclick="foreslaaUge()">✨ Foreslå ugen</button><button class="l" onclick="del('madplan')">📤 Del ugen</button></div>
   <p class="muted">Det, du allerede har nok af på lageret, kommer ikke på listen.</p>`;
 },
 indkob(){
   const ikke=D.indkob.filter(x=>!x.kobt),kobt=D.indkob.filter(x=>x.kobt);
   const li=x=>`<li class="${x.kobt?'done':''}"><input type="checkbox" ${x.kobt?'checked':''} onchange="kobt('${x.id}',this.checked)" style="width:22px;height:22px"><span class="n">${esc(ingTekst(x))}</span><input type="number" min="0" step="0.01" placeholder="pris kr" value="${x.pris??''}" style="width:100px" onchange="setPris('${x.id}',this.value)"><button class="x" title="Slet" onclick="sletVare('${x.id}')">✕</button></li>`;
   return `<h2>Indkøb</h2>
-  <div class="card"><div class="row"><input class="grow" id="nyvare" placeholder="Fx 1 l mælk"><button class="b" onclick="tilfojVare()">Tilføj</button></div></div>
-  <div class="card"><ul class="list">${ikke.length?ikke.map(li).join(''):'<li class="empty" style="justify-content:center">Indkøbslisten er tom.</li>'}</ul></div>
+  <div class="card"><div class="row"><input class="grow" id="nyvare" placeholder="Fx 1 l mælk"><button class="b" onclick="tilfojVare()">Tilføj</button><button class="l" onclick="del('indkob')">📤 Del listen</button></div></div>
+  <div class="card"><ul class="list">${ikke.length?ikke.map(li).join(''):'<li class="empty" style="justify-content:center">Indkøbslisten er tom.</li>'}</ul>${(()=>{const p=ikke.filter(x=>x.pris);return p.length?`<p class="muted" style="margin:10px 0 0">💡 Ca. ${kr(p.reduce((s,x)=>s+x.pris,0))} for ${p.length} af ${ikke.length} varer – ud fra dine egne priser.</p>`:''})()}</div>
   ${kobt.length?`<div class="card"><b>Købt (${kobt.length})</b><ul class="list">${kobt.map(li).join('')}</ul>
   <div class="row" style="margin-top:10px"><button class="b" onclick="kobtTilLager()">🥫 Flyt købte til lager</button></div>
   <p class="muted">Priser du har skrevet, bliver lagt i budgettet.</p></div>`:''}`;
@@ -201,6 +388,7 @@ lager(){
     return `<li class="${soon?'soon':''}"><span class="n">${esc(ingTekst(x))}</span>
     <span class="exp muted">${x.udlob?(dage<0?'Udløbet':dage===0?'Udløber i dag':'Holdbar til '+new Date(x.udlob).toLocaleDateString('da-DK',{day:'numeric',month:'short'})):''}</span>
     <button class="l" onclick="brugLager('${x.id}')">Brugt</button></li>`}).join(''):'<li class="empty" style="justify-content:center">Lageret er tomt.</li>'}</ul></div>
+  ${kanLave()}
   <p class="muted">Varer der udløber inden for 3 dage, er farvet.</p>`;
 },
 budget(){
@@ -209,14 +397,14 @@ budget(){
   const brugt=u.reduce((s,x)=>s+x.belob,0),b=D.budget.maaned||0,pct=b?Math.min(100,brugt/b*100):0;
   const navn=new Date(md+'-01').toLocaleDateString('da-DK',{month:'long',year:'numeric'});
   const ind=D.budget.ind.filter(x=>x.dato.slice(0,7)===md),sumInd=ind.reduce((s,x)=>s+x.belob,0);
-  const sumFaste=D.budget.faste.reduce((s,x)=>s+x.belob,0),tilbage=sumInd-sumFaste-brugt;
+  const sumFaste=D.budget.faste.reduce((s,x)=>s+x.belob,0),sparetMd=sparetI(md),tilbage=sumInd-sumFaste-brugt-sparetMd;
   const nu=new Date(),dageIgen=new Date(nu.getFullYear(),nu.getMonth()+1,0).getDate()-nu.getDate()+1;
   const kort=x=>new Date(x.dato).toLocaleDateString('da-DK',{day:'numeric',month:'short'});
   return `<div class="row" style="margin-bottom:12px"><button class="l" onclick="skiftMd(-1)">‹</button><h2 style="flex:1;text-align:center;margin:0">Budget · ${navn}</h2><button class="l" onclick="skiftMd(1)">›</button></div>
   <div class="card" style="text-align:center"><div class="muted">Tilbage i ${navn.split(' ')[0]}</div>
   <div class="big" style="font-size:40px;color:${tilbage<0?'var(--warn)':'var(--acc)'}">${kr(tilbage)}</div>
   ${erNu&&tilbage>0?`<div class="muted">Det er ca. ${kr(Math.floor(tilbage/dageIgen))} pr. dag resten af måneden (${dageIgen} dage)</div>`:''}
-  <div class="row" style="justify-content:center;gap:18px;margin-top:10px"><span>💵 Ind: <b>${kr(sumInd)}</b></span><span>🏠 Faste: <b>${kr(sumFaste)}</b></span><span>🛒 Køb: <b>${kr(brugt)}</b></span></div></div>
+  <div class="row" style="justify-content:center;gap:18px;margin-top:10px"><span>💵 Ind: <b>${kr(sumInd)}</b></span><span>🏠 Faste: <b>${kr(sumFaste)}</b></span><span>🛒 Køb: <b>${kr(brugt)}</b></span>${D.budget.maal.length?`<span>🐷 Sparet: <b>${kr(sparetMd)}</b></span>`:''}</div></div>
   ${tipsKort(sumInd,sumFaste,brugt,tilbage,erNu)}
   <div class="card" style="border:2px solid var(--acc)"><b>⚡ Hurtigt: sig det, skriv det eller tag et billede</b>
   <div class="muted" style="margin:4px 0 8px">Fx »løn 12.000«, »husleje 4500« eller »Netto 250«</div>
@@ -233,6 +421,7 @@ budget(){
   <div class="card"><b>🏠 Faste udgifter hver måned</b> <span class="muted">– fx husleje, mobil, transport</span>
   <div class="row" style="margin-top:8px"><input class="grow" id="ftekst" placeholder="Fx Husleje"><input type="text" inputmode="decimal" id="fbelob" placeholder="kr" style="width:120px"><button class="b" onclick="tilfojFast()">Tilføj</button></div>
   <ul class="list">${D.budget.faste.map(x=>`<li><span class="n">${esc(x.tekst)}</span><b>${kr(x.belob)}</b><button class="x" title="Slet" onclick="sletFast('${x.id}')">✕</button></li>`).join('')}</ul></div>
+  ${opsparingKort()}
   <h2 style="margin-top:22px">🛒 Køb</h2>
   <div class="card"><div class="row"><label style="margin:0">Budget til mad pr. måned</label><input type="text" inputmode="decimal" id="mbudget" value="${b||''}" placeholder="kr" style="width:140px"><button class="l" onclick="setBudget()">Gem</button></div>
   ${b?`<div class="bar"><i class="${brugt>b?'over':''}" style="width:${pct}%"></i></div>`:''}</div>
@@ -249,7 +438,7 @@ function ugenr(d){d=new Date(Date.UTC(d.getFullYear(),d.getMonth(),d.getDate()))
 
 function vis(){
   document.querySelectorAll('#nav button').forEach(b=>b.classList.toggle('on',b.dataset.p===side));
-  document.getElementById('main').innerHTML=SIDER[side]();
+  document.getElementById('main').innerHTML=(side!=='forside'?banner(side):'')+SIDER[side]();
   const s=document.getElementById('soeg');if(s){s.oninput=()=>{window._q=s.value;const p=s.selectionStart;vis();const n=document.getElementById('soeg');n.focus();n.setSelectionRange(p,p)}}
   [['nyvare',tilfojVare],['nylager',tilfojLager],['ubelob',tilfojUdgift],['ibelob',tilfojInd],['hurtig',hurtigTekst],['fbelob',tilfojFast]].forEach(([i,f])=>{const e=document.getElementById(i);if(e)e.onkeydown=ev=>{if(ev.key==='Enter')f()}});
 }
@@ -257,13 +446,28 @@ document.querySelectorAll('#nav button').forEach(b=>b.onclick=()=>{side=b.datase
 
 // Opskrifter
 const dlg=document.getElementById('dlg'),dlgin=document.getElementById('dlgin');
-function visOpskrift(oid){
+let visPort=null;
+function skal(i,o,p){if(i.maengde==null||!o.portioner)return{...i};let v=i.maengde*p/o.portioner;v=['','stk','fed','dåse','dåser'].includes(i.enhed)?Math.max(.5,Math.round(v*2)/2):Math.round(v*10)/10;return{...i,maengde:v}}
+function visOpskrift(oid,p){
   const o=D.opskrifter.find(x=>x.id===oid);if(!o)return;
-  dlgin.innerHTML=`<h2>${esc(o.navn)}</h2>${o.portioner?`<div class="muted">${o.portioner} portioner</div>`:''}
-  <h3>Ingredienser</h3><ul>${o.ing.map(i=>`<li>${esc(ingTekst(i))}</li>`).join('')||'<li class="muted">Ingen</li>'}</ul>
-  ${o.frem?`<h3>Sådan gør du</h3><div style="white-space:pre-wrap">${esc(o.frem)}</div>`:''}
-  <div class="row" style="margin-top:16px"><button class="b" onclick="opskriftTilIndkob('${o.id}')">🛒 På indkøbslisten</button><button class="l" onclick="redigerOpskrift('${o.id}')">Ret</button><button class="l" onclick="sletOpskrift('${o.id}')">Slet</button><button class="l" onclick="dlg.close()">Luk</button></div>`;
+  p=p||o.portioner||4;visPort=p;const ing=o.ing.map(i=>skal(i,o,p)),mt=match(o);
+  const dage=[...Array(7)].map((_,k)=>{const d=new Date();d.setHours(0,0,0,0);d.setDate(d.getDate()+k);return d});
+  dlgin.innerHTML=`${o.foto?`<div class="dfoto" style="background-image:url(${o.foto})"></div>`:''}<h2>${esc(o.navn)}</h2>
+  <div>${o.tid?`<span class="tag">⏱️ ${o.tid} min</span>`:''}${(o.tags||[]).map(x=>`<span class="tag">${x}</span>`).join('')}${D.lager.length?`<span class="tag">🥫 Du har ${mt.har}/${mt.af}</span>`:''}</div>
+  ${o.portioner?`<div class="port" style="margin-top:12px"><button class="l" onclick="visOpskrift('${o.id}',${Math.max(1,p-1)})">−</button><b>${p} personer</b><button class="l" onclick="visOpskrift('${o.id}',${p+1})">+</button></div>`:''}
+  <h3>Ingredienser</h3><ul class="ingl">${ing.map(i=>{const h=iLager(i.navn);return `<li>${h?'✅':'▫️'} ${esc(ingTekst(i))}</li>`}).join('')||'<li class="muted">Ingen</li>'}</ul>
+  ${o.trin&&o.trin.length?`<h3>Sådan gør du</h3><ol class="trin">${o.trin.map(x=>`<li>${esc(x)}</li>`).join('')}</ol>`:o.frem?`<h3>Sådan gør du</h3><div style="white-space:pre-wrap">${esc(o.frem)}</div>`:''}
+  <div class="row" style="margin-top:16px"><button class="b" onclick="opskriftTilIndkob('${o.id}')">🛒 På indkøbslisten</button><button class="b" onclick="document.getElementById('vdag').hidden=false">📅 På madplan</button><button class="b" onclick="lavRet('${o.id}')">👩‍🍳 Jeg har lavet den</button></div>
+  <div id="vdag" hidden><p class="muted" style="margin:10px 0 6px">Hvilken dag?</p><div class="chips">${dage.map(d=>`<button class="chip" onclick="setPlan('${iso(d)}','opskrift','${o.id}');dlg.close();toast('${esc(o.navn)} er sat på ${d.toLocaleDateString('da-DK',{weekday:'long'})}')">${d.toLocaleDateString('da-DK',{weekday:'short',day:'numeric'})}</button>`).join('')}</div></div>
+  <div class="row" style="margin-top:10px"><button class="l" onclick="del('opskrift:${o.id}')">📤 Del</button><button class="l" onclick="redigerOpskrift('${o.id}')">Ret</button><button class="l" onclick="sletOpskrift('${o.id}')">Slet</button><button class="l" onclick="dlg.close()">Luk</button></div>
+  <p class="muted" style="font-size:13px">✅ = det har du på lager. Salt, peber og vand regner vi med, at du har.</p>`;
   if(!dlg.open)dlg.showModal();
+}
+function lavRet(oid){
+  const o=D.opskrifter.find(x=>x.id===oid);if(!o)return;const s=snap();let n=0;
+  o.ing.map(i=>skal(i,o,visPort||o.portioner)).forEach(i=>{const l=iLager(i.navn);if(!l||l.basis)return;n++;
+    if(l.maengde==null){D.lager=D.lager.filter(x=>x!==l);return}if(i.maengde==null)return;const a=base(l),b=base(i);if(a.k!==b.k)return;const rest=(a.v-b.v)/(ENH[l.enhed]?ENH[l.enhed][1]:1);if(rest<=0.0001)D.lager=D.lager.filter(x=>x!==l);else l.maengde=Math.round(rest*100)/100});
+  save();dlg.close();vis();toast(n?'Velbekomme! '+n+' varer er trukket fra lageret 😋':'Velbekomme! 😋',n?fortrydTil(s):null);
 }
 function redigerOpskrift(oid){
   const o=D.opskrifter.find(x=>x.id===oid)||{navn:'',portioner:'',ing:[],frem:''};
@@ -271,19 +475,21 @@ function redigerOpskrift(oid){
   <label>Navn</label><input id="onavn" style="width:100%" value="${esc(o.navn)}">
   <label>Portioner</label><input id="oport" type="number" min="1" style="width:100px" value="${o.portioner||''}">
   <label>Ingredienser (én pr. linje, fx »200 g mel«)</label><textarea id="oing">${esc(o.ing.map(ingTekst).join('\n'))}</textarea>
-  <label>Sådan gør du</label><textarea id="ofrem">${esc(o.frem)}</textarea>
+  <label>Sådan gør du${o.trin?' (ét trin pr. linje)':''}</label><textarea id="ofrem">${esc(o.trin?o.trin.join('\n'):o.frem)}</textarea>
   <div class="row" style="margin-top:14px"><button class="b" onclick="gemOpskrift('${oid||''}')">Gem</button><button class="l" onclick="dlg.close()">Annullér</button></div>`;
   if(!dlg.open)dlg.showModal();
 }
 function gemOpskrift(oid){
   const navn=document.getElementById('onavn').value.trim();if(!navn){alert('Skriv et navn');return}
-  const o={id:oid||id(),navn,portioner:parseInt(document.getElementById('oport').value)||null,
-    ing:document.getElementById('oing').value.split('\n').filter(l=>l.trim()).map(parseIng),frem:document.getElementById('ofrem').value.trim()};
+  const gl=D.opskrifter.find(x=>x.id===oid)||{},frem=document.getElementById('ofrem').value.trim();
+  const o={...gl,id:oid||id(),navn,portioner:parseInt(document.getElementById('oport').value)||null,
+    ing:document.getElementById('oing').value.split('\n').filter(l=>l.trim()).map(parseIng),frem:gl.trin?'':frem};
+  if(gl.trin)o.trin=frem.split('\n').map(s=>s.trim()).filter(Boolean);
   const i=D.opskrifter.findIndex(x=>x.id===oid);if(i>=0)D.opskrifter[i]=o;else D.opskrifter.push(o);
   save();dlg.close();vis();toast('Opskriften er gemt');
 }
-function sletOpskrift(oid){const s=snap();D.opskrifter=D.opskrifter.filter(x=>x.id!==oid);save();dlg.close();vis();toast('Opskriften er slettet',fortrydTil(s))}
-function opskriftTilIndkob(oid){const s=snap();const o=D.opskrifter.find(x=>x.id===oid);const n=tilIndkob(o.ing);save();dlg.close();vis();toast(n?n+' varer lagt på indkøbslisten':'Du har det hele på lageret',n?fortrydTil(s):null)}
+function sletOpskrift(oid){const s=snap();if(String(oid).startsWith('std-'))D.stdSlettet.push(oid);D.opskrifter=D.opskrifter.filter(x=>x.id!==oid);save();dlg.close();vis();toast('Opskriften er slettet',fortrydTil(s))}
+function opskriftTilIndkob(oid){const s=snap();const o=D.opskrifter.find(x=>x.id===oid);const n=tilIndkob(o.ing.map(i=>skal(i,o,visPort||o.portioner)));save();dlg.close();vis();toast(n?n+' varer lagt på indkøbslisten':'Du har det hele på lageret',n?fortrydTil(s):null)}
 
 // Madplan
 function skiftUge(n){ugeStart.setDate(ugeStart.getDate()+7*n);vis()}
@@ -296,7 +502,7 @@ function ugeTilIndkob(){
 }
 
 // Indkøb
-function tilfojVare(){const e=document.getElementById('nyvare');if(!e.value.trim())return;const p=parseIng(e.value);D.indkob.push({id:id(),...p,pris:null,kobt:false});save();vis();document.getElementById('nyvare').focus()}
+function tilfojVare(){const e=document.getElementById('nyvare');if(!e.value.trim())return;const p=parseIng(e.value);D.indkob.push({id:id(),...p,pris:D.priser[norm(p.navn)]??null,kobt:false});save();vis();document.getElementById('nyvare').focus()}
 function kobt(vid,v){D.indkob.find(x=>x.id===vid).kobt=v;save();vis()}
 function setPris(vid,v){D.indkob.find(x=>x.id===vid).pris=v===''?null:parseFloat(v);save()}
 function sletVare(vid){const s=snap();D.indkob=D.indkob.filter(x=>x.id!==vid);save();vis();toast('Varen er slettet',fortrydTil(s))}
@@ -304,7 +510,7 @@ function kobtTilLager(){
   const s=snap();const k=D.indkob.filter(x=>x.kobt);let sum=0;
   k.forEach(x=>{const l=D.lager.find(y=>sammeNavn(y.navn,x.navn)&&y.enhed===x.enhed);
     if(l&&l.maengde!=null&&x.maengde!=null)l.maengde+=x.maengde;else if(!l)D.lager.push({id:id(),navn:x.navn,maengde:x.maengde,enhed:x.enhed,udlob:''});
-    if(x.pris)sum+=x.pris});
+    if(x.pris){sum+=x.pris;D.priser[norm(x.navn)]=x.pris}});
   if(sum)D.budget.udgifter.push({id:id(),dato:iso(new Date()),tekst:'Indkøb ('+k.length+' varer)',belob:sum});
   D.indkob=D.indkob.filter(x=>!x.kobt);save();vis();toast(k.length+' varer flyttet til lager'+(sum?' · '+kr(sum)+' i budget':''),fortrydTil(s));
 }
@@ -330,9 +536,50 @@ function csv(){
   D.budget.faste.forEach(x=>r.push([md,'Fast udgift',q(x.tekst),f(-x.belob)]));
   D.budget.udgifter.filter(x=>x.dato.slice(0,7)===md).forEach(x=>r.push([x.dato,'Køb',q(x.tekst),f(-x.belob)]));
   const si=D.budget.ind.filter(x=>x.dato.slice(0,7)===md).reduce((s,x)=>s+x.belob,0),sf=D.budget.faste.reduce((s,x)=>s+x.belob,0),sk=D.budget.udgifter.filter(x=>x.dato.slice(0,7)===md).reduce((s,x)=>s+x.belob,0);
-  r.push([],['','','Tilbage',f(si-sf-sk)]);
+  D.budget.maal.forEach(g=>g.ind.filter(x=>x.dato.slice(0,7)===md).forEach(x=>r.push([x.dato,'Opsparing',q(g.navn),f(-x.belob)])));const sp=sparetI(md);r.push([],['','','Tilbage',f(si-sf-sk-sp)]);
   const a=document.createElement('a');a.href=URL.createObjectURL(new Blob(['﻿'+r.map(x=>x.join(';')).join('\r\n')],{type:'text/csv'}));a.download='budget-'+md+'.csv';a.click();
 }
+
+// Opsparing (version 8)
+const sparetI=md=>D.budget.maal.reduce((s,g)=>s+g.ind.filter(x=>x.dato.slice(0,7)===md).reduce((a,x)=>a+x.belob,0),0);
+function budgetTal(md){const ind=D.budget.ind.filter(x=>x.dato.slice(0,7)===md).reduce((s,x)=>s+x.belob,0),faste=D.budget.faste.reduce((s,x)=>s+x.belob,0),kob=D.budget.udgifter.filter(x=>x.dato.slice(0,7)===md).reduce((s,x)=>s+x.belob,0),sparet=sparetI(md);return{ind,faste,kob,sparet,tilbage:ind-faste-kob-sparet}}
+function maalEmoji(n){n=norm(n);const l=[['ferie|rejse|tur','✈️'],['telefon|iphone|mobil','📱'],['computer|pc|mac','💻'],['bil|kørekort','🚗'],['cykel','🚲'],['koncert|festival|billet','🎟️'],['gave|jul','🎁'],['buffer|nød|uforudset','🛟'],['tøj|sko','👟'],['spil|playstation|xbox','🎮'],['flytte|lejlighed|depositum','🏠']];for(const[k,e]of l)if(new RegExp(k).test(n))return e;return '🎯'}
+function opsparingKort(){
+  return `<div class="card"><b>🐷 Opsparing</b> <span class="muted">– spar op til noget, du drømmer om</span>
+  ${D.budget.maal.map(g=>{const s=g.ind.reduce((a,x)=>a+x.belob,0),p=Math.min(100,g.maal?s/g.maal*100:0);return `<div class="maal"><div class="row"><span style="font-size:28px">${g.emoji}</span><b style="flex:1">${esc(g.navn)}</b><span><b>${kr(s)}</b> / ${kr(g.maal)}</span><button class="x" title="Slet" onclick="sletMaal('${g.id}')">✕</button></div>
+   <div class="bar"><i style="width:${p}%"></i></div>${p>=100?'<div style="font-weight:800">🎉 Mål nået! Sejt gået!</div>':`<div class="muted" style="font-size:14px">${kr(g.maal-s)} tilbage · ${Math.round(p)} %</div>`}
+   <div class="row" style="margin-top:8px"><input type="text" inputmode="decimal" id="ms-${g.id}" placeholder="kr" style="flex:1 1 90px"><button class="b" onclick="spar('${g.id}',1)">+ Læg til</button><button class="l" onclick="spar('${g.id}',-1)">− Tag ud</button></div></div>`}).join('')}
+  <div class="row" style="margin-top:12px"><input id="mnavn" class="grow" placeholder="Fx Ny telefon, Ferie, Buffer"><input id="mbelob" type="text" inputmode="decimal" placeholder="Mål i kr" style="width:120px"><button class="b" onclick="nytMaal()">+ Nyt mål</button></div>
+  <p class="muted" style="font-size:14px;margin-bottom:0">Det, du lægger til opsparing, trækkes fra »Tilbage« i den måned.</p></div>`;
+}
+function nytMaal(){const n=document.getElementById('mnavn').value.trim(),b=tal('mbelob');if(!n||!b){alert('Skriv hvad du sparer op til og hvor meget');return}D.budget.maal.push({id:id(),navn:n,emoji:maalEmoji(n),maal:b,ind:[]});save();vis();toast('Nyt sparemål: '+n+' 🐷')}
+function spar(gid,fortegn){const g=D.budget.maal.find(x=>x.id===gid),b=tal('ms-'+gid);if(!b){alert('Skriv et beløb');return}const s=snap(),har=g.ind.reduce((a,x)=>a+x.belob,0);if(fortegn<0&&b>har){alert('Der er kun '+kr(har)+' på opsparingen');return}
+  g.ind.push({dato:datoIMd(),belob:fortegn*b});save();vis();const ny=har+fortegn*b;toast(fortegn>0?(ny>=g.maal?'🎉 Du har nået dit mål!':'+'+kr(b)+' til '+g.navn+' 🐷'):kr(b)+' taget ud',fortrydTil(s))}
+function sletMaal(gid){const s=snap();D.budget.maal=D.budget.maal.filter(x=>x.id!==gid);save();vis();toast('Sparemålet er slettet',fortrydTil(s))}
+// Lager -> opskrifter
+function kanLave(){
+  if(!D.lager.length)return '';
+  const idag=new Date();idag.setHours(0,0,0,0);const snart=D.lager.filter(x=>x.udlob&&(new Date(x.udlob)-idag)/864e5<=3);
+  const l=D.opskrifter.map(o=>({o,m:match(o),s:snart.some(v=>o.ing.some(i=>iLager(i.navn)===v))})).filter(x=>x.m.har>0&&(x.m.pct>=.5||x.s)).sort((a,b)=>(b.s-a.s)||(b.m.pct-a.m.pct)).slice(0,6);
+  if(!l.length)return '';
+  return `<div class="card"><b>👩‍🍳 Det kan du lave med det, du har</b><div class="mini">${l.map(x=>`<button class="minikort" onclick="visOpskrift('${x.o.id}')"><span class="rfoto ${x.o.foto?'':'tom'}" ${x.o.foto?`style="background-image:url(${x.o.foto})"`:''}>${x.o.foto?'':'🍽️'}</span><b>${esc(x.o.navn)}</b><span class="muted">${x.s?'⏰ Brug det, der udløber · ':''}✅ ${x.m.har}/${x.m.af}</span></button>`).join('')}</div></div>`;
+}
+function forsideTips(){
+  const idag=new Date();idag.setHours(0,0,0,0);
+  const snart=D.lager.filter(x=>x.udlob&&(new Date(x.udlob)-idag)/864e5<=3);
+  if(snart.length){const o=D.opskrifter.find(o=>snart.some(v=>o.ing.some(i=>iLager(i.navn)===v)));return `<div class="card" style="margin-top:14px"><b>⏰ ${esc(snart[0].navn)} udløber snart</b>${o?`<div class="row" style="margin-top:8px"><span style="flex:1">Lav <b>${esc(o.navn)}</b> – så bliver intet smidt ud.</span><button class="b" onclick="visOpskrift('${o.id}')">Se retten</button></div>`:''}</div>`}
+  if(!D.madplan[iso(new Date())])return `<div class="card" style="margin-top:14px"><div class="row"><span style="flex:1">🤔 Ved du ikke, hvad du skal spise? Lad appen foreslå ugens mad.</span><button class="b" onclick="gaaTil('madplan');foreslaaUge()">✨ Foreslå</button></div></div>`;
+  return '';
+}
+function foreslaaUge(){
+  const s=snap();let brugt=new Set(),n=0;
+  const valg=[...D.opskrifter].map(o=>({o,r:match(o).pct+Math.random()*.5})).sort((a,b)=>b.r-a.r).map(x=>x.o);
+  if(!valg.length){toast('Der er ingen opskrifter endnu');return}
+  for(let i=0;i<7;i++){const d=new Date(ugeStart);d.setDate(d.getDate()+i);const k=iso(d);if(D.madplan[k]&&(D.madplan[k].opskrift||D.madplan[k].tekst))continue;
+    const o=valg.find(x=>!brugt.has(x.id))||valg[i%valg.length];brugt.add(o.id);D.madplan[k]={opskrift:o.id};n++}
+  save();vis();toast(n?'✨ '+n+' dage er fyldt med mad':'Ugen er allerede fyldt',n?fortrydTil(s):null);
+}
+
 // Venlige tips (kan slås fra)
 const TIPS=['Lav en madplan for ugen, før du handler. Så køber du kun det, du skal bruge.',
 'Kig i tilbudsaviserne, før du handler. Byg gerne madplanen ud fra tilbuddene.',
@@ -418,6 +665,24 @@ function sletUdgift(uid){const s=snap();D.budget.udgifter=D.budget.udgifter.filt
 function eksport(){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(D,null,1)],{type:'application/json'}));a.download='budget-og-mad-kopi-'+iso(new Date())+'.json';a.click()}
 function importer(inp){const f=inp.files[0];if(!f)return;f.text().then(t=>{try{const n=JSON.parse(t);if(!n.opskrifter)throw 0;if(!confirm('Erstat alle data med kopien?'))return;const s=snap();D=n;save();vis();toast('Kopien er hentet',fortrydTil(s))}catch(e){alert('Filen kan ikke læses')}})}
 
+
+// Forside med fotoknapper (version 8)
+const FOTO={budget:['fotos/budget.jpg','💰','Budget'],opskrifter:['fotos/opskrifter.jpg','📖','Opskrifter'],madplan:['fotos/madplan.jpg','📅','Madplan'],indkob:['fotos/indkob.jpg','🛒','Indkøb'],lager:['fotos/lager.jpg','🥫','Lager']};
+function gaaTil(p){side=p;localStorage.setItem(KEY+'-side',p);vis();scrollTo(0,0)}
+function banner(p){const f=FOTO[p];return f?`<div class="banner" style="background-image:url(${f[0]})"><span>${f[1]} ${f[2]}</span></div>`:''}
+SIDER.forside=function(){
+  const nu=new Date(),md=iso(nu).slice(0,7),idag=new Date(nu);idag.setHours(0,0,0,0);
+  const plan=D.madplan[iso(nu)]||{},ret=plan.opskrift?(D.opskrifter.find(o=>o.id===plan.opskrift)||{}).navn:plan.tekst;
+  const snart=D.lager.filter(x=>x.udlob&&(new Date(x.udlob)-idag)/864e5<=3).length,paaListe=D.indkob.filter(x=>!x.kobt).length;
+  const b=budgetTal(md);
+  const info={budget:b.ind?'Tilbage: '+kr(b.tilbage):'Skriv din løn ind',opskrifter:D.opskrifter.length?D.opskrifter.length+' opskrifter':'Gem din første ret',madplan:ret?'I dag: '+ret:'Hvad skal du spise i dag?',indkob:paaListe?paaListe+' ting på listen':'Listen er tom',lager:D.lager.length?D.lager.length+' varer'+(snart?' · '+snart+' udløber snart':''):'Hvad har du derhjemme?'};
+  const h=nu.getHours(),hilsen=h<10?'Godmorgen':h<17?'Hej':'Godaften';
+  return `<div class="fhero" style="background-image:url(ikoner/foto-pizza.jpg)"><div><div class="fh1">${hilsen} 👋</div><div class="fh2">Hvad skal vi i dag?</div></div></div>
+  <div class="tiles">${Object.entries(FOTO).map(([k,f])=>`<button class="tile t-${k}" onclick="gaaTil('${k}')" style="background-image:url(${f[0]})"><span class="te">${f[1]}</span><span class="tn">${f[2]}</span><span class="ti">${esc(info[k])}</span></button>`).join('')}</div>
+  ${forsideTips()}
+  ${hjaelpKort()}`;
+};
+
 vis();
 
 // Læg appen på telefonen
@@ -445,7 +710,77 @@ if(erMobil&&!erInstalleret){
   document.getElementById('instknap').style.display='';
   if(!localStorage.getItem(KEY+'-guide'))setTimeout(visGuide,800);
 }
-if('serviceWorker' in navigator&&(location.protocol==='https:'||location.hostname==='localhost'||location.hostname==='127.0.0.1'))navigator.serviceWorker.register('sw.js');
+
+// ---------- Sikre opdateringer (version 8) ----------
+document.getElementById('ver').textContent='version '+APP_VERSION;
+if(localStorage.getItem(KEY+'-fejl')){localStorage.removeItem(KEY+'-fejl');setTimeout(()=>toast('Den nye opdatering havde en fejl. Du kører videre på den gamle version – intet er tabt.'),600)}
+function visOpdatering(w){
+  if(document.getElementById('opd'))return;
+  if(Date.now()<+(localStorage.getItem(KEY+'-vent')||0))return;
+  fetch('version.json',{cache:'no-store'}).then(r=>r.json()).catch(()=>({})).then(v=>{
+    const d=document.createElement('div');d.className='opd';d.id='opd';
+    d.innerHTML=`<b style="font-size:18px">✨ Ny opdatering${v.version?' – version '+v.version:''}</b>${v.nyt?`<p style="margin:6px 0">${esc(v.nyt)}</p>`:''}<p class="muted" style="margin:4px 0 10px">Du bestemmer selv. Appen virker fint på den version, du har nu.</p><div class="row"><button class="b" style="flex:1" id="opdja">Opdater nu</button><button class="l" id="opdvent">Vent med at opdatere</button></div>`;
+    document.body.appendChild(d);
+    document.getElementById('opdja').onclick=()=>{localStorage.setItem(KEY+'-test',Date.now());d.innerHTML='<b>Opdaterer…</b>';w.postMessage('OPDATER')};
+    document.getElementById('opdvent').onclick=()=>{localStorage.setItem(KEY+'-vent',Date.now()+864e5);d.remove();toast('OK – jeg spørger igen i morgen')};
+  });
+}
+if('serviceWorker' in navigator&&(location.protocol==='https:'||location.hostname==='localhost'||location.hostname==='127.0.0.1')){
+  let genstart=false;
+  navigator.serviceWorker.addEventListener('controllerchange',()=>{if(localStorage.getItem(KEY+'-test')&&!genstart){genstart=true;location.reload()}});
+  navigator.serviceWorker.register('sw.js').then(reg=>{
+    const tjek=()=>{if(reg.waiting&&navigator.serviceWorker.controller)visOpdatering(reg.waiting)};
+    tjek();
+    reg.addEventListener('updatefound',()=>{const w=reg.installing;w&&w.addEventListener('statechange',()=>{if(w.state==='installed')tjek()})});
+    setInterval(()=>reg.update().catch(()=>{}),30*60*1000);
+  });
+}
+
+// ---------- Del med en ven (uden server) ----------
+function delLink(type,data){return location.origin+location.pathname+'#del='+encodeURIComponent(btoa(unescape(encodeURIComponent(JSON.stringify({type,data,fra:'Budget og Mad'})))))}
+async function del(type){
+  let data,titel;
+  if(type==='indkob'){data=D.indkob.filter(x=>!x.kobt).map(x=>({navn:x.navn,maengde:x.maengde,enhed:x.enhed}));titel='min indkøbsliste';if(!data.length){toast('Listen er tom');return}}
+  else if(type==='madplan'){data={};for(let i=0;i<7;i++){const d=new Date(ugeStart);d.setDate(d.getDate()+i);const v=D.madplan[iso(d)];if(v){const o=v.opskrift&&D.opskrifter.find(x=>x.id===v.opskrift);data[iso(d)]=o?{navn:o.navn,opskrift:o}:{tekst:v.tekst}}}titel='ugens madplan';if(!Object.keys(data).length){toast('Madplanen er tom');return}}
+  else if(type.startsWith('opskrift:')){const o=D.opskrifter.find(x=>x.id===type.slice(9));data=o;type='opskrift';titel='opskriften på '+o.navn}
+  const url=delLink(type,data),tekst='Her er '+titel+' fra Budget og Mad 🍲';
+  if(navigator.share){try{await navigator.share({title:'Budget og Mad',text:tekst,url});return}catch(e){if(e.name==='AbortError')return}}
+  try{await navigator.clipboard.writeText(tekst+'\n'+url);toast('Linket er kopieret – send det til din ven')}catch(e){prompt('Kopiér linket og send det:',url)}
+}
+function modtagDel(){
+  if(!location.hash.startsWith('#del='))return;
+  let p;try{p=JSON.parse(decodeURIComponent(escape(atob(decodeURIComponent(location.hash.slice(5))))))}catch(e){return}
+  history.replaceState(null,'',location.pathname);
+  const navn={indkob:'en indkøbsliste',madplan:'en madplan',opskrift:'en opskrift'}[p.type];if(!navn)return;
+  dlgin.innerHTML=`<h2>📥 Du har fået ${navn}</h2><p class="muted">Kun det, din ven har valgt at dele, er med. Intet andet fra din ven kommer ind i din app.</p>
+  ${p.type==='indkob'?`<ul class="ingl">${p.data.map(x=>`<li>${esc(ingTekst(x))}</li>`).join('')}</ul>`:p.type==='madplan'?`<ul class="ingl">${Object.entries(p.data).map(([k,v])=>`<li>${new Date(k).toLocaleDateString('da-DK',{weekday:'long'})}: ${esc(v.navn||v.tekst)}</li>`).join('')}</ul>`:`<p><b>${esc(p.data.navn)}</b></p>`}
+  <div class="row" style="margin-top:12px"><button class="b" id="tagimod" style="flex:1">Tilføj til min app</button><button class="l" onclick="dlg.close()">Nej tak</button></div>`;
+  dlg.showModal();
+  document.getElementById('tagimod').onclick=()=>{const s=snap();
+    if(p.type==='indkob')p.data.forEach(x=>D.indkob.push({id:id(),navn:String(x.navn),maengde:x.maengde??null,enhed:String(x.enhed||''),pris:D.priser[norm(x.navn)]??null,kobt:false}));
+    if(p.type==='opskrift'||p.type==='madplan'){const tilf=o=>{let e=D.opskrifter.find(x=>x.navn===o.navn);if(!e){e={id:id(),navn:String(o.navn),portioner:o.portioner||null,ing:(o.ing||[]).map(i=>({navn:String(i.navn),maengde:i.maengde??null,enhed:String(i.enhed||'')})),trin:Array.isArray(o.trin)?o.trin.map(String):undefined,frem:String(o.frem||''),tags:Array.isArray(o.tags)?o.tags.map(String):[],tid:+o.tid||null,foto:/^fotos\/retter\/[a-z]+\.jpg$/.test(o.foto||'')?o.foto:''};D.opskrifter.push(e)}return e};
+      if(p.type==='opskrift')tilf(p.data);else Object.entries(p.data).forEach(([k,v])=>{if(!/^\d{4}-\d\d-\d\d$/.test(k))return;D.madplan[k]=v.opskrift?{opskrift:tilf(v.opskrift).id}:{tekst:String(v.tekst||'')}})}
+    save();dlg.close();gaaTil(p.type==='indkob'?'indkob':p.type==='madplan'?'madplan':'opskrifter');toast('Tilføjet ✔',fortrydTil(s))};
+}
+modtagDel();
+
+// ---------- Skriv til hjælperen ----------
+let hjaelpFil=null;
+async function sendHjaelp(){
+  const tekst=document.getElementById('hjtekst').value.trim();if(!tekst&&!hjaelpFil){alert('Skriv hvad du har brug for hjælp til');return}
+  const msg='Hej '+EJER+'! Jeg har brug for hjælp med Budget og Mad (version '+APP_VERSION+'):\n\n'+tekst;
+  if(navigator.share){const d={title:'Hjælp til Budget og Mad',text:msg};if(hjaelpFil&&navigator.canShare&&navigator.canShare({files:[hjaelpFil]}))d.files=[hjaelpFil];try{await navigator.share(d);return}catch(e){if(e.name==='AbortError')return}}
+  location.href='mailto:?subject='+encodeURIComponent('Hjælp til Budget og Mad')+'&body='+encodeURIComponent(msg+(hjaelpFil?'\n\n(Husk at vedhæfte dit skærmbillede)':''));
+}
+function hjaelpKort(){
+  return `<div class="card" style="margin-top:14px"><b>💬 Brug for hjælp?</b><p class="muted" style="margin:4px 0 8px">Skriv til ${esc(EJER)}. Du kan sætte et skærmbillede på. Det er kun det, du selv skriver og vælger, der bliver sendt – appen sender aldrig noget af sig selv.</p>
+  <textarea id="hjtekst" placeholder="Hvad driller?" style="min-height:70px"></textarea>
+  <div class="row" style="margin-top:8px"><label class="l" style="margin:0;cursor:pointer;color:inherit;background:var(--felt);border-radius:14px;padding:9px 14px;font-weight:600">📷 Skærmbillede<input type="file" accept="image/*" hidden onchange="hjaelpFil=this.files[0]||null;document.getElementById('hjfil').textContent=hjaelpFil?'✔ '+hjaelpFil.name:''"></label><span id="hjfil" class="muted"></span><button class="b" style="margin-left:auto" onclick="sendHjaelp()">Send ➜</button></div></div>
+  <div class="card"><b>ℹ️ Om appen</b><p class="muted" style="margin:6px 0 0">Budget og Mad – version ${APP_VERSION}. © ${esc(EJER)}. Appen tilhører ${esc(EJER)}, og kun ${esc(EJER)} kan sende opdateringer. Den må ikke kopieres eller deles videre uden tilladelse. Dine tal ligger kun på din egen telefon. Fotos fra Unsplash.</p></div>`;
+}
+
+localStorage.removeItem(KEY+'-test'); // appen startede fint
 </script>
 </body>
 </html>
+<!-- BOM-APP-OK -->

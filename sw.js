@@ -1,15 +1,76 @@
-// Budget og Mad – gemmer appen på telefonen, så den virker uden internet
-const CACHE='bom-v6';
-const FILER=['./','./index.html','./manifest.json','./ikoner/ikon-180.png','./ikoner/ikon-192.png','./ikoner/ikon-512.png'];
-self.addEventListener('install',e=>{e.waitUntil(caches.open(CACHE).then(c=>c.addAll(FILER)));self.skipWaiting()});
-self.addEventListener('activate',e=>{e.waitUntil(caches.keys().then(k=>Promise.all(k.filter(n=>n!==CACHE).map(n=>caches.delete(n)))));self.clients.claim()});
-self.addEventListener('fetch',e=>{
-  const u=new URL(e.request.url);
-  if(e.request.method!=='GET')return;
-  if(u.origin===location.origin){
-    // Nyeste version når der er net, ellers den gemte
-    e.respondWith(fetch(e.request).then(r=>{const k=r.clone();caches.open(CACHE).then(c=>c.put(e.request,k));return r}).catch(()=>caches.match(e.request,{ignoreSearch:true})));
-  }else if(u.hostname==='cdn.jsdelivr.net'||u.hostname.endsWith('tessdata.projectnaptha.com')){
-    e.respondWith(caches.match(e.request).then(h=>h||fetch(e.request).then(r=>{const k=r.clone();caches.open(CACHE).then(c=>c.put(e.request,k));return r})));
+// Budget og Mad – gemmer appen på telefonen, så den virker uden internet.
+// Sikre opdateringer: en ny version bliver først brugt, når brugeren selv trykker »Opdater«.
+// Har den nye version fejl, bliver den ikke taget i brug, og appen kører videre på den gamle.
+const VERSION = 8;
+const CACHE = 'bom-v' + VERSION;
+const META = 'bom-meta';
+const FILER = ['./', './index.html', './manifest.json', './version.json',
+  './ikoner/ikon-180.png', './ikoner/ikon-192.png', './ikoner/ikon-512.png', './ikoner/foto-pizza.jpg',
+  './fotos/budget.jpg', './fotos/opskrifter.jpg', './fotos/madplan.jpg', './fotos/indkob.jpg', './fotos/lager.jpg',
+  './fotos/retter/frikadeller.jpg', './fotos/retter/boller.jpg', './fotos/retter/biksemad.jpg', './fotos/retter/braendende.jpg',
+  './fotos/retter/millionbof.jpg', './fotos/retter/porresuppe.jpg', './fotos/retter/gulearter.jpg', './fotos/retter/risengrod.jpg',
+  './fotos/retter/pandekager.jpg', './fotos/retter/kyllingkarry.jpg', './fotos/retter/spaghetti.jpg', './fotos/retter/chili.jpg',
+  './fotos/retter/havregrod.jpg'];
+
+async function hentAktiv() {
+  const m = await caches.open(META);
+  const r = await m.match('aktiv');
+  return r ? r.text() : CACHE;
+}
+async function saetAktiv(navn) {
+  const m = await caches.open(META);
+  await m.put('aktiv', new Response(navn));
+}
+
+self.addEventListener('install', e => {
+  e.waitUntil((async () => {
+    const c = await caches.open(CACHE);
+    try {
+      await c.addAll(FILER.map(u => new Request(u, { cache: 'reload' })));
+      // Tjek at den nye version er hel, før den må bruges
+      const side = await (await c.match('./index.html')).text();
+      if (!side.includes('BOM-APP-OK') || !side.includes('</html>')) throw new Error('index.html er ikke hel');
+      JSON.parse(await (await c.match('./manifest.json')).text());
+    } catch (fejl) {
+      await caches.delete(CACHE);
+      throw fejl; // installationen stoppes – den gamle version bliver
+    }
+    // Første gang (ingen gammel version) må den gerne starte med det samme
+    if (!self.registration.active) self.skipWaiting();
+  })());
+});
+
+self.addEventListener('activate', e => {
+  e.waitUntil((async () => {
+    const navne = (await caches.keys()).filter(n => /^bom-v\d+$/.test(n)).sort((a, b) => +b.slice(5) - +a.slice(5));
+    // Behold den nye og den forrige version (til at gå tilbage), slet ældre
+    const forrige = navne.find(n => n !== CACHE);
+    for (const n of navne) if (n !== CACHE && n !== forrige) await caches.delete(n);
+    await saetAktiv(CACHE);
+    await self.clients.claim();
+  })());
+});
+
+self.addEventListener('message', e => {
+  if (e.data === 'OPDATER') self.skipWaiting();
+  if (e.data === 'TILBAGE') e.waitUntil((async () => {
+    const forrige = (await caches.keys()).filter(n => /^bom-v\d+$/.test(n) && n !== CACHE).sort((a, b) => +b.slice(5) - +a.slice(5))[0];
+    if (forrige) await saetAktiv(forrige);
+  })());
+});
+
+self.addEventListener('fetch', e => {
+  const u = new URL(e.request.url);
+  if (e.request.method !== 'GET') return;
+  if (u.origin === location.origin) {
+    if (u.pathname.endsWith('/version.json') || u.pathname.endsWith('/sw.js')) return; // altid frisk
+    e.respondWith((async () => {
+      const c = await caches.open(await hentAktiv());
+      return (await c.match(e.request, { ignoreSearch: true })) || fetch(e.request);
+    })());
+  } else if (u.hostname === 'cdn.jsdelivr.net' || u.hostname.endsWith('tessdata.projectnaptha.com')) {
+    e.respondWith(caches.match(e.request).then(h => h || fetch(e.request).then(r => {
+      const k = r.clone(); caches.open(CACHE).then(c => c.put(e.request, k)); return r;
+    })));
   }
 });
