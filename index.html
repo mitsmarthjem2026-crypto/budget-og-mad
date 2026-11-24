@@ -235,6 +235,7 @@ body.medbg{background:linear-gradient(color-mix(in srgb,var(--bg) 72%,transparen
 .tskift{position:absolute!important;top:12px;right:12px;width:40px;height:40px;border-radius:50%;background:rgba(255,255,255,.85);display:flex;align-items:center;justify-content:center;font-size:18px;cursor:pointer;z-index:2;box-shadow:0 2px 8px rgba(0,0,0,.2)}
 .bskift{width:auto!important;height:auto!important;border-radius:20px!important;padding:7px 12px;border:0;font:inherit;font-size:14px!important;font-weight:700;color:#1d130e}
 .indkobknapper{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:12px}.indkobknapper .b{padding:14px 6px!important;font-size:15px;text-align:center;cursor:pointer;color:#fff;margin:0;display:flex;align-items:center;justify-content:center;line-height:1.2}
+.godraad summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:8px}.godraad summary::-webkit-details-marker{display:none}.godraad summary::after{content:'▾';margin-left:auto;color:var(--muted)}.godraad[open] summary::after{content:'▴'}
 /* Version 8: fotofarver og forside */
 :root{--bg:#fff6ef;--acc:#e8553e;--acc2:#ffe7df;--grad:linear-gradient(135deg,#ff8a3d 0%,#e8364f 100%);--felt:#fff1e9;--line:#f1e2d8}
 @media (prefers-color-scheme:dark){:root{--bg:#140d0a;--card:#211612;--acc:#ff8a5c;--acc2:#3a1d14;--felt:#1a110d;--line:#3a2a22}}
@@ -268,7 +269,7 @@ button.b,label.b{box-shadow:0 6px 16px rgba(232,85,62,.3)}
 <style>@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}</style>
 </head>
 <body>
-<header><h1><img src="ikoner/ikon-192.png" alt="" style="width:1.3em;height:1.3em;border-radius:.3em;vertical-align:-.3em;margin-right:.35em">Budget og Mad</h1><button id="instknap" onclick="visGuide()" style="display:none;border:1px solid #fff;background:none;color:#fff;border-radius:10px;padding:6px 10px;font:inherit;font-size:14px;cursor:pointer">📲<span class="itxt"> Installér</span></button><button id="fortrydknap" hidden onclick="fortrydSidste()">↩️<span class="ftxt"> Fortryd</span></button><button id="indstilknap" onclick="visIndstillinger()" title="Indstillinger">⚙️</button><span class="ver" id="ver">version 36</span></header>
+<header><h1><img src="ikoner/ikon-192.png" alt="" style="width:1.3em;height:1.3em;border-radius:.3em;vertical-align:-.3em;margin-right:.35em">Budget og Mad</h1><button id="instknap" onclick="visGuide()" style="display:none;border:1px solid #fff;background:none;color:#fff;border-radius:10px;padding:6px 10px;font:inherit;font-size:14px;cursor:pointer">📲<span class="itxt"> Installér</span></button><button id="fortrydknap" hidden onclick="fortrydSidste()">↩️<span class="ftxt"> Fortryd</span></button><button id="indstilknap" onclick="visIndstillinger()" title="Indstillinger">⚙️</button><span class="ver" id="ver">version 37</span></header>
 <nav id="nav">
   <button data-p="forside"><span class="ic">🏠</span>Hjem</button>
   <button data-p="opskrifter"><span class="ic">📖</span>Opskrifter</button>
@@ -282,7 +283,7 @@ button.b,label.b{box-shadow:0 6px 16px rgba(232,85,62,.3)}
 <dialog id="dlg"><div class="in" id="dlgin"></div></dialog>
 
 <script>
-const KEY='madapp-v1';const APP_VERSION=36, EJER='Søren';
+const KEY='madapp-v1';const APP_VERSION=37, EJER='Søren';
 let D;try{D=JSON.parse(localStorage.getItem(KEY)||'null')}catch(e){D=null;try{localStorage.setItem(KEY+'-skadet-'+Date.now(),localStorage.getItem(KEY))}catch(x){}}
 if(!D||typeof D!=='object')D={};
 ['opskrifter','indkob','lager','stdSlettet','gemteLister'].forEach(k=>{if(!Array.isArray(D[k]))D[k]=[]});
@@ -629,8 +630,9 @@ function tipsKort(ind,faste,kob,tilbage,erNu){
   const stream=D.budget.faste.filter(x=>ORD('netflix|hbo|max|viaplay|disney|spotify|tv2|tv 2|youtube|apple tv|prime').test(x.tekst)).length;
   if(stream>=2)t.push('Du har '+stream+' streamingtjenester. Mange slår dem til og fra en måned ad gangen.');
   const dag=Math.floor(Date.now()/864e5);t.push(TIPS[dag%TIPS.length]);
-  return `<div class="card" style="background:#fffbea;border-color:#f0dc9a"><div class="row"><b style="flex:1">💡 Gode råd</b><button class="x" style="font-size:14px" title="Skjul tips" onclick="D.tipsFra=true;save();vis()">Skjul</button></div>
-  <ul style="margin:6px 0 0;padding-left:20px">${t.slice(0,3).map(x=>`<li style="margin:4px 0">${esc(x)}</li>`).join('')}</ul></div>`;
+  return `<details class="card godraad" style="background:#fffbea;border-color:#f0dc9a"><summary><b>💡 Gode råd</b><span class="muted" style="font-size:13px">(${Math.min(3,t.length)}) – tryk for at se</span></summary>
+  <ul style="margin:8px 0 0;padding-left:20px">${t.slice(0,3).map(x=>`<li style="margin:4px 0">${esc(x)}</li>`).join('')}</ul>
+  <div style="text-align:right;margin-top:6px"><button class="x" style="font-size:14px;width:auto;border-radius:12px;padding:4px 10px" title="Skjul tips" onclick="D.tipsFra=true;save();vis()">Skjul helt</button></div></details>`;
 }
 // Hurtig indtastning: tale, tekst, billede
 let fs=null,hStatus='';
