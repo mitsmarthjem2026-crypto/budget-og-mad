@@ -29,6 +29,7 @@
 <script src="opskrifter.js"></script>
 <script src="motion.js"></script>
 <script src="spil.js"></script>
+<script src="budget2.js"></script>
 <script src="jura.js"></script>
 <script>
 window.FEJLLOG=[];(function(){function gem(o){try{var l=JSON.parse(localStorage.getItem('madapp-v1-fejllog')||'[]');l.push(o);l=l.slice(-20);localStorage.setItem('madapp-v1-fejllog',JSON.stringify(l))}catch(e){}}addEventListener('error',function(e){gem({tid:new Date().toISOString(),fejl:String(e.message||'').slice(0,200),linje:e.lineno||0,kol:e.colno||0,fil:String(e.filename||'').split('/').pop().split('?')[0]})});addEventListener('unhandledrejection',function(e){gem({tid:new Date().toISOString(),fejl:'Promise: '+String((e.reason&&e.reason.message)||e.reason||'').slice(0,200)})})})();
@@ -338,7 +339,7 @@ body{padding-top:env(safe-area-inset-top)}
 <dialog id="dlg"><div class="in" id="dlgin"></div></dialog>
 
 <script>
-const KEY='madapp-v1';const ENHED=(()=>{let e=localStorage.getItem('madapp-v1-enhed');if(!e){e=(crypto.randomUUID?crypto.randomUUID():Date.now().toString(36)+Math.random().toString(36).slice(2));localStorage.setItem('madapp-v1-enhed',e)}return e})();const APP_VERSION=56, EJER='Søren';
+const KEY='madapp-v1';const ENHED=(()=>{let e=localStorage.getItem('madapp-v1-enhed');if(!e){e=(crypto.randomUUID?crypto.randomUUID():Date.now().toString(36)+Math.random().toString(36).slice(2));localStorage.setItem('madapp-v1-enhed',e)}return e})();const APP_VERSION=57, EJER='Søren';
 let D;try{D=JSON.parse(localStorage.getItem(KEY)||'null')}catch(e){D=null;try{localStorage.setItem(KEY+'-skadet-'+Date.now(),localStorage.getItem(KEY))}catch(x){}}
 if(!D||typeof D!=='object')D={};
 ['opskrifter','indkob','lager','stdSlettet','gemteLister'].forEach(k=>{if(!Array.isArray(D[k]))D[k]=[]});
@@ -503,7 +504,9 @@ budget(){
   <ul class="list">${[...D.budget.faste].sort((a,b)=>(a.dag||99)-(b.dag||99)).map(x=>`<li><span class="muted" style="width:52px">${x.dag?'d. '+x.dag:''}</span><span class="n">${esc(x.tekst)}</span><b>${kr(x.belob)}</b><button class="x" title="Ret" onclick="retPost('fast','${x.id}')">✏️</button><button class="x" title="Slet" onclick="sletFast('${x.id}')">🗑️</button></li>`).join('')}</ul>
   ${D.budget.faste.length?`<div class="row" style="justify-content:space-between;margin-top:8px;font-weight:700"><span>I alt pr. måned: ${kr(sumFaste)}</span><span class="muted">pr. år: ${kr(sumFaste*12)}</span></div>`:''}</div>
   ${huskeKort()}
+  ${eksempelKort()}
   ${opsparingKort()}
+  ${ejerHentKort()}
   <h2 style="margin-top:22px">🛒 Køb</h2>
   <div class="card"><div class="row"><label style="margin:0">Budget til mad pr. måned</label><input type="text" inputmode="decimal" id="mbudget" value="${b||''}" placeholder="kr" style="width:140px"><button class="l" onclick="setBudget()">Gem</button></div>
   ${b?`<div class="bar"><i class="${brugt>b?'over':''}" style="width:${pct}%"></i></div>`:''}</div>

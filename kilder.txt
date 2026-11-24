@@ -305,3 +305,11 @@ fotos/retter/ny/kikaertspinat.jpg: martin becker – https://unsplash.com/photos
 fotos/retter/ny/spinatpasta.jpg: shibani Mishra – https://unsplash.com/photos/docP-fBTnjw
 
 Ca. priser (version 56): Sørens egen prisoversigt »117_retter_med_ingredienser_og_priser.pdf« (vejledende discountpriser, specialvarer anslået, for 2 personer) og hans madplan for 2 personer (11 retter). Vises i appen som »ca. pris«, ikke som rigtige butikspriser.
+
+Eksempel: budget for 2 voksne (version 57) – alle tal er ca. og afrundede:
+Udgifter: Danmarks Statistik, »Forbrugsundersøgelsen 2024«, Nyt fra Danmarks Statistik nr. 43, 26. februar 2026, tabellen »Forbrug efter husstandstyper. 2024«, kolonnen »2 voksne, hp under 60 år uden børn« (kr. pr. husstand pr. år, delt med 12) – https://www.dst.dk/nytudg/52886
+Penge ind: Danmarks Statistik, »Indkomster for personer 2025«, Nyt nr. 288, 13. november 2026: gennemsnitlig disponibel indkomst pr. person over 14 år 300.100 kr. i 2025 (x 2 personer / 12 = ca. 50.000 kr. om måneden) – https://www.dst.dk/nytudg/54786
+At leve for: Forbrugerrådet Tænk, »Sådan udregner du dit rådighedsbeløb«, 28. maj 2025: ca. 12.250 kr. om måneden for samlevende – https://taenk.dk/privatoekonomi/gode-raad/raadighedsbeloeb
+Udbetaling til bolig: Bolius, »Boligkøbere skal have opsparing på 5 procent ved boligkøb« (kravet om 5 % er et minimum) – https://www.bolius.dk/boligkoebere-skal-have-opsparing-paa-5-procent-ved-boligkoeb-30368
+Aftensmad: median af appens egne ca. priser for 2 personer (se version 56).
+Opsparingsbeløb og boligpris (6.000 / 1.500 / 1.500 kr. og 2.000.000 kr.) er kun eksempler, som brugeren selv retter.

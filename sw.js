@@ -1,10 +1,10 @@
 // Budget og Mad – gemmer appen på telefonen, så den virker uden internet.
 // Sikre opdateringer: en ny version bliver først brugt, når brugeren selv trykker »Opdater«.
 // Har den nye version fejl, bliver den ikke taget i brug, og appen kører videre på den gamle.
-const VERSION = 56;
+const VERSION = 57;
 const CACHE = 'bom-v' + VERSION;
 const META = 'bom-meta';
-const FILER = ['./', './index.html', './opskrifter.js', './motion.js', './spil.js', './jura.js', './styring.js', './manifest.json', './version.json',
+const FILER = ['./', './index.html', './opskrifter.js', './motion.js', './spil.js', './budget2.js', './jura.js', './styring.js', './manifest.json', './version.json',
   './ikoner/ikon-180.png', './ikoner/ikon-192.png', './ikoner/ikon-512.png', './fotos/galleri/madlavning.jpg', './fotos/galleri/koekken.jpg', './fotos/galleri/picnic.jpg', './fotos/galleri/udenfor.jpg', './fotos/galleri/bord.jpg', './fotos/galleri/salat.jpg', './fotos/galleri/frugt.jpg',
   './fotos/budget.jpg', './fotos/motion.jpg', './fotos/spil.jpg', './fotos/opskrifter.jpg', './fotos/madplan.jpg', './fotos/indkob.jpg', './fotos/lager.jpg', './fotos/kalender.jpg',
   './fotos/retter/frikadeller.jpg', './fotos/retter/boller.jpg', './fotos/retter/biksemad.jpg', './fotos/retter/braendende.jpg',
@@ -34,6 +34,7 @@ self.addEventListener('install', e => {
       const ops = await (await c.match('./opskrifter.js')).text();
       if (!ops.includes('STD_OPSKRIFTER') || !ops.trim().endsWith(';')) throw new Error('opskrifter.js er ikke hel');
       new Function(ops); // stopper, hvis der er stavefejl i koden
+      new Function(await (await c.match('./budget2.js')).text()); // version 57: også budget2.js
       const scripts = [...side.matchAll(/<script>([\s\S]*?)<\/script>/g)].map(x => x[1]);
       scripts.forEach(s => new Function(s));
       const v = JSON.parse(await (await c.match('./version.json')).text());
