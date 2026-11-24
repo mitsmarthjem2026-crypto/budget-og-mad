@@ -313,3 +313,9 @@ At leve for: Forbrugerrådet Tænk, »Sådan udregner du dit rådighedsbeløb«,
 Udbetaling til bolig: Bolius, »Boligkøbere skal have opsparing på 5 procent ved boligkøb« (kravet om 5 % er et minimum) – https://www.bolius.dk/boligkoebere-skal-have-opsparing-paa-5-procent-ved-boligkoeb-30368
 Aftensmad: median af appens egne ca. priser for 2 personer (se version 56).
 Opsparingsbeløb og boligpris (6.000 / 1.500 / 1.500 kr. og 2.000.000 kr.) er kun eksempler, som brugeren selv retter.
+
+Fil fra banken (version 59) – vejledninger fra bankernes egne hjælpesider (læst 25-11-2026):
+Danske Bank, »Kontoudskrifter«: mobilbank → konto → 3 prikker → »Eksporter kontobevægelser« → PDF, XLSX eller CSV – https://danskebank.dk/privat/find-hjaelp/konti/kontoudskrifter
+Jyske Bank, »Sådan danner du en kontoudskrift i Jyske net- og mobilbank«: konto → 3 prikker → »Print og eksporter« → periode og filtype → OK – https://www.jyskebank.dk/hjaelp/netbank-og-mobilbank/find-dine-kontoudskrifter
+Nykredit, »Hvordan henter jeg selv kontoudskrifter via netbanken?«: Konti og kort → Konti → »Gem posteringer som fil« → CSV – https://www.nykredit.dk/kundeservice/mitnykredit---netbanken/hvordan-henter-jeg-selv-kontoudskrifter-via-netbanken/
+Andre banker (fx Nordea, Lunar): ingen hjælpeside kunne læses – derfor kun et generelt råd i appen.

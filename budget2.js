@@ -187,3 +187,111 @@ function mshGem() {
   });
   msh = null; save(); vis(); toast(n + ' poster lagt ind i dit budget', fortrydTil(s));
 }
+
+// ---------- 🏦 Hent fil fra banken (CSV) – version 59 ----------
+// Filen læses kun på telefonen. Intet sendes nogen steder hen.
+// Vejledninger fra bankernes egne hjælpesider (se kilder.txt).
+let bankF = null; // forslag fra bankfilen, vises før noget gemmes
+const BANK_GUIDE = [
+  ['Danske Bank', 'I mobilbanken: Vælg konto → tryk på de 3 prikker øverst til højre → »Eksporter kontobevægelser« → vælg CSV og periode → »Eksporter«.'],
+  ['Jyske Bank', 'I net- eller mobilbanken: Vælg kontoen → tryk på de 3 prikker øverst → »Print og eksporter« → vælg periode og filtype (CSV, hvis du kan vælge det) → »OK«.'],
+  ['Nykredit', 'I netbanken på PC: »Konti og kort« → »Konti« → vælg konto → »Gem posteringer som fil« → vælg periode → eksportformat »CSV« → »Næste«.'],
+  ['Andre banker', 'Kig efter »Eksporter«, »Gem som fil« eller »Udlæs til fil« ved kontoens bevægelser, og vælg CSV. Kan det ikke lade sig gøre i mobilbanken, så prøv netbanken på en PC.']
+];
+function bankKort() {
+  return `<div class="card"><b>🏦 Hent fil fra banken</b> <span class="muted">– læg dine køb og penge ind på én gang</span>
+  <p class="muted" style="margin:6px 0 8px">Hent en CSV-fil med dine kontobevægelser i din bank, og vælg den her. Filen bliver kun læst på din telefon – intet sendes nogen steder hen. Du ser det hele, før noget bliver gemt.</p>
+  <details class="hjdel"><summary style="cursor:pointer"><b>📖 Sådan henter du filen i din bank</b></summary>
+   ${BANK_GUIDE.map(([b, t]) => `<p style="margin:8px 0 0"><b>${b}:</b> ${t}</p>`).join('')}
+   <p class="muted" style="font-size:13px;margin:8px 0 0">På iPhone: gem filen i »Filer«. Vælg den derefter med knappen herunder.</p></details>
+  <label class="b" style="font:inherit;display:block;text-align:center;cursor:pointer;margin:10px 0 0;color:#fff;background:var(--acc);border-radius:10px;padding:10px 16px">📂 Vælg filen fra banken<input type="file" accept=".csv,.txt,text/csv,text/plain" hidden onchange="bankLaes(this)"></label>
+  ${bankF ? bankVis() : ''}</div>`;
+}
+function bankTekst(buf) {
+  try { return new TextDecoder('utf-8', {fatal: true}).decode(buf) } catch (e) { return new TextDecoder('windows-1252').decode(buf) }
+}
+function bankDel(linje, sep) { // deler en CSV-linje, også med "…" omkring felterne
+  const ud = []; let f = '', q = false;
+  for (let i = 0; i < linje.length; i++) {
+    const c = linje[i];
+    if (q) { if (c === '"' && linje[i + 1] === '"') { f += '"'; i++ } else if (c === '"') q = false; else f += c }
+    else if (c === '"') q = true; else if (c === sep) { ud.push(f.trim()); f = '' } else f += c;
+  }
+  ud.push(f.trim()); return ud;
+}
+function bankBelob(t) {
+  t = String(t || '').replace(/\s|kr\.?|DKK/gi, '').replace(/−/g, '-');
+  if (!t || !/^[-+]?[\d.,]+$/.test(t)) return NaN;
+  if (t.includes(',')) t = t.replace(/\./g, '').replace(',', '.'); else if (/^[-+]?\d{1,3}(\.\d{3})+$/.test(t)) t = t.replace(/\./g, '');
+  return parseFloat(t);
+}
+function bankDato(t) {
+  t = String(t || '').trim(); let m;
+  if ((m = t.match(/^(\d{4})[-/.](\d{1,2})[-/.](\d{1,2})/))) return m[1] + '-' + m[2].padStart(2, '0') + '-' + m[3].padStart(2, '0');
+  if ((m = t.match(/^(\d{1,2})[-/.](\d{1,2})[-/.](\d{2,4})/))) { const y = m[3].length === 2 ? '20' + m[3] : m[3]; return y + '-' + m[2].padStart(2, '0') + '-' + m[1].padStart(2, '0') }
+  return '';
+}
+function bankLaes(inp) {
+  const f = inp.files && inp.files[0]; if (!f) return;
+  const r = new FileReader();
+  r.onload = () => {
+    try {
+      const tekst = bankTekst(r.result).replace(/^﻿/, '');
+      const linjer = tekst.split(/\r?\n/).filter(l => l.trim());
+      if (!linjer.length) throw new Error('tom');
+      const sep = [';', '\t', ','].map(s => [s, linjer.slice(0, 5).reduce((a, l) => a + l.split(s).length, 0)]).sort((a, b) => b[1] - a[1])[0][0];
+      const rk = linjer.map(l => bankDel(l, sep));
+      // find overskrift-linjen (Dato / Tekst / Beløb) – ellers gæt ud fra indholdet
+      const h = rk.findIndex(x => x.some(c => /dato|date/i.test(c)) && x.some(c => /bel[øo]b|amount/i.test(c)));
+      let iD, iT, iB;
+      if (h >= 0) {
+        const o = rk[h].map(c => c.toLowerCase());
+        iD = o.findIndex(c => /^(bogf|dato|date|posteringsdato)/.test(c)); if (iD < 0) iD = o.findIndex(c => /dato|date/.test(c));
+        iB = o.findIndex(c => /^(bel[øo]b|amount)/.test(c)); if (iB < 0) iB = o.findIndex(c => /bel[øo]b|amount/.test(c));
+        iT = o.findIndex(c => /tekst|text|beskrivelse|navn|modtager|description/.test(c));
+      } else {
+        const p = rk[0]; iD = p.findIndex(c => bankDato(c)); iB = p.findIndex((c, i) => i !== iD && isFinite(bankBelob(c))); iT = p.findIndex((c, i) => i !== iD && i !== iB && /[a-zæøå]/i.test(c));
+      }
+      if (iD < 0 || iB < 0) throw new Error('kolonner');
+      const poster = [];
+      rk.slice(h + 1).forEach(x => {
+        const dato = bankDato(x[iD]), b = bankBelob(x[iB]);
+        if (!dato || !isFinite(b) || !b) return;
+        const tx = (iT >= 0 ? x[iT] : '') || (b > 0 ? 'Penge ind' : 'Køb');
+        poster.push({hvor: b > 0 ? 'ind' : 'kob', tekst: tx.slice(0, 60), belob: Math.round(Math.abs(b) * 100) / 100, dato});
+      });
+      if (!poster.length) throw new Error('ingen');
+      poster.forEach(p => { p.findes = bankFindes(p); p.valgt = !p.findes });
+      poster.sort((a, b) => b.dato.localeCompare(a.dato));
+      bankF = {poster, navn: f.name};
+      vis(); toast(poster.length + ' poster fundet – se dem igennem');
+    } catch (e) { alert('Filen kunne ikke læses. Vælg en CSV-fil med kontobevægelser fra din bank (ikke PDF eller Excel).') }
+    inp.value = '';
+  };
+  r.readAsArrayBuffer(f);
+}
+function bankFindes(p) {
+  const s = x => String(x || '').toLowerCase().trim();
+  const l = p.hvor === 'ind' ? D.budget.ind : D.budget.udgifter;
+  return l.some(x => x.dato === p.dato && x.belob === p.belob && s(x.tekst) === s(p.tekst));
+}
+function bankAlle(v) { if (!bankF) return; bankF.poster.forEach(p => p.valgt = v && !p.findes); vis() }
+function bankVis() {
+  const valgt = bankF.poster.filter(p => p.valgt), ind = valgt.filter(p => p.hvor === 'ind').reduce((s, p) => s + p.belob, 0), ud = valgt.filter(p => p.hvor === 'kob').reduce((s, p) => s + p.belob, 0);
+  const kort = d => new Date(d).toLocaleDateString('da-DK', {day: 'numeric', month: 'short'});
+  return `<div style="margin-top:12px"><b>Er det rigtigt?</b> <span class="muted">Penge ind bliver til »Penge ind«, og det, der er gået fra, bliver til »Køb«. Fjern fluebenet ved det, du ikke vil have med.</span>
+  <div class="row" style="margin-top:8px"><button class="l" onclick="bankAlle(true)">Vælg alle</button><button class="l" onclick="bankAlle(false)">Vælg ingen</button></div>
+  <div style="max-height:420px;overflow:auto;margin-top:8px">${bankF.poster.map((p, i) => `<label class="row" style="margin:4px 0;gap:8px;cursor:pointer;font-weight:400;flex-wrap:nowrap"><input type="checkbox" ${p.valgt ? 'checked' : ''} onchange="bankF.poster[${i}].valgt=this.checked;vis()" style="width:22px;height:22px;flex:none"><span class="muted" style="width:54px;flex:none">${kort(p.dato)}</span><span style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis">${esc(p.tekst)}${p.findes ? ' <span class="muted">(har du)</span>' : ''}</span><b style="flex:none;color:${p.hvor === 'ind' ? 'var(--acc)' : 'inherit'}">${p.hvor === 'ind' ? '+' : '−'}${kr(p.belob)}</b></label>`).join('')}</div>
+  <div class="muted" style="margin-top:8px">Valgt: ${valgt.length} · ind ${kr(ind)} · ud ${kr(ud)}</div>
+  <div class="row" style="margin-top:10px"><button class="b" style="flex:1" onclick="bankGem()" ${valgt.length ? '' : 'disabled'}>✓ Læg ${valgt.length} ind i mit budget</button><button class="l" onclick="bankF=null;vis()">Annullér</button></div></div>`;
+}
+function bankGem() {
+  if (!bankF) return;
+  const s = snap(); let n = 0;
+  bankF.poster.filter(p => p.valgt).forEach(p => {
+    n++;
+    if (p.hvor === 'ind') D.budget.ind.push({id: id(), dato: p.dato, tekst: p.tekst, belob: p.belob});
+    else D.budget.udgifter.push({id: id(), dato: p.dato, tekst: p.tekst, belob: p.belob});
+  });
+  bankF = null; save(); vis(); toast(n + ' poster lagt ind i dit budget. Skift måned med pilene øverst.', fortrydTil(s));
+}
