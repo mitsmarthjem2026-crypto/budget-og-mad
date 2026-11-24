@@ -258,7 +258,7 @@ button.b,label.b{box-shadow:0 6px 16px rgba(232,85,62,.3)}
 <style>@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}</style>
 </head>
 <body>
-<header onclick="if(event.target===this||event.target.tagName==='H1'||event.target.tagName==='IMG')vaelgFoto()" style="cursor:pointer"><h1><img src="ikoner/ikon-192.png" alt="" style="width:1.3em;height:1.3em;border-radius:.3em;vertical-align:-.3em;margin-right:.35em">Budget og Mad</h1><button id="instknap" onclick="visGuide()" style="display:none;border:1px solid #fff;background:none;color:#fff;border-radius:10px;padding:6px 10px;font:inherit;font-size:14px;cursor:pointer">📲<span class="itxt"> Installér</span></button><button id="fortrydknap" hidden onclick="fortrydSidste()">↩️<span class="ftxt"> Fortryd</span></button><button id="indstilknap" onclick="visIndstillinger()" title="Indstillinger">⚙️</button><span class="ver" id="ver">version 25</span></header>
+<header onclick="if(event.target===this||event.target.tagName==='H1'||event.target.tagName==='IMG')vaelgFoto()" style="cursor:pointer"><h1><img src="ikoner/ikon-192.png" alt="" style="width:1.3em;height:1.3em;border-radius:.3em;vertical-align:-.3em;margin-right:.35em">Budget og Mad</h1><button id="instknap" onclick="visGuide()" style="display:none;border:1px solid #fff;background:none;color:#fff;border-radius:10px;padding:6px 10px;font:inherit;font-size:14px;cursor:pointer">📲<span class="itxt"> Installér</span></button><button id="fortrydknap" hidden onclick="fortrydSidste()">↩️<span class="ftxt"> Fortryd</span></button><button id="indstilknap" onclick="visIndstillinger()" title="Indstillinger">⚙️</button><span class="ver" id="ver">version 26</span></header>
 <nav id="nav">
   <button data-p="forside"><span class="ic">🏠</span>Hjem</button>
   <button data-p="opskrifter"><span class="ic">📖</span>Opskrifter</button>
@@ -272,7 +272,7 @@ button.b,label.b{box-shadow:0 6px 16px rgba(232,85,62,.3)}
 <dialog id="dlg"><div class="in" id="dlgin"></div></dialog>
 
 <script>
-const KEY='madapp-v1';const APP_VERSION=25, EJER='Søren';
+const KEY='madapp-v1';const APP_VERSION=26, EJER='Søren';
 let D;try{D=JSON.parse(localStorage.getItem(KEY)||'null')}catch(e){D=null;try{localStorage.setItem(KEY+'-skadet-'+Date.now(),localStorage.getItem(KEY))}catch(x){}}
 if(!D||typeof D!=='object')D={};
 ['opskrifter','indkob','lager','stdSlettet','gemteLister'].forEach(k=>{if(!Array.isArray(D[k]))D[k]=[]});
@@ -870,7 +870,7 @@ function visOpskriftHjaelp(){
 
 // ---------- Indstillinger, oplæsning og foto af opskrift (version 19) ----------
 const STR={lille:.9,normal:1,stor:1.15,kaempe:1.3},FONTE={rund:'',klassisk:'Georgia,"Times New Roman",serif',enkel:'system-ui,-apple-system,"Segoe UI",Roboto,sans-serif',laese:'Verdana,Tahoma,"Trebuchet MS",sans-serif'};
-const TEMAER={solnedgang:['Solnedgang','#ff8a3d','#e8364f','#e8553e','#ffe7df','#fff6ef'],mynte:['Mynte','#10b981','#06b6d4','#0fa968','#e4f7ee','#f2f7f4'],hav:['Hav','#3b82f6','#06b6d4','#2563eb','#e0edff','#f2f7ff'],lilla:['Lilla','#a855f7','#ec4899','#9333ea','#f3e8ff','#faf5ff'],skov:['Skov','#65a30d','#15803d','#4d7c0f','#ecfccb','#f7fbef'],kaffe:['Kaffe','#a16207','#78350f','#92400e','#fef3c7','#fbf7f0'],nat:['Nat','#475569','#0f172a','#334155','#e2e8f0','#f1f5f9'],slik:['Slik','#f472b6','#fb923c','#db2777','#fce7f3','#fff5fa']};
+const TEMAER={solnedgang:['Solnedgang','#ff8a3d','#e8364f','#e8553e','#ffe7df','#fff6ef'],mynte:['Mynte','#10b981','#06b6d4','#0fa968','#e4f7ee','#f2f7f4'],hav:['Hav','#3b82f6','#06b6d4','#2563eb','#e0edff','#f2f7ff'],lilla:['Lilla','#a855f7','#ec4899','#9333ea','#f3e8ff','#faf5ff'],skov:['Skov','#65a30d','#15803d','#4d7c0f','#ecfccb','#f7fbef'],kaffe:['Kaffe','#a16207','#78350f','#92400e','#fef3c7','#fbf7f0'],nat:['Nat','#475569','#0f172a','#334155','#e2e8f0','#f1f5f9'],slik:['Slik','#f472b6','#fb923c','#db2777','#fce7f3','#fff5fa'],gul:['Gul','#eab308','#d97706','#a16207','#fef9c3','#fffdf0'],moerkegroen:['Mørkegrøn','#166534','#14532d','#15803d','#dcfce7','#f3faf5']};
 const BAGGRUNDE=[['ingen','Ingen'],['fotos/galleri/frugt.jpg','Frugt og bær'],['fotos/galleri/bord.jpg','Fyldt bord'],['fotos/galleri/opskrifter4.jpg','Grøntsager'],['fotos/galleri/opskrifter2.jpg','Skærebræt'],['fotos/galleri/picnic.jpg','Picnic'],['fotos/galleri/indkob2.jpg','Torvehal'],['fotos/galleri/lager3.jpg','Krydderier'],['fotos/galleri/opskrifter-12.jpg','Urter'],['fotos/galleri/opskrifter-14.jpg','Krydderiskåle'],['fotos/galleri/opskrifter-16.jpg','Råvarer'],['fotos/galleri/opskrifter-20.jpg','Køkkenbord'],['fotos/galleri/madplan-12.jpg','Salat'],['fotos/galleri/madplan-20.jpg','Bowls'],['fotos/galleri/indkob-17.jpg','Marked'],['fotos/galleri/indkob-21.jpg','Frugtdisk'],['fotos/galleri/lager-16.jpg','Spisekammer'],['fotos/galleri/lager-22.jpg','Glas'],['fotos/galleri/budget-12.jpg','Mønter'],['fotos/galleri/forside-16.jpg','Middag']];
 function brugIndstil(){D.indstil=D.indstil||{};document.body.style.zoom=STR[D.indstil.str||'normal']||1;document.body.style.fontFamily=FONTE[D.indstil.font||'rund']||'';
   const tm=TEMAER[D.indstil.tema],r=document.documentElement.style;
