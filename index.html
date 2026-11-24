@@ -269,7 +269,7 @@ button.b,label.b{box-shadow:0 6px 16px rgba(232,85,62,.3)}
 <style>@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}</style>
 </head>
 <body>
-<header><h1><img src="ikoner/ikon-192.png" alt="" style="width:1.3em;height:1.3em;border-radius:.3em;vertical-align:-.3em;margin-right:.35em">Budget og Mad</h1><button id="instknap" onclick="visGuide()" style="display:none;border:1px solid #fff;background:none;color:#fff;border-radius:10px;padding:6px 10px;font:inherit;font-size:14px;cursor:pointer">📲<span class="itxt"> Installér</span></button><button id="fortrydknap" hidden onclick="fortrydSidste()">↩️<span class="ftxt"> Fortryd</span></button><button id="indstilknap" onclick="visIndstillinger()" title="Indstillinger">⚙️</button><span class="ver" id="ver">version 40</span></header>
+<header><h1><img src="ikoner/ikon-192.png" alt="" style="width:1.3em;height:1.3em;border-radius:.3em;vertical-align:-.3em;margin-right:.35em">Budget og Mad</h1><button id="instknap" onclick="visGuide()" style="display:none;border:1px solid #fff;background:none;color:#fff;border-radius:10px;padding:6px 10px;font:inherit;font-size:14px;cursor:pointer">📲<span class="itxt"> Installér</span></button><button id="fortrydknap" hidden onclick="fortrydSidste()">↩️<span class="ftxt"> Fortryd</span></button><button id="indstilknap" onclick="visIndstillinger()" title="Indstillinger">⚙️</button><span class="ver" id="ver">version 41</span></header>
 <nav id="nav">
   <button data-p="forside"><span class="ic">🏠</span>Hjem</button>
   <button data-p="opskrifter"><span class="ic">📖</span>Opskrifter</button>
@@ -283,7 +283,7 @@ button.b,label.b{box-shadow:0 6px 16px rgba(232,85,62,.3)}
 <dialog id="dlg"><div class="in" id="dlgin"></div></dialog>
 
 <script>
-const KEY='madapp-v1';const ENHED=(()=>{let e=localStorage.getItem('madapp-v1-enhed');if(!e){e=(crypto.randomUUID?crypto.randomUUID():Date.now().toString(36)+Math.random().toString(36).slice(2));localStorage.setItem('madapp-v1-enhed',e)}return e})();const APP_VERSION=40, EJER='Søren';
+const KEY='madapp-v1';const ENHED=(()=>{let e=localStorage.getItem('madapp-v1-enhed');if(!e){e=(crypto.randomUUID?crypto.randomUUID():Date.now().toString(36)+Math.random().toString(36).slice(2));localStorage.setItem('madapp-v1-enhed',e)}return e})();const APP_VERSION=41, EJER='Søren';
 let D;try{D=JSON.parse(localStorage.getItem(KEY)||'null')}catch(e){D=null;try{localStorage.setItem(KEY+'-skadet-'+Date.now(),localStorage.getItem(KEY))}catch(x){}}
 if(!D||typeof D!=='object')D={};
 ['opskrifter','indkob','lager','stdSlettet','gemteLister'].forEach(k=>{if(!Array.isArray(D[k]))D[k]=[]});
@@ -386,10 +386,13 @@ madplan(){
 },
 indkob(){
   const ikke=D.indkob.filter(x=>!x.kobt),kobt=D.indkob.filter(x=>x.kobt);
-  const li=x=>`<li class="${x.kobt?'done':''}"><input type="checkbox" ${x.kobt?'checked':''} onchange="kobt('${x.id}',this.checked)" style="width:22px;height:22px"><span class="n">${esc(ingTekst(x))}${x.kobt?'':` <a class="tilbud" href="https://etilbudsavis.dk/soeg/${encodeURIComponent(x.navn)}" target="_blank" rel="noopener">🔎 tilbud</a>`}</span><input type="number" min="0" step="0.01" placeholder="pris kr" value="${x.pris??''}" style="width:100px" onchange="setPris('${x.id}',this.value)"><button class="x" title="Slet" onclick="sletVare('${x.id}')">🗑️</button></li>`;
+  const li=x=>`<li class="${x.kobt?'done':''}"><input type="checkbox" ${x.kobt?'checked':''} onchange="kobt('${x.id}',this.checked)" style="width:22px;height:22px"><span class="n">${esc(ingTekst(x))}${x.hvem&&!x.kobt?` <span class="tag">👤 ${esc(x.hvem)}</span>`:''}${x.kobt?'':` <a class="tilbud" href="https://etilbudsavis.dk/soeg/${encodeURIComponent(x.navn)}" target="_blank" rel="noopener">🔎 tilbud</a>`}</span><input type="number" min="0" step="0.01" placeholder="pris kr" value="${x.pris??''}" style="width:100px" onchange="setPris('${x.id}',this.value)"><button class="x" title="Slet" onclick="sletVare('${x.id}')">🗑️</button></li>`;
   return `<h2>Indkøb</h2>
   <div class="indkobknapper"><button class="b" onclick="scanStregkode('indkob')">📷 Scan vare</button><label class="b">🧾 Foto af bon<input type="file" accept="image/*" capture="environment" hidden onchange="bonFoto(this)"></label><button class="b" onclick="faerdigHandlet()">✅ Færdig med at handle</button></div><div id="bonstatus" class="muted" style="margin:-4px 0 10px"></div>
-  <div class="card"><div class="row"><input class="grow" id="nyvare" placeholder="Fx 1 l mælk"><button class="b" onclick="tilfojVare()">Tilføj</button><button class="l" onclick="del('indkob')">📤 Del listen</button></div></div>
+  <div class="indkobknapper"><button class="b" onclick="fraOpskrifter()">📖 Fra opskrifter</button><button class="b" onclick="billigst()">💰 Hvor er det billigst?</button><button class="b" onclick="delFlere()">👥 Del mellem flere</button></div>
+  <div class="card"><div class="row"><input class="grow" id="nyvare" placeholder="Fx 1 l mælk"><button class="b" onclick="tilfojVare()">Tilføj</button><button class="l" onclick="del('indkob')">📤 Del listen</button></div>
+  <div class="row" style="margin-top:8px"><label style="margin:0">🏪 Jeg handler i:</label><input id="butiknu" list="butikker" value="${esc(D.indstil.butik||'')}" placeholder="Fx Netto" style="flex:1" onchange="D.indstil.butik=this.value.trim();save()"><datalist id="butikker">${butikker().map(b=>`<option value="${esc(b)}">`).join('')}</datalist></div>
+  <p class="muted" style="font-size:13px;margin:4px 0 0">Priser, du skriver, bliver husket for den butik. Så kan appen se, hvor det er billigst.</p></div>
   <div class="card"><ul class="list">${ikke.length?ikke.map(li).join(''):'<li class="empty" style="justify-content:center">Indkøbslisten er tom.</li>'}</ul>${ikke.length?`<div class="row" style="margin-top:12px"><button class="l" onclick="sletHeleListen()">🗑️ Slet hele listen</button><button class="l" onclick="document.getElementById('lnavn').focus()">💾 Gem listen</button></div>`:''}<p class="muted" style="margin:10px 0 0;font-size:14px">🔎 »tilbud« viser ugens rigtige tilbud på varen hos eTilbudsavis.</p>${(()=>{const p=ikke.filter(x=>x.pris);return p.length?`<p class="muted" style="margin:10px 0 0">💡 Ca. ${kr(p.reduce((s,x)=>s+x.pris,0))} for ${p.length} af ${ikke.length} varer – ud fra dine egne priser.</p>`:''})()}</div>
   ${kobt.length?`<div class="card"><b>Købt (${kobt.length})</b><ul class="list">${kobt.map(li).join('')}</ul>
   <div class="row" style="margin-top:10px"><button class="b" onclick="kobtTilLager()">🥫 Flyt købte til lager</button></div>
@@ -534,7 +537,7 @@ function ugeTilIndkob(){
 // Indkøb
 function tilfojVare(){const e=document.getElementById('nyvare');if(!e.value.trim())return;const p=parseIng(e.value);D.indkob.push({id:id(),...p,pris:D.priser[norm(p.navn)]??null,kobt:false});save();vis();document.getElementById('nyvare').focus()}
 function kobt(vid,v){D.indkob.find(x=>x.id===vid).kobt=v;save();vis()}
-function setPris(vid,v){D.indkob.find(x=>x.id===vid).pris=v===''?null:parseFloat(v);save()}
+function setPris(vid,v){const x=D.indkob.find(y=>y.id===vid);x.pris=v===''?null:parseFloat(v);if(x.pris>0){D.priser[norm(x.navn)]=x.pris;const b=(D.indstil.butik||'').trim();if(b)husk(x.navn,b,x.pris)}save()}
 function sletVare(vid){const s=snap();D.indkob=D.indkob.filter(x=>x.id!==vid);save();vis();toast('Varen er slettet',fortrydTil(s))}
 function kobtTilLager(){
   const s=snap();const k=D.indkob.filter(x=>x.kobt);let sum=0;
@@ -1157,7 +1160,7 @@ async function bonFoto(inp){
       const s=snap(),b=tal('bontotal'),dato=document.getElementById('bondato').value||iso(new Date()),butik=document.getElementById('bonbutik').value.trim()||'Indkøb';let nl=0,nk=0;
       varer.forEach((v,i)=>{if(!document.getElementById('bv'+i).checked)return;const navn=document.getElementById('bn'+i).value.trim();if(!navn)return;
         if(document.getElementById('bonliste').checked){const paa=D.indkob.find(x=>!x.kobt&&(sammeNavn(x.navn,navn)||tok(x.navn).some(w=>tok(navn).includes(w))));if(paa){D.indkob=D.indkob.filter(x=>x!==paa);nk++}}
-        if(!iLager(navn))D.lager.push({id:id(),navn,maengde:null,enhed:'',udlob:''});if(v.pris>0)D.priser[norm(navn)]=v.pris;nl++});
+        if(!iLager(navn))D.lager.push({id:id(),navn,maengde:null,enhed:'',udlob:''});if(v.pris>0){D.priser[norm(navn)]=v.pris;husk(navn,butik,v.pris)}nl++});
       if(b&&document.getElementById('bonbudget').checked)D.budget.udgifter.push({id:id(),dato,tekst:butik,belob:b});
       save();dlg.close();vis();toast(`🧾 Gemt: ${b?kr(b)+' i budget · ':''}${nl} på lager${nk?' · '+nk+' krydset af':''}`,fortrydTil(s));
     };
@@ -1196,6 +1199,59 @@ function gemKoeleskab(n){
   navne.forEach(v=>{const p=parseIng(v);if(iLager(p.navn))return;D.lager.push({id:id(),...p,udlob:''});k++});
   save();dlg.close();vis();toast(k?k+' varer lagt på lager 🥫':'Det hele var allerede på lager',k?fortrydTil(s):null);
 }
+
+// ---------- Smartere indkøb (version 41) ----------
+function husk(vare,butik,pris){if(!butik||!(pris>0))return;D.butikPriser=D.butikPriser&&typeof D.butikPriser==='object'?D.butikPriser:{};const k=norm(vare);D.butikPriser[k]=D.butikPriser[k]||{};D.butikPriser[k][butik.trim()]=pris}
+function butikker(){const s=new Set();Object.values(D.butikPriser||{}).forEach(o=>Object.keys(o).forEach(b=>s.add(b)));['Netto','Rema 1000','Lidl','Føtex','Bilka','Coop 365','Kvickly','Meny','Spar','Løvbjerg'].forEach(b=>s.add(b));return [...s]}
+function prisI(vare,butik){const p=(D.butikPriser||{})[norm(vare)];return p?p[butik]:undefined}
+function fraOpskrifter(){
+  const idag=new Date();idag.setHours(0,0,0,0);const plan=[];for(let i=0;i<7;i++){const d=new Date(idag);d.setDate(d.getDate()+i);const v=D.madplan[iso(d)];const o=v&&v.opskrift&&D.opskrifter.find(x=>x.id===v.opskrift);if(o)plan.push({o,d})}
+  dlgin.innerHTML=`<h2>📖 Fra opskrifter</h2><p class="muted" style="margin-top:-6px">Vælg retter. Det, du mangler, kommer på listen. Det, du har på lager, kommer ikke med.</p>
+  ${plan.length?`<h3>📅 Fra din madplan</h3><ul class="ingl">${plan.map(({o,d},i)=>`<li class="row" style="flex-wrap:nowrap"><input type="checkbox" checked class="foval" value="${o.id}" style="width:22px;height:22px"><span style="flex:1">${esc(o.navn)}</span><span class="muted">${d.toLocaleDateString('da-DK',{weekday:'short',day:'numeric'})}</span></li>`).join('')}</ul>`:'<p class="muted">Der er ingen retter på madplanen de næste 7 dage.</p>'}
+  <h3>🔎 Eller find en ret</h3><input id="fosoeg" style="width:100%" placeholder="Søg i opskrifter…" oninput="foSoeg(this.value)"><ul class="ingl" id="foliste"></ul>
+  <div class="row" style="margin-top:8px"><label style="margin:0">Personer</label><input id="fopers" type="number" min="1" max="20" value="2" style="width:80px"></div>
+  <div class="row" style="margin-top:12px"><button class="b" style="flex:1" onclick="foTilfoj()">🛒 Læg det, jeg mangler, på listen</button><button class="l" onclick="dlg.close()">Luk</button></div>`;
+  dlg.showModal();
+}
+function foSoeg(q){q=norm(q);document.getElementById('foliste').innerHTML=q?D.opskrifter.filter(o=>norm(o.navn).includes(q)).slice(0,10).map(o=>`<li class="row" style="flex-wrap:nowrap"><input type="checkbox" class="foval" value="${o.id}" style="width:22px;height:22px"><span style="flex:1">${esc(o.navn)}</span></li>`).join('')||'<li class="muted">Ingen fundet</li>':''}
+function foTilfoj(){const ids=[...new Set([...document.querySelectorAll('.foval:checked')].map(x=>x.value))];if(!ids.length){alert('Vælg mindst én ret');return}const p=Math.max(1,parseInt(document.getElementById('fopers').value)||2);const s=snap();let n=0;ids.forEach(oid=>{const o=D.opskrifter.find(x=>x.id===oid);if(o)n+=tilIndkob(o.ing.map(i=>skal(i,o,p)))});save();dlg.close();vis();toast(n?n+' varer lagt på listen 🛒':'Du har det hele på lager',n?fortrydTil(s):null)}
+function billigst(){
+  const ikke=D.indkob.filter(x=>!x.kobt);if(!ikke.length){toast('Listen er tom');return}
+  const bs=[...new Set(ikke.flatMap(x=>Object.keys((D.butikPriser||{})[norm(x.navn)]||{})))];
+  const harPris=ikke.filter(x=>Object.keys((D.butikPriser||{})[norm(x.navn)]||{}).length);
+  const pr=bs.map(b=>{const kendt=ikke.filter(x=>prisI(x.navn,b)!==undefined);return{b,sum:kendt.reduce((s,x)=>s+prisI(x.navn,b),0),n:kendt.length}}).sort((a,c)=>c.n-a.n||a.sum-c.sum);
+  const faelles=ikke.filter(x=>bs.length>1&&bs.every(b=>prisI(x.navn,b)!==undefined));
+  pr.forEach(p=>p.faelles=faelles.reduce((s,x)=>s+prisI(x.navn,p.b),0));
+  const hel=faelles.length?[...pr].sort((a,c)=>a.faelles-c.faelles)[0]:null;
+  const opdelt={};let ukendt=[];ikke.forEach(x=>{const p=(D.butikPriser||{})[norm(x.navn)];if(!p||!Object.keys(p).length){ukendt.push(x);return}const [b,v]=Object.entries(p).sort((a,c)=>a[1]-c[1])[0];(opdelt[b]=opdelt[b]||[]).push({x,v})});
+  const sumOp=Object.values(opdelt).flat().reduce((s,y)=>s+y.v,0);
+  dlgin.innerHTML=`<h2>💰 Hvor er det billigst?</h2>
+  ${!harPris.length?`<p>Appen kender endnu ingen priser fra butikkerne på dine varer.</p><p class="muted">Skriv priser, når du handler (vælg »Jeg handler i«), eller tag et foto af bonen. Så husker appen prisen for den butik – og næste gang kan den sige, hvor det er billigst.</p><p class="muted" style="font-size:13px">Priser direkte fra Netto, Føtex og Bilka kræver en gratis nøgle fra Salling Group, som du selv skal oprette. Sig til, hvis du vil have det.</p>`:`
+  <p class="muted" style="margin-top:-6px">Ud fra de priser, du selv har fået (bon eller skrevet). ${harPris.length} af ${ikke.length} varer har en pris.</p>
+  <div class="chips"><button class="chip on" id="bt1" onclick="document.getElementById('bv1').hidden=false;document.getElementById('bv2').hidden=true;this.classList.add('on');document.getElementById('bt2').classList.remove('on')">🏪 Alt i én butik</button><button class="chip" id="bt2" onclick="document.getElementById('bv2').hidden=false;document.getElementById('bv1').hidden=true;this.classList.add('on');document.getElementById('bt1').classList.remove('on')">✂️ Del op pr. vare</button></div>
+  <div id="bv1">${faelles.length?`<p class="muted" style="font-size:13px">Sammenlignet på de ${faelles.length} varer, som alle butikkerne har en pris på – så det er fair.</p><ul class="ingl">${[...pr].sort((a,c)=>a.faelles-c.faelles).map(p=>`<li class="row"><b style="flex:1">${esc(p.b)}${p===hel?' ⭐':''}</b><span>${kr(p.faelles)}</span></li>`).join('')}</ul>
+   <p>⭐ Billigst samlet: <b>${esc(hel.b)}</b>.</p><button class="b" style="width:100%" onclick="sendButik('${esc(hel.b)}')">📤 Send listen til ${esc(hel.b)}</button>`:`<p>Butikkerne kan ikke sammenlignes endnu, for der er ingen vare på listen, som alle butikkerne har en pris på.</p><ul class="ingl">${pr.map(p=>`<li class="row"><b style="flex:1">${esc(p.b)}</b><span class="muted" style="font-size:13px">pris på ${p.n} af ${ikke.length} varer</span></li>`).join('')}</ul><p class="muted">Prøv »✂️ Del op pr. vare« i stedet.</p>`}</div>
+  <div id="bv2" hidden>${Object.entries(opdelt).map(([b,l])=>`<h3>🏪 ${esc(b)} – ca. ${kr(l.reduce((s,y)=>s+y.v,0))}</h3><ul class="ingl">${l.map(y=>`<li class="row"><span style="flex:1">${esc(ingTekst(y.x))}</span><span>${kr(y.v)}</span></li>`).join('')}</ul>`).join('')}
+   ${ukendt.length?`<h3>❓ Ingen pris endnu</h3><ul class="ingl">${ukendt.map(x=>`<li>${esc(ingTekst(x))}</li>`).join('')}</ul>`:''}
+   <p>I alt ca. <b>${kr(sumOp)}</b> når du handler hver vare, hvor den er billigst.</p><button class="b" style="width:100%" onclick="sendOpdelt()">📤 Send de opdelte lister</button></div>`}
+  <div class="row" style="margin-top:12px"><button class="l" style="flex:1" onclick="dlg.close()">Luk</button></div>`;
+  window._opdelt=opdelt;window._ukendt=ukendt;dlg.showModal();
+}
+async function delTekst(titel,tekst){if(navigator.share){try{await navigator.share({title:titel,text:tekst});return}catch(e){if(e.name==='AbortError')return}}try{await navigator.clipboard.writeText(tekst);toast('Listen er kopieret – send den')}catch(e){prompt('Kopiér listen:',tekst)}}
+function sendButik(b){const l=D.indkob.filter(x=>!x.kobt);delTekst('Indkøb – '+b,'🛒 Indkøb i '+b+':\n'+l.map(x=>'• '+ingTekst(x)).join('\n'))}
+function sendOpdelt(){const o=window._opdelt||{};let tx='🛒 Indkøb – billigst pr. vare:\n';Object.entries(o).forEach(([b,l])=>{tx+='\n🏪 '+b+':\n'+l.map(y=>'• '+ingTekst(y.x)).join('\n')+'\n'});if((window._ukendt||[]).length)tx+='\n❓ Hvor som helst:\n'+window._ukendt.map(x=>'• '+ingTekst(x)).join('\n');delTekst('Indkøb – opdelt',tx)}
+function delFlere(){
+  const ikke=D.indkob.filter(x=>!x.kobt);if(!ikke.length){toast('Listen er tom');return}
+  const navne=(D.indstil.handlere&&D.indstil.handlere.length?D.indstil.handlere:['Mig']);
+  dlgin.innerHTML=`<h2>👥 Del mellem flere</h2><p class="muted" style="margin-top:-6px">Skriv hvem der handler, og tryk på et navn ved hver vare. Du bestemmer selv.</p>
+  <div class="row"><input id="hnavne" class="grow" value="${esc(navne.join(', '))}" placeholder="Fx Mig, Emma, Ali"><button class="l" onclick="D.indstil.handlere=document.getElementById('hnavne').value.split(',').map(s=>s.trim()).filter(Boolean).slice(0,6);save();delFlere()">OK</button></div>
+  <ul class="ingl">${ikke.map(x=>`<li><div>${esc(ingTekst(x))}</div><div class="chips" style="margin:4px 0 0">${navne.map(n=>`<button class="chip ${x.hvem===n?'on':''}" onclick="saetHvem('${x.id}','${esc(n).replace(/'/g,'')}')">${esc(n)}</button>`).join('')}</div></li>`).join('')}</ul>
+  <h3>📤 Send hver sin liste</h3><div class="row">${navne.map(n=>{const c=ikke.filter(x=>x.hvem===n).length;return `<button class="b" ${c?'':'disabled style="opacity:.5"'} onclick="sendHvem('${esc(n).replace(/'/g,'')}')">${esc(n)} (${c})</button>`}).join('')}</div>
+  <div class="row" style="margin-top:12px"><button class="l" style="flex:1" onclick="dlg.close();vis()">Færdig</button></div>`;
+  if(!dlg.open)dlg.showModal();
+}
+function saetHvem(vid,n){const x=D.indkob.find(y=>y.id===vid);if(!x)return;x.hvem=x.hvem===n?'':n;save();const st=document.querySelector('dialog').scrollTop;delFlere();document.querySelector('dialog').scrollTop=st}
+function sendHvem(n){const l=D.indkob.filter(x=>!x.kobt&&x.hvem===n);delTekst('Indkøb til '+n,'🛒 '+n+' køber:\n'+l.map(x=>'• '+ingTekst(x)).join('\n'))}
 
 // ---------- Gemte indkøbslister (version 14) ----------
 function sletHeleListen(){const n=D.indkob.filter(x=>!x.kobt).length;if(!n)return;const s=snap();D.indkob=D.indkob.filter(x=>x.kobt);save();vis();toast(n+' varer slettet 🗑️',fortrydTil(s))}
