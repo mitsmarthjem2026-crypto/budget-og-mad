@@ -1,5 +1,5 @@
 // Budget og Mad – gemmer appen på telefonen, så den virker uden internet
-const CACHE='bom-v5';
+const CACHE='bom-v6';
 const FILER=['./','./index.html','./manifest.json','./ikoner/ikon-180.png','./ikoner/ikon-192.png','./ikoner/ikon-512.png'];
 self.addEventListener('install',e=>{e.waitUntil(caches.open(CACHE).then(c=>c.addAll(FILER)));self.skipWaiting()});
 self.addEventListener('activate',e=>{e.waitUntil(caches.keys().then(k=>Promise.all(k.filter(n=>n!==CACHE).map(n=>caches.delete(n)))));self.clients.claim()});
