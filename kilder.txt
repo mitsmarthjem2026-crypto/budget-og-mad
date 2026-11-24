@@ -145,3 +145,91 @@ fotos/galleri/indkob4.jpg: Vitaly Gariev – https://unsplash.com/photos/6aBRyZG
 fotos/galleri/lager1.jpg: Darrien Staton – https://unsplash.com/photos/ZUhM8LE_HGc
 fotos/galleri/lager2.jpg: Megan Nixon – https://unsplash.com/photos/gSptirCdrUs
 fotos/galleri/lager3.jpg: Heather McKean – https://unsplash.com/photos/1I9bMlIAIBM
+
+Version 25 – flere fotos, 20 pr. kategori (Unsplash, gratis efter Unsplash-licensen, hentet 24-11-2026):
+fotos/galleri/forside-10.jpg: No Revisions – https://unsplash.com/photos/jCvbQdgHxFo
+fotos/galleri/forside-11.jpg: Jason Briscoe – https://unsplash.com/photos/n4ymhyyFY7A
+fotos/galleri/forside-12.jpg: Douglas Fehr – https://unsplash.com/photos/4nk7VPj_m6g
+fotos/galleri/forside-13.jpg: Jimmy Dean – https://unsplash.com/photos/my1mDMraGf0
+fotos/galleri/forside-14.jpg: Becca Tapert – https://unsplash.com/photos/O7sK3d3TPWQ
+fotos/galleri/forside-15.jpg: Jason Briscoe – https://unsplash.com/photos/VBsG1VOgLIU
+fotos/galleri/forside-16.jpg: OurWhisky Foundation – https://unsplash.com/photos/jlXtAvGx_hg
+fotos/galleri/forside-17.jpg: Klara Kulikova – https://unsplash.com/photos/QATxlTPJImo
+fotos/galleri/budget-10.jpg: Jakub Żerdzicki – https://unsplash.com/photos/8wLZi9OhsWU
+fotos/galleri/budget-11.jpg: Dan Dennis – https://unsplash.com/photos/pZ56pVKd_6c
+fotos/galleri/budget-12.jpg: micheile henderson – https://unsplash.com/photos/SoT4-mZhyhE
+fotos/galleri/budget-13.jpg: Ibrahim Rifath – https://unsplash.com/photos/OApHds2yEGQ
+fotos/galleri/budget-14.jpg: Jakub Żerdzicki – https://unsplash.com/photos/LgE3whpa5VA
+fotos/galleri/budget-15.jpg: Matthew Lancaster – https://unsplash.com/photos/OtfnlTw0lH4
+fotos/galleri/budget-16.jpg: Recha Oktaviani – https://unsplash.com/photos/h2aDKwigQeA
+fotos/galleri/budget-17.jpg: Allison Saeng – https://unsplash.com/photos/HrFCxo0Go5Y
+fotos/galleri/budget-18.jpg: Mathieu Stern – https://unsplash.com/photos/1zO4O3Z0UJA
+fotos/galleri/budget-19.jpg: Sasun Bughdaryan – https://unsplash.com/photos/eE4uRsnNCsI
+fotos/galleri/budget-20.jpg: pina messina – https://unsplash.com/photos/Sw2XNTgA-wc
+fotos/galleri/budget-21.jpg: micheile henderson – https://unsplash.com/photos/lZ_4nPFKcV8
+fotos/galleri/budget-22.jpg: Towfiqu barbhuiya – https://unsplash.com/photos/joqWSI9u_XM
+fotos/galleri/budget-23.jpg: Napendra Singh – https://unsplash.com/photos/XmvQveCDsQI
+fotos/galleri/budget-24.jpg: Jason Leung – https://unsplash.com/photos/SAYzxuS1O3M
+fotos/galleri/opskrifter-10.jpg: Alyson McPhee – https://unsplash.com/photos/yWG-ndhxvqY
+fotos/galleri/opskrifter-11.jpg: camera obscura – https://unsplash.com/photos/mAcZ7DXz5QM
+fotos/galleri/opskrifter-12.jpg: Markus Spiske – https://unsplash.com/photos/6hDDnisCRMk
+fotos/galleri/opskrifter-13.jpg: Mae Mu – https://unsplash.com/photos/m9pzwmxm2rk
+fotos/galleri/opskrifter-14.jpg: Zoshua Colah – https://unsplash.com/photos/aIcw-jdp53s
+fotos/galleri/opskrifter-15.jpg: 360floralflaves – https://unsplash.com/photos/DI7nHnvUNsI
+fotos/galleri/opskrifter-16.jpg: Calum Lewis – https://unsplash.com/photos/vA1L1jRTM70
+fotos/galleri/opskrifter-17.jpg: Marisol Benitez – https://unsplash.com/photos/QvkAQTNj4zk
+fotos/galleri/opskrifter-18.jpg: Ahmet Koç – https://unsplash.com/photos/-u89OLgERv4
+fotos/galleri/opskrifter-19.jpg: Deepak Adhikari – https://unsplash.com/photos/SvM3z6WcYO8
+fotos/galleri/opskrifter-20.jpg: Kevin Doran – https://unsplash.com/photos/OtdNWHGRvfI
+fotos/galleri/opskrifter-21.jpg: Jenna E. – https://unsplash.com/photos/5zKFbbEryP8
+fotos/galleri/opskrifter-22.jpg: Anita Schnitzer – https://unsplash.com/photos/eZ0-0K1Bu4o
+fotos/galleri/opskrifter-23.jpg: Agnieszka Stankiewicz – https://unsplash.com/photos/obMdrL5pFWI
+fotos/galleri/opskrifter-24.jpg: Jason Leung – https://unsplash.com/photos/2IaZGfBKgMY
+fotos/galleri/madplan-10.jpg: Hikari Graf – https://unsplash.com/photos/lE_WxCJo7cA
+fotos/galleri/madplan-11.jpg: Monaz Hastam – https://unsplash.com/photos/qk6EjQHVLkY
+fotos/galleri/madplan-12.jpg: Anna Pelzer – https://unsplash.com/photos/IGfIGP5ONV0
+fotos/galleri/madplan-13.jpg: S'well – https://unsplash.com/photos/mP8HvwFA_dw
+fotos/galleri/madplan-14.jpg: Dean Zhang – https://unsplash.com/photos/HBZ9V-a0FFc
+fotos/galleri/madplan-15.jpg: Ella Olsson – https://unsplash.com/photos/P4jRJYN33wE
+fotos/galleri/madplan-16.jpg: Sumit Bhatia – https://unsplash.com/photos/emy9Rhhn2PI
+fotos/galleri/madplan-17.jpg: Ferks Guare – https://unsplash.com/photos/zxPLJJz2o_c
+fotos/galleri/madplan-18.jpg: S'well – https://unsplash.com/photos/SfP1PtM9Qa8
+fotos/galleri/madplan-19.jpg: Paul Torres – https://unsplash.com/photos/SYqJ0EEHuvI
+fotos/galleri/madplan-20.jpg: Sonny Mauricio – https://unsplash.com/photos/yhc4pSbl01A
+fotos/galleri/madplan-21.jpg: kofookoo.de – https://unsplash.com/photos/UQE3rtWMfV4
+fotos/galleri/madplan-22.jpg: S'well – https://unsplash.com/photos/56aSOnOibAk
+fotos/galleri/madplan-23.jpg: Luisa Brimble – https://unsplash.com/photos/2RrBE90w0T8
+fotos/galleri/madplan-24.jpg: Sandra Harris – https://unsplash.com/photos/MT3MFSaBsN0
+fotos/galleri/madplan-25.jpg: Janesca – https://unsplash.com/photos/HDvVQJNSq9Y
+fotos/galleri/madplan-26.jpg: Syamsul Haj – https://unsplash.com/photos/FttWZx9-wCk
+fotos/galleri/indkob-10.jpg: Franki Chamaki – https://unsplash.com/photos/ivfp_yxZuYQ
+fotos/galleri/indkob-11.jpg: nrd – https://unsplash.com/photos/D6Tu_L3chLE
+fotos/galleri/indkob-12.jpg: JEaLiFe Pictures – https://unsplash.com/photos/Y3OTP6FwocA
+fotos/galleri/indkob-13.jpg: Nathália Rosa – https://unsplash.com/photos/rWMIbqmOxrY
+fotos/galleri/indkob-14.jpg: Rap Dela Rea – https://unsplash.com/photos/ECMRLse82Pc
+fotos/galleri/indkob-15.jpg: Boxed Water Is Better – https://unsplash.com/photos/7H1hDt694s8
+fotos/galleri/indkob-16.jpg: Jack Lee – https://unsplash.com/photos/IH65r4HEQWQ
+fotos/galleri/indkob-17.jpg: Valeriano Escobar – https://unsplash.com/photos/cghqmLvDvvQ
+fotos/galleri/indkob-18.jpg: T – https://unsplash.com/photos/kQvpvuEqZVw
+fotos/galleri/indkob-19.jpg: S O C I A L . C U T – https://unsplash.com/photos/3KvD6JFZWAU
+fotos/galleri/indkob-20.jpg: Zoshua Colah – https://unsplash.com/photos/W_H1sClALf0
+fotos/galleri/indkob-21.jpg: Markus Spiske – https://unsplash.com/photos/i5tesTFPBjw
+fotos/galleri/indkob-22.jpg: Kelvin Zyteng – https://unsplash.com/photos/zRGs0d6Lntk
+fotos/galleri/indkob-23.jpg: Anthony Camp – https://unsplash.com/photos/X5LAqXehKJo
+fotos/galleri/indkob-24.jpg: Waldemar Brandt – https://unsplash.com/photos/0usDJWVlHX0
+fotos/galleri/lager-10.jpg: Jacob McGowin – https://unsplash.com/photos/514ttExZr1U
+fotos/galleri/lager-11.jpg: Alex Tyson – https://unsplash.com/photos/IjfDxaiM6bE
+fotos/galleri/lager-12.jpg: Jacob McGowin – https://unsplash.com/photos/wbNj8AaMifg
+fotos/galleri/lager-13.jpg: Donna Spearman – https://unsplash.com/photos/Kml12zn10wI
+fotos/galleri/lager-14.jpg: Nicolas J. Barbier – https://unsplash.com/photos/3A0qRjOesX4
+fotos/galleri/lager-15.jpg: Zoshua Colah – https://unsplash.com/photos/RLVijPav1kU
+fotos/galleri/lager-16.jpg: Artem Kostelnyuk – https://unsplash.com/photos/NrqKwJ1KPo8
+fotos/galleri/lager-17.jpg: Onur Burak Akın – https://unsplash.com/photos/gC-cKJebRhg
+fotos/galleri/lager-18.jpg: Ray Shrewsberry – https://unsplash.com/photos/bhni1zsPiio
+fotos/galleri/lager-19.jpg: Calle Macarone – https://unsplash.com/photos/Vl78eNdiJaQ
+fotos/galleri/lager-20.jpg: Kristiina Klaas – https://unsplash.com/photos/w9vkXTDc9pc
+fotos/galleri/lager-21.jpg: Sticker it – https://unsplash.com/photos/6BTUw1FPafc
+fotos/galleri/lager-22.jpg: NordWood Themes – https://unsplash.com/photos/UkaxVVAgDaw
+fotos/galleri/lager-23.jpg: Muhammed A. Mustapha – https://unsplash.com/photos/l8pJWy8N2jA
+fotos/galleri/lager-24.jpg: Antonio Araujo – https://unsplash.com/photos/LXcwwdZcPwQ
+fotos/galleri/lager-25.jpg: Julia Fiander – https://unsplash.com/photos/U2edNLT_jI8
