@@ -1,0 +1,7 @@
+# Kun selve appen kommer på nettet
+/*
+!/.gitignore
+!/index.html
+!/manifest.json
+!/sw.js
+!/ikoner/

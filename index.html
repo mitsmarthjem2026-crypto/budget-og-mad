@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Budget og Mad">
+<meta name="theme-color" content="#2f7d4f">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="mobile-web-app-capable" content="yes">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="ikoner/ikon-180.png">
+<link rel="icon" href="ikoner/ikon-192.png">
+<link rel="apple-touch-startup-image" href="ikoner/start-640x1136.png" media="(device-width: 320px) and (device-height: 568px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)">
+<link rel="apple-touch-startup-image" href="ikoner/start-750x1334.png" media="(device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)">
+<link rel="apple-touch-startup-image" href="ikoner/start-1242x2208.png" media="(device-width: 414px) and (device-height: 736px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)">
+<link rel="apple-touch-startup-image" href="ikoner/start-1125x2436.png" media="(device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)">
+<link rel="apple-touch-startup-image" href="ikoner/start-828x1792.png" media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)">
+<link rel="apple-touch-startup-image" href="ikoner/start-1242x2688.png" media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)">
+<link rel="apple-touch-startup-image" href="ikoner/start-1080x2340.png" media="(device-width: 360px) and (device-height: 780px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)">
+<link rel="apple-touch-startup-image" href="ikoner/start-1170x2532.png" media="(device-width: 390px) and (device-height: 844px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)">
+<link rel="apple-touch-startup-image" href="ikoner/start-1284x2778.png" media="(device-width: 428px) and (device-height: 926px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)">
+<link rel="apple-touch-startup-image" href="ikoner/start-1179x2556.png" media="(device-width: 393px) and (device-height: 852px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)">
+<link rel="apple-touch-startup-image" href="ikoner/start-1290x2796.png" media="(device-width: 430px) and (device-height: 932px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)">
+<link rel="apple-touch-startup-image" href="ikoner/start-1206x2622.png" media="(device-width: 402px) and (device-height: 874px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)">
+<link rel="apple-touch-startup-image" href="ikoner/start-1320x2868.png" media="(device-width: 440px) and (device-height: 956px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)">
+<link rel="apple-touch-startup-image" href="ikoner/start-1260x2736.png" media="(device-width: 420px) and (device-height: 912px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)">
+<title>Budget og Mad</title>
+<style>
+html{background:#2f7d4f}
+:root{--bg:#f6f4ef;--card:#fff;--txt:#222;--muted:#666;--line:#e2ddd3;--acc:#2f7d4f;--acc2:#e8f3ec;--warn:#b54a1c;--warnbg:#fdeee6}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;background:var(--bg);color:var(--txt);font-size:17px}
+header{background:var(--acc);color:#fff;padding:14px 20px;display:flex;align-items:center;gap:12px}
+header h1{margin:0;font-size:22px;flex:1;white-space:nowrap}
+header .ver{font-size:13px;opacity:.8}
+nav{display:flex;gap:6px;padding:10px 20px;background:#fff;border-bottom:1px solid var(--line);position:sticky;top:0;z-index:5}
+nav button{flex:1;border:0;background:none;padding:10px 6px;border-radius:10px;font-size:16px;cursor:pointer;color:var(--muted)}
+nav button .ic{display:block;font-size:22px}
+nav button.on{background:var(--acc2);color:var(--acc);font-weight:600}
+main{max-width:1100px;margin:0 auto;padding:18px 20px 110px}
+h2{margin:4px 0 14px;font-size:22px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:14px}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+input,textarea,select{font:inherit;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:#fff;min-width:0}
+textarea{width:100%;min-height:90px}
+input.grow{flex:1 1 160px}
+button.b{font:inherit;border:0;border-radius:10px;padding:10px 16px;background:var(--acc);color:#fff;cursor:pointer}
+button.l{font:inherit;border:1px solid var(--line);border-radius:10px;padding:9px 14px;background:#fff;cursor:pointer}
+button.x{border:0;background:none;font-size:20px;cursor:pointer;color:var(--muted);padding:4px 8px}
+.list{list-style:none;margin:0;padding:0}
+.list li{display:flex;align-items:center;gap:10px;padding:10px 4px;border-bottom:1px solid var(--line)}
+.list li:last-child{border-bottom:0}
+.list li .n{flex:1}
+.done .n{text-decoration:line-through;color:var(--muted)}
+.muted{color:var(--muted);font-size:15px}
+.empty{color:var(--muted);text-align:center;padding:20px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px}
+.rc{cursor:pointer}
+.rc h3{margin:0 0 6px;font-size:18px}
+.week{display:grid;grid-template-columns:repeat(7,1fr);gap:10px}
+.day{background:#fff;border:1px solid var(--line);border-radius:12px;padding:10px;min-height:120px}
+.day.today{border-color:var(--acc);box-shadow:0 0 0 2px var(--acc2)}
+.day b{display:block}
+.day select,.day input{width:100%;margin-top:8px;font-size:15px}
+.soon{background:var(--warnbg)}
+.soon .exp{color:var(--warn);font-weight:600}
+.big{font-size:28px;font-weight:700}
+.bar{height:14px;background:var(--line);border-radius:7px;overflow:hidden;margin:8px 0}
+.bar i{display:block;height:100%;background:var(--acc)}
+.bar i.over{background:var(--warn)}
+#hurtig{flex:1 1 0!important}
+.toast{position:fixed;left:50%;bottom:90px;transform:translateX(-50%);background:#222;color:#fff;padding:12px 16px;border-radius:12px;display:none;gap:14px;align-items:center;z-index:20}
+.toast button{background:none;border:1px solid #fff;color:#fff;border-radius:8px;padding:6px 10px;font:inherit;cursor:pointer}
+dialog{border:0;border-radius:16px;padding:0;max-width:640px;width:94vw}
+dialog .in{padding:18px}
+dialog::backdrop{background:rgba(0,0,0,.35)}
+label{display:block;font-size:15px;color:var(--muted);margin:10px 0 4px}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+@media (max-width:760px){
+  body{font-size:16px}
+  header{padding:12px 14px;padding-top:max(12px,env(safe-area-inset-top));gap:8px}
+  header h1{font-size:19px}
+  header .ver{font-size:11px;white-space:nowrap}
+  #instknap{white-space:nowrap;padding:5px 9px!important}
+  nav{position:fixed;bottom:0;top:auto;left:0;right:0;border-top:1px solid var(--line);border-bottom:0;padding:6px 6px max(6px,env(safe-area-inset-bottom));gap:2px}
+  nav button{font-size:12px;padding:6px 2px}
+  main{padding:14px 12px 110px}
+  .week{grid-template-columns:1fr}
+  .day{min-height:0}
+  .stats{grid-template-columns:1fr}
+  input,select,textarea{font-size:16px}
+  .row input.grow{flex:1 1 100%}
+  .row input[inputmode=decimal]{flex:1 1 90px}
+  .big{font-size:24px}
+  nav button .ic{font-size:20px}
+}
+@media (max-width:350px){
+  nav button{font-size:10.5px}
+  header h1{font-size:18px}
+  header h1{font-size:16px}
+  header .ver{font-size:10px}
+  .itxt{display:none}
+  main{padding:12px 8px 110px}
+  .card{padding:12px}
+}
+</style>
+</head>
+<body>
+<header><h1>🍲 Budget og Mad</h1><button id="instknap" onclick="visGuide()" style="display:none;border:1px solid #fff;background:none;color:#fff;border-radius:10px;padding:6px 10px;font:inherit;font-size:14px;cursor:pointer">📲<span class="itxt"> Installér</span></button><span class="ver">version 4</span></header>
+<nav id="nav">
+  <button data-p="opskrifter"><span class="ic">📖</span>Opskrifter</button>
+  <button data-p="madplan"><span class="ic">📅</span>Madplan</button>
+  <button data-p="indkob"><span class="ic">🛒</span>Indkøb</button>
+  <button data-p="lager"><span class="ic">🥫</span>Lager</button>
+  <button data-p="budget"><span class="ic">💰</span>Budget</button>
+</nav>
+<main id="main"></main>
+<div class="toast" id="toast"><span id="tmsg"></span><button id="tundo">Fortryd</button></div>
+<dialog id="dlg"><div class="in" id="dlgin"></div></dialog>
+
+<script>
+const KEY='madapp-v1';
+let D=JSON.parse(localStorage.getItem(KEY)||'null')||{opskrifter:[],indkob:[],lager:[],madplan:{},budget:{maaned:0,udgifter:[]}};
+D.budget.ind=D.budget.ind||[];D.budget.faste=D.budget.faste||[];
+let budgetMd=new Date().getFullYear()+'-'+String(new Date().getMonth()+1).padStart(2,'0');
+let side=localStorage.getItem(KEY+'-side')||'opskrifter';if(['#opskrifter','#madplan','#indkob','#lager','#budget'].includes(location.hash))side=location.hash.slice(1);
+let ugeStart=mandag(new Date());
+const save=()=>localStorage.setItem(KEY,JSON.stringify(D));
+const id=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,6);
+const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const kr=n=>{n=Math.round(n*100)/100;return n.toLocaleString('da-DK',{minimumFractionDigits:n%1?2:0,maximumFractionDigits:2})+' kr'};
+const iso=d=>d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+function mandag(d){d=new Date(d);d.setHours(0,0,0,0);d.setDate(d.getDate()-((d.getDay()+6)%7));return d}
+const DAGE=['Mandag','Tirsdag','Onsdag','Torsdag','Fredag','Lørdag','Søndag'];
+
+let undoFn=null,tT;
+function toast(msg,undo){const t=document.getElementById('toast');document.getElementById('tmsg').textContent=msg;undoFn=undo;document.getElementById('tundo').style.display=undo?'':'none';t.style.display='flex';clearTimeout(tT);tT=setTimeout(()=>t.style.display='none',6000)}
+document.getElementById('tundo').onclick=()=>{if(undoFn){undoFn();save();vis()}document.getElementById('toast').style.display='none'};
+function snap(){return JSON.stringify(D)}
+function fortrydTil(s){return()=>{D=JSON.parse(s)}}
+
+// "200 g mel" -> {maengde:200, enhed:'g', navn:'mel'}
+function parseIng(linje){
+  const m=linje.trim().match(/^([\d]+(?:[.,]\d+)?)\s*(g|kg|ml|dl|cl|l|stk|spsk|tsk|knsp|fed|dåse|dåser|pakke|pk|bundt)?\.?\s+(.+)$/i);
+  if(m)return{maengde:parseFloat(m[1].replace(',','.')),enhed:(m[2]||'').toLowerCase(),navn:m[3].trim()};
+  return{maengde:null,enhed:'',navn:linje.trim()};
+}
+const ingTekst=i=>(i.maengde!=null?(String(i.maengde).replace('.',',')+' '):'')+(i.enhed?i.enhed+' ':'')+i.navn;
+const sammeNavn=(a,b)=>a.trim().toLowerCase()===b.trim().toLowerCase();
+
+function tilIndkob(ings){
+  let n=0;
+  ings.forEach(i=>{
+    const paaLager=D.lager.find(l=>sammeNavn(l.navn,i.navn));
+    if(paaLager&&(i.maengde==null||paaLager.maengde==null||(paaLager.enhed===i.enhed&&paaLager.maengde>=i.maengde)))return;
+    const fin=D.indkob.find(x=>!x.kobt&&sammeNavn(x.navn,i.navn)&&x.enhed===i.enhed);
+    if(fin){if(fin.maengde!=null&&i.maengde!=null)fin.maengde+=i.maengde}
+    else D.indkob.push({id:id(),navn:i.navn,maengde:i.maengde,enhed:i.enhed,pris:null,kobt:false});
+    n++;
+  });
+  return n;
+}
+
+const SIDER={
+opskrifter(){
+  const q=(window._q||'').toLowerCase();
+  const liste=D.opskrifter.filter(o=>!q||o.navn.toLowerCase().includes(q)||o.ing.some(i=>i.navn.toLowerCase().includes(q)));
+  return `<h2>Opskrifter</h2>
+  <div class="row" style="margin-bottom:14px"><input class="grow" id="soeg" placeholder="Søg i opskrifter eller ingredienser" value="${esc(window._q||'')}"><button class="b" onclick="redigerOpskrift()">+ Ny opskrift</button></div>
+  ${liste.length?`<div class="grid">${liste.map(o=>`<div class="card rc" onclick="visOpskrift('${o.id}')"><h3>${esc(o.navn)}</h3><div class="muted">${o.portioner?o.portioner+' portioner · ':''}${o.ing.length} ingredienser</div></div>`).join('')}</div>`
+  :`<div class="card empty">${D.opskrifter.length?'Ingen opskrifter passer til søgningen.':'Du har ingen opskrifter endnu. Tryk på »+ Ny opskrift«.'}</div>`}`;
+},
+madplan(){
+  const dage=[...Array(7)].map((_,i)=>{const d=new Date(ugeStart);d.setDate(d.getDate()+i);return d});
+  const uge=ugenr(ugeStart);const idag=iso(new Date());
+  return `<h2>Madplan</h2>
+  <div class="row" style="margin-bottom:14px"><button class="l" onclick="skiftUge(-1)">‹ Forrige</button><b style="flex:1;text-align:center">Uge ${uge} · ${dage[0].toLocaleDateString('da-DK',{day:'numeric',month:'short'})} – ${dage[6].toLocaleDateString('da-DK',{day:'numeric',month:'short'})}</b><button class="l" onclick="skiftUge(1)">Næste ›</button></div>
+  <div class="week">${dage.map((d,i)=>{const k=iso(d),v=D.madplan[k]||{};return `<div class="day ${k===idag?'today':''}"><b>${DAGE[i]}</b><span class="muted">${d.toLocaleDateString('da-DK',{day:'numeric',month:'short'})}</span>
+    <select onchange="setPlan('${k}','opskrift',this.value)"><option value="">– vælg opskrift –</option>${D.opskrifter.map(o=>`<option value="${o.id}" ${v.opskrift===o.id?'selected':''}>${esc(o.navn)}</option>`).join('')}</select>
+    <input placeholder="eller skriv selv" value="${esc(v.tekst||'')}" onchange="setPlan('${k}','tekst',this.value)"></div>`}).join('')}</div>
+  <div class="row" style="margin-top:14px"><button class="b" onclick="ugeTilIndkob()">🛒 Læg ugens ingredienser på indkøbslisten</button></div>
+  <p class="muted">Det, du allerede har nok af på lageret, kommer ikke på listen.</p>`;
+},
+indkob(){
+  const ikke=D.indkob.filter(x=>!x.kobt),kobt=D.indkob.filter(x=>x.kobt);
+  const li=x=>`<li class="${x.kobt?'done':''}"><input type="checkbox" ${x.kobt?'checked':''} onchange="kobt('${x.id}',this.checked)" style="width:22px;height:22px"><span class="n">${esc(ingTekst(x))}</span><input type="number" min="0" step="0.01" placeholder="pris kr" value="${x.pris??''}" style="width:100px" onchange="setPris('${x.id}',this.value)"><button class="x" title="Slet" onclick="sletVare('${x.id}')">✕</button></li>`;
+  return `<h2>Indkøb</h2>
+  <div class="card"><div class="row"><input class="grow" id="nyvare" placeholder="Fx 1 l mælk"><button class="b" onclick="tilfojVare()">Tilføj</button></div></div>
+  <div class="card"><ul class="list">${ikke.length?ikke.map(li).join(''):'<li class="empty" style="justify-content:center">Indkøbslisten er tom.</li>'}</ul></div>
+  ${kobt.length?`<div class="card"><b>Købt (${kobt.length})</b><ul class="list">${kobt.map(li).join('')}</ul>
+  <div class="row" style="margin-top:10px"><button class="b" onclick="kobtTilLager()">🥫 Flyt købte til lager</button></div>
+  <p class="muted">Priser du har skrevet, bliver lagt i budgettet.</p></div>`:''}`;
+},
+lager(){
+  const idag=new Date();idag.setHours(0,0,0,0);
+  const s=[...D.lager].sort((a,b)=>(a.udlob||'9999').localeCompare(b.udlob||'9999')||a.navn.localeCompare(b.navn,'da'));
+  return `<h2>Lager</h2>
+  <div class="card"><div class="row"><input class="grow" id="nylager" placeholder="Fx 500 g pasta"><label style="margin:0">Holdbar til</label><input type="date" id="nyudlob"><button class="b" onclick="tilfojLager()">Tilføj</button></div></div>
+  <div class="card"><ul class="list">${s.length?s.map(x=>{const dage=x.udlob?Math.round((new Date(x.udlob)-idag)/864e5):null;const soon=dage!=null&&dage<=3;
+    return `<li class="${soon?'soon':''}"><span class="n">${esc(ingTekst(x))}</span>
+    <span class="exp muted">${x.udlob?(dage<0?'Udløbet':dage===0?'Udløber i dag':'Holdbar til '+new Date(x.udlob).toLocaleDateString('da-DK',{day:'numeric',month:'short'})):''}</span>
+    <button class="l" onclick="brugLager('${x.id}')">Brugt</button></li>`}).join(''):'<li class="empty" style="justify-content:center">Lageret er tomt.</li>'}</ul></div>
+  <p class="muted">Varer der udløber inden for 3 dage, er farvet.</p>`;
+},
+budget(){
+  const md=budgetMd,erNu=md===iso(new Date()).slice(0,7);
+  const u=D.budget.udgifter.filter(x=>x.dato.slice(0,7)===md).sort((a,b)=>b.dato.localeCompare(a.dato));
+  const brugt=u.reduce((s,x)=>s+x.belob,0),b=D.budget.maaned||0,pct=b?Math.min(100,brugt/b*100):0;
+  const navn=new Date(md+'-01').toLocaleDateString('da-DK',{month:'long',year:'numeric'});
+  const ind=D.budget.ind.filter(x=>x.dato.slice(0,7)===md),sumInd=ind.reduce((s,x)=>s+x.belob,0);
+  const sumFaste=D.budget.faste.reduce((s,x)=>s+x.belob,0),tilbage=sumInd-sumFaste-brugt;
+  const nu=new Date(),dageIgen=new Date(nu.getFullYear(),nu.getMonth()+1,0).getDate()-nu.getDate()+1;
+  const kort=x=>new Date(x.dato).toLocaleDateString('da-DK',{day:'numeric',month:'short'});
+  return `<div class="row" style="margin-bottom:12px"><button class="l" onclick="skiftMd(-1)">‹</button><h2 style="flex:1;text-align:center;margin:0">Budget · ${navn}</h2><button class="l" onclick="skiftMd(1)">›</button></div>
+  <div class="card" style="text-align:center"><div class="muted">Tilbage i ${navn.split(' ')[0]}</div>
+  <div class="big" style="font-size:40px;color:${tilbage<0?'var(--warn)':'var(--acc)'}">${kr(tilbage)}</div>
+  ${erNu&&tilbage>0?`<div class="muted">Det er ca. ${kr(Math.floor(tilbage/dageIgen))} pr. dag resten af måneden (${dageIgen} dage)</div>`:''}
+  <div class="row" style="justify-content:center;gap:18px;margin-top:10px"><span>💵 Ind: <b>${kr(sumInd)}</b></span><span>🏠 Faste: <b>${kr(sumFaste)}</b></span><span>🛒 Køb: <b>${kr(brugt)}</b></span></div></div>
+  ${tipsKort(sumInd,sumFaste,brugt,tilbage,erNu)}
+  <div class="card" style="border:2px solid var(--acc)"><b>⚡ Hurtigt: sig det, skriv det eller tag et billede</b>
+  <div class="muted" style="margin:4px 0 8px">Fx »løn 12.000«, »husleje 4500« eller »Netto 250«</div>
+  <div class="row"><input class="grow" id="hurtig" placeholder="Skriv her…"><button class="b" onclick="hurtigTekst()" title="Videre">➜</button></div>
+  <div class="row" style="margin-top:8px"><button class="b" id="mic" style="flex:1" onclick="talInd()">🎤 Tal ind</button><label class="b" style="font:inherit;flex:1;text-align:center;cursor:pointer;margin:0;color:#fff;background:var(--acc);border-radius:10px;padding:10px 16px">📷 Kvittering<input type="file" accept="image/*" capture="environment" hidden onchange="kvittering(this)"></label></div>
+  <div id="hstatus" class="muted" style="margin-top:6px">${esc(hStatus)}</div>
+  ${fs?`<div style="background:var(--acc2);border-radius:12px;padding:12px;margin-top:10px"><b>Er det rigtigt?</b>
+   <div class="row" style="margin-top:8px"><select id="ftype"><option value="ind" ${fs.type==='ind'?'selected':''}>💵 Penge ind</option><option value="fast" ${fs.type==='fast'?'selected':''}>🏠 Fast udgift</option><option value="kob" ${fs.type==='kob'?'selected':''}>🛒 Køb</option></select>
+   <input class="grow" id="fstekst" value="${esc(fs.tekst)}"><input type="text" inputmode="decimal" id="fsbelob" value="${fs.belob!=null?String(fs.belob).replace('.',','):''}" placeholder="kr"></div>
+   <div class="row" style="margin-top:8px"><button class="b" onclick="gemForslag()">✓ Gem</button><button class="l" onclick="fs=null;hStatus='';vis()">Annullér</button></div></div>`:''}</div>
+  <div class="card"><b>💵 Penge ind</b> <span class="muted">– fx løn eller SU, når du får den</span>
+  <div class="row" style="margin-top:8px"><input class="grow" id="itekst" placeholder="Løn" value="Løn"><input type="text" inputmode="decimal" id="ibelob" placeholder="kr" style="width:120px"><button class="b" onclick="tilfojInd()">Tilføj</button></div>
+  <ul class="list">${ind.map(x=>`<li><span class="muted" style="width:70px">${kort(x)}</span><span class="n">${esc(x.tekst)}</span><b>${kr(x.belob)}</b><button class="x" title="Slet" onclick="sletInd('${x.id}')">✕</button></li>`).join('')}</ul></div>
+  <div class="card"><b>🏠 Faste udgifter hver måned</b> <span class="muted">– fx husleje, mobil, transport</span>
+  <div class="row" style="margin-top:8px"><input class="grow" id="ftekst" placeholder="Fx Husleje"><input type="text" inputmode="decimal" id="fbelob" placeholder="kr" style="width:120px"><button class="b" onclick="tilfojFast()">Tilføj</button></div>
+  <ul class="list">${D.budget.faste.map(x=>`<li><span class="n">${esc(x.tekst)}</span><b>${kr(x.belob)}</b><button class="x" title="Slet" onclick="sletFast('${x.id}')">✕</button></li>`).join('')}</ul></div>
+  <h2 style="margin-top:22px">🛒 Køb</h2>
+  <div class="card"><div class="row"><label style="margin:0">Budget til mad pr. måned</label><input type="text" inputmode="decimal" id="mbudget" value="${b||''}" placeholder="kr" style="width:140px"><button class="l" onclick="setBudget()">Gem</button></div>
+  ${b?`<div class="bar"><i class="${brugt>b?'over':''}" style="width:${pct}%"></i></div>`:''}</div>
+  <div class="stats"><div class="card"><div class="muted">Brugt</div><div class="big">${kr(brugt)}</div></div>
+  <div class="card"><div class="muted">Tilbage</div><div class="big" style="color:${b&&brugt>b?'var(--warn)':'inherit'}">${b?kr(b-brugt):'–'}</div></div>
+  <div class="card"><div class="muted">Antal køb</div><div class="big">${u.length}</div></div></div>
+  <div class="card"><div class="row"><input type="date" id="udato" value="${datoIMd()}"><input class="grow" id="utekst" placeholder="Fx Netto"><input type="text" inputmode="decimal" id="ubelob" placeholder="kr" style="width:110px"><button class="b" onclick="tilfojUdgift()">Tilføj</button></div></div>
+  <div class="card"><ul class="list">${u.length?u.map(x=>`<li><span class="muted" style="width:70px">${new Date(x.dato).toLocaleDateString('da-DK',{day:'numeric',month:'short'})}</span><span class="n">${esc(x.tekst)}</span><b>${kr(x.belob)}</b><button class="x" onclick="sletUdgift('${x.id}')">✕</button></li>`).join(''):'<li class="empty" style="justify-content:center">Ingen køb i denne måned.</li>'}</ul></div>
+  <div class="card"><b>📄 CSV-fil</b><p class="muted">Gem ${navn} som en fil, der kan åbnes i Excel.</p><button class="b" onclick="csv()">⬇ Gem som CSV</button></div>
+  <div class="card"><b>Sikkerhedskopi</b><p class="muted">Gem alle dine data i en fil, eller hent dem igen.</p><div class="row"><button class="l" onclick="eksport()">⬇ Gem kopi</button><label class="l" style="margin:0;cursor:pointer;color:inherit;border:1px solid var(--line);border-radius:10px;padding:9px 14px">⬆ Hent kopi<input type="file" accept=".json" onchange="importer(this)" hidden></label></div></div>`;
+}};
+
+function ugenr(d){d=new Date(Date.UTC(d.getFullYear(),d.getMonth(),d.getDate()));const n=d.getUTCDay()||7;d.setUTCDate(d.getUTCDate()+4-n);const y=new Date(Date.UTC(d.getUTCFullYear(),0,1));return Math.ceil(((d-y)/864e5+1)/7)}
+
+function vis(){
+  document.querySelectorAll('#nav button').forEach(b=>b.classList.toggle('on',b.dataset.p===side));
+  document.getElementById('main').innerHTML=SIDER[side]();
+  const s=document.getElementById('soeg');if(s){s.oninput=()=>{window._q=s.value;const p=s.selectionStart;vis();const n=document.getElementById('soeg');n.focus();n.setSelectionRange(p,p)}}
+  [['nyvare',tilfojVare],['nylager',tilfojLager],['ubelob',tilfojUdgift],['ibelob',tilfojInd],['hurtig',hurtigTekst],['fbelob',tilfojFast]].forEach(([i,f])=>{const e=document.getElementById(i);if(e)e.onkeydown=ev=>{if(ev.key==='Enter')f()}});
+}
+document.querySelectorAll('#nav button').forEach(b=>b.onclick=()=>{side=b.dataset.p;localStorage.setItem(KEY+'-side',side);vis();scrollTo(0,0)});
+
+// Opskrifter
+const dlg=document.getElementById('dlg'),dlgin=document.getElementById('dlgin');
+function visOpskrift(oid){
+  const o=D.opskrifter.find(x=>x.id===oid);if(!o)return;
+  dlgin.innerHTML=`<h2>${esc(o.navn)}</h2>${o.portioner?`<div class="muted">${o.portioner} portioner</div>`:''}
+  <h3>Ingredienser</h3><ul>${o.ing.map(i=>`<li>${esc(ingTekst(i))}</li>`).join('')||'<li class="muted">Ingen</li>'}</ul>
+  ${o.frem?`<h3>Sådan gør du</h3><div style="white-space:pre-wrap">${esc(o.frem)}</div>`:''}
+  <div class="row" style="margin-top:16px"><button class="b" onclick="opskriftTilIndkob('${o.id}')">🛒 På indkøbslisten</button><button class="l" onclick="redigerOpskrift('${o.id}')">Ret</button><button class="l" onclick="sletOpskrift('${o.id}')">Slet</button><button class="l" onclick="dlg.close()">Luk</button></div>`;
+  if(!dlg.open)dlg.showModal();
+}
+function redigerOpskrift(oid){
+  const o=D.opskrifter.find(x=>x.id===oid)||{navn:'',portioner:'',ing:[],frem:''};
+  dlgin.innerHTML=`<h2>${oid?'Ret opskrift':'Ny opskrift'}</h2>
+  <label>Navn</label><input id="onavn" style="width:100%" value="${esc(o.navn)}">
+  <label>Portioner</label><input id="oport" type="number" min="1" style="width:100px" value="${o.portioner||''}">
+  <label>Ingredienser (én pr. linje, fx »200 g mel«)</label><textarea id="oing">${esc(o.ing.map(ingTekst).join('\n'))}</textarea>
+  <label>Sådan gør du</label><textarea id="ofrem">${esc(o.frem)}</textarea>
+  <div class="row" style="margin-top:14px"><button class="b" onclick="gemOpskrift('${oid||''}')">Gem</button><button class="l" onclick="dlg.close()">Annullér</button></div>`;
+  if(!dlg.open)dlg.showModal();
+}
+function gemOpskrift(oid){
+  const navn=document.getElementById('onavn').value.trim();if(!navn){alert('Skriv et navn');return}
+  const o={id:oid||id(),navn,portioner:parseInt(document.getElementById('oport').value)||null,
+    ing:document.getElementById('oing').value.split('\n').filter(l=>l.trim()).map(parseIng),frem:document.getElementById('ofrem').value.trim()};
+  const i=D.opskrifter.findIndex(x=>x.id===oid);if(i>=0)D.opskrifter[i]=o;else D.opskrifter.push(o);
+  save();dlg.close();vis();toast('Opskriften er gemt');
+}
+function sletOpskrift(oid){const s=snap();D.opskrifter=D.opskrifter.filter(x=>x.id!==oid);save();dlg.close();vis();toast('Opskriften er slettet',fortrydTil(s))}
+function opskriftTilIndkob(oid){const s=snap();const o=D.opskrifter.find(x=>x.id===oid);const n=tilIndkob(o.ing);save();dlg.close();vis();toast(n?n+' varer lagt på indkøbslisten':'Du har det hele på lageret',n?fortrydTil(s):null)}
+
+// Madplan
+function skiftUge(n){ugeStart.setDate(ugeStart.getDate()+7*n);vis()}
+function setPlan(k,f,v){D.madplan[k]=D.madplan[k]||{};D.madplan[k][f]=v;if(!D.madplan[k].opskrift&&!D.madplan[k].tekst)delete D.madplan[k];save()}
+function ugeTilIndkob(){
+  const s=snap();let ings=[];
+  for(let i=0;i<7;i++){const d=new Date(ugeStart);d.setDate(d.getDate()+i);const v=D.madplan[iso(d)];if(v&&v.opskrift){const o=D.opskrifter.find(x=>x.id===v.opskrift);if(o)ings=ings.concat(o.ing.map(x=>({...x})))}}
+  if(!ings.length){toast('Vælg opskrifter i ugen først');return}
+  const n=tilIndkob(ings);save();toast(n?n+' varer lagt på indkøbslisten':'Du har det hele på lageret',n?fortrydTil(s):null);
+}
+
+// Indkøb
+function tilfojVare(){const e=document.getElementById('nyvare');if(!e.value.trim())return;const p=parseIng(e.value);D.indkob.push({id:id(),...p,pris:null,kobt:false});save();vis();document.getElementById('nyvare').focus()}
+function kobt(vid,v){D.indkob.find(x=>x.id===vid).kobt=v;save();vis()}
+function setPris(vid,v){D.indkob.find(x=>x.id===vid).pris=v===''?null:parseFloat(v);save()}
+function sletVare(vid){const s=snap();D.indkob=D.indkob.filter(x=>x.id!==vid);save();vis();toast('Varen er slettet',fortrydTil(s))}
+function kobtTilLager(){
+  const s=snap();const k=D.indkob.filter(x=>x.kobt);let sum=0;
+  k.forEach(x=>{const l=D.lager.find(y=>sammeNavn(y.navn,x.navn)&&y.enhed===x.enhed);
+    if(l&&l.maengde!=null&&x.maengde!=null)l.maengde+=x.maengde;else if(!l)D.lager.push({id:id(),navn:x.navn,maengde:x.maengde,enhed:x.enhed,udlob:''});
+    if(x.pris)sum+=x.pris});
+  if(sum)D.budget.udgifter.push({id:id(),dato:iso(new Date()),tekst:'Indkøb ('+k.length+' varer)',belob:sum});
+  D.indkob=D.indkob.filter(x=>!x.kobt);save();vis();toast(k.length+' varer flyttet til lager'+(sum?' · '+kr(sum)+' i budget':''),fortrydTil(s));
+}
+
+// Lager
+function tilfojLager(){const e=document.getElementById('nylager');if(!e.value.trim())return;D.lager.push({id:id(),...parseIng(e.value),udlob:document.getElementById('nyudlob').value});save();vis();document.getElementById('nylager').focus()}
+function brugLager(lid){const s=snap();D.lager=D.lager.filter(x=>x.id!==lid);save();vis();toast('Fjernet fra lager',fortrydTil(s))}
+
+// Budget
+function setBudget(){D.budget.maaned=tal('mbudget')||0;save();vis();toast('Budget gemt')}
+function tilfojUdgift(){const b=tal('ubelob');if(!b){alert('Skriv et beløb');return}D.budget.udgifter.push({id:id(),dato:document.getElementById('udato').value||iso(new Date()),tekst:document.getElementById('utekst').value.trim()||'Køb',belob:b});save();vis()}
+function skiftMd(n){const d=new Date(budgetMd+'-01');d.setMonth(d.getMonth()+n);budgetMd=iso(d).slice(0,7);vis()}
+function datoIMd(){const i=iso(new Date());return i.slice(0,7)===budgetMd?i:budgetMd+'-01'}
+function tal(id){let v=String(document.getElementById(id).value).replace(/\s|kr\.?/gi,'');if(v.includes(','))v=v.replace(/\./g,'').replace(',','.');else if(/^\d{1,3}(\.\d{3})+$/.test(v))v=v.replace(/\./g,'');return parseFloat(v)}
+function tilfojInd(){const b=tal('ibelob');if(!b){alert('Skriv et beløb');return}D.budget.ind.push({id:id(),dato:datoIMd(),tekst:document.getElementById('itekst').value.trim()||'Løn',belob:b});save();vis();toast('Penge ind er gemt')}
+function sletInd(x){const s=snap();D.budget.ind=D.budget.ind.filter(y=>y.id!==x);save();vis();toast('Slettet',fortrydTil(s))}
+function tilfojFast(){const b=tal('fbelob'),t=document.getElementById('ftekst').value.trim();if(!t||!b){alert('Skriv navn og beløb');return}D.budget.faste.push({id:id(),tekst:t,belob:b});save();vis();toast('Fast udgift er gemt')}
+function sletFast(x){const s=snap();D.budget.faste=D.budget.faste.filter(y=>y.id!==x);save();vis();toast('Slettet',fortrydTil(s))}
+function csv(){
+  const md=budgetMd,f=n=>String(Math.round(n*100)/100).replace('.',','),q=t=>'"'+String(t).replace(/"/g,'""')+'"';
+  const r=[['Dato','Type','Tekst','Beløb (kr)']];
+  D.budget.ind.filter(x=>x.dato.slice(0,7)===md).forEach(x=>r.push([x.dato,'Penge ind',q(x.tekst),f(x.belob)]));
+  D.budget.faste.forEach(x=>r.push([md,'Fast udgift',q(x.tekst),f(-x.belob)]));
+  D.budget.udgifter.filter(x=>x.dato.slice(0,7)===md).forEach(x=>r.push([x.dato,'Køb',q(x.tekst),f(-x.belob)]));
+  const si=D.budget.ind.filter(x=>x.dato.slice(0,7)===md).reduce((s,x)=>s+x.belob,0),sf=D.budget.faste.reduce((s,x)=>s+x.belob,0),sk=D.budget.udgifter.filter(x=>x.dato.slice(0,7)===md).reduce((s,x)=>s+x.belob,0);
+  r.push([],['','','Tilbage',f(si-sf-sk)]);
+  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob(['﻿'+r.map(x=>x.join(';')).join('\r\n')],{type:'text/csv'}));a.download='budget-'+md+'.csv';a.click();
+}
+// Venlige tips (kan slås fra)
+const TIPS=['Lav en madplan for ugen, før du handler. Så køber du kun det, du skal bruge.',
+'Kig i tilbudsaviserne, før du handler. Byg gerne madplanen ud fra tilbuddene.',
+'Tag ikke på indkøb, når du er sulten. Så ryger der færre ekstra ting i kurven.',
+'Lav dobbelt portion og frys resten. Så har du en færdig ret en anden dag.',
+'Sammenlign kiloprisen på hylden. Den store pakke er ikke altid billigst.',
+'Når lønnen kommer, så flyt et lille beløb til opsparing med det samme.',
+'Butikkens egne mærker er tit billigere end de kendte mærker.',
+'Tjek dine abonnementer en gang imellem. Brug du dem alle sammen?',
+'Tag madpakke med. Det er tit meget billigere end at købe mad ude.',
+'Brug det, der er i køleskabet, før du køber nyt.'];
+function tipsKort(ind,faste,kob,tilbage,erNu){
+  if(D.tipsFra)return `<div style="text-align:right;margin:-4px 0 10px"><button class="l" style="font-size:14px;padding:6px 10px" onclick="D.tipsFra=false;save();vis()">💡 Vis tips</button></div>`;
+  const t=[];
+  if(!ind)t.push('Skriv din løn eller SU ind, når du får den. Så kan du se, hvad du har at gøre godt med.');
+  if(ind&&tilbage<0)t.push('Der er brugt mere, end der er kommet ind. Måske kan nogle køb vente til næste løn?');
+  if(ind&&faste>ind/2)t.push('De faste udgifter fylder over halvdelen af det, du får ind. Måske er der et abonnement, du kan undvære?');
+  const stream=D.budget.faste.filter(x=>ORD('netflix|hbo|max|viaplay|disney|spotify|tv2|tv 2|youtube|apple tv|prime').test(x.tekst)).length;
+  if(stream>=2)t.push('Du har '+stream+' streamingtjenester. Mange slår dem til og fra en måned ad gangen.');
+  const dag=Math.floor(Date.now()/864e5);t.push(TIPS[dag%TIPS.length]);
+  return `<div class="card" style="background:#fffbea;border-color:#f0dc9a"><div class="row"><b style="flex:1">💡 Gode råd</b><button class="x" style="font-size:14px" title="Skjul tips" onclick="D.tipsFra=true;save();vis()">Skjul</button></div>
+  <ul style="margin:6px 0 0;padding-left:20px">${t.slice(0,3).map(x=>`<li style="margin:4px 0">${esc(x)}</li>`).join('')}</ul></div>`;
+}
+// Hurtig indtastning: tale, tekst, billede
+let fs=null,hStatus='';
+const ORD=(l,g)=>new RegExp('(?<!\\p{L})('+l+')(?!\\p{L})','iu'+(g||''));const ORD_IND=ORD('løn|su|indtægt|fik|lommepenge|børnepenge|boligstøtte|ydelse|overført|gave');
+const ORD_FAST=ORD('husleje|leje|mobil|telefon|abonnement|netflix|spotify|hbo|viaplay|disney|forsikring|internet|el|vand|varme|fitness|kontingent|hver måned|fast|faste|månedskort|rejsekort|a-kasse|fagforening|lån|afdrag');
+function forstaa(t){
+  t=t.trim();
+  const m=t.match(/(\d{1,3}(?:[.\s]\d{3})+|\d+)(?:,(\d{1,2}))?/);
+  let belob=null;if(m)belob=parseFloat(m[1].replace(/[.\s]/g,'')+(m[2]?'.'+m[2]:''));
+  let tekst=(m?t.replace(m[0],' '):t).replace(ORD('kroner|kr\\.?|jeg|har|fik|betalt|betalte|brugt|brugte|til|på|for|i|om|måneden|hver','g'),' ').replace(/\s+/g,' ').trim();
+  const type=ORD_IND.test(t)?'ind':ORD_FAST.test(t)?'fast':'kob';
+  if(!tekst)tekst=type==='ind'?'Løn':type==='fast'?'Fast udgift':'Køb';
+  return{type,tekst:tekst.charAt(0).toUpperCase()+tekst.slice(1),belob};
+}
+function visForslag(f,status){fs=f;hStatus=status||'';vis();if(f.belob==null){const e=document.getElementById('fsbelob');if(e)e.focus()}}
+function hurtigTekst(){const v=document.getElementById('hurtig').value;if(!v.trim())return;visForslag(forstaa(v),'Du skrev: »'+v+'«')}
+function gemForslag(){
+  const type=document.getElementById('ftype').value,tekst=document.getElementById('fstekst').value.trim(),b=tal('fsbelob');
+  if(!b){alert('Skriv et beløb');return}
+  const s=snap();
+  if(type==='ind')D.budget.ind.push({id:id(),dato:datoIMd(),tekst:tekst||'Løn',belob:b});
+  else if(type==='fast')D.budget.faste.push({id:id(),tekst:tekst||'Fast udgift',belob:b});
+  else D.budget.udgifter.push({id:id(),dato:fs&&fs.dato&&fs.dato.slice(0,7)===budgetMd?fs.dato:datoIMd(),tekst:tekst||'Køb',belob:b});
+  fs=null;hStatus='';save();vis();toast('Gemt: '+tekst+' '+kr(b),fortrydTil(s));
+}
+let rec=null;
+function talInd(){
+  const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+  if(!SR){hStatus='Tale virker ikke i denne browser. Tryk i feltet og brug mikrofonen på tastaturet i stedet.';vis();return}
+  if(rec){rec.stop();return}
+  rec=new SR();rec.lang='da-DK';rec.interimResults=false;rec.maxAlternatives=1;
+  const knap=document.getElementById('mic');knap.textContent='🔴 Lytter… (tryk for stop)';
+  document.getElementById('hstatus').textContent='Sig fx »husleje 4500«';
+  rec.onresult=e=>{const t=e.results[0][0].transcript;visForslag(forstaa(t),'Jeg hørte: »'+t+'«')};
+  rec.onerror=e=>{hStatus=e.error==='not-allowed'?'Giv lov til mikrofonen og prøv igen.':'Jeg hørte ikke noget. Prøv igen.';vis()};
+  rec.onend=()=>{rec=null;const k=document.getElementById('mic');if(k)k.textContent='🎤 Tal ind'};
+  rec.start();
+}
+function hentTesseract(){return window.Tesseract?Promise.resolve():new Promise((ok,fejl)=>{const s=document.createElement('script');s.src='https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js';s.onload=ok;s.onerror=()=>fejl(new Error('net'));document.head.appendChild(s)})}
+function laesKvittering(tekst){
+  const linjer=tekst.split('\n').map(l=>l.trim()).filter(Boolean);
+  const pris=l=>{const m=[...l.matchAll(/(\d{1,3}(?:[.\s]\d{3})*|\d+)[,.](\d{2})\b/g)];return m.length?parseFloat(m[m.length-1][1].replace(/[.\s]/g,'')+'.'+m[m.length-1][2]):null};
+  let belob=null;
+  for(const l of linjer){if(/(total|i alt|ialt|at betale|til betaling|beløb|sum)/i.test(l)&&pris(l)!=null)belob=pris(l)}
+  const butik=(linjer.find(l=>/[a-zæøå]{3,}/i.test(l))||'Køb').replace(/[^\wæøåÆØÅ&\- ]/g,'').trim().slice(0,30);
+  const dm=tekst.match(/\b(\d{1,2})[.\-/](\d{1,2})[.\-/](20\d{2}|\d{2})\b/);
+  let dato=null;if(dm){const y=dm[3].length===2?'20'+dm[3]:dm[3];dato=y+'-'+dm[2].padStart(2,'0')+'-'+dm[1].padStart(2,'0')}
+  return{type:'kob',tekst:butik||'Køb',belob,dato};
+}
+async function kvittering(inp){
+  const f=inp.files[0];if(!f)return;
+  hStatus='Læser kvitteringen… (første gang tager det lidt længere)';vis();
+  try{
+    await hentTesseract();
+    const r=await Tesseract.recognize(f,'dan',{logger:m=>{if(m.status==='recognizing text'){const e=document.getElementById('hstatus');if(e)e.textContent='Læser kvitteringen… '+Math.round(m.progress*100)+' %'}}});
+    const k=laesKvittering(r.data.text);
+    visForslag(k,k.belob!=null?'Fundet på kvitteringen. Tjek at det passer.':'Jeg kunne ikke finde totalen. Skriv beløbet selv.');
+  }catch(e){hStatus=e.message==='net'?'Kræver internet første gang. Prøv igen, når du er online.':'Billedet kunne ikke læses. Prøv et skarpere billede.';vis()}
+}
+function sletUdgift(uid){const s=snap();D.budget.udgifter=D.budget.udgifter.filter(x=>x.id!==uid);save();vis();toast('Købet er slettet',fortrydTil(s))}
+function eksport(){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(D,null,1)],{type:'application/json'}));a.download='budget-og-mad-kopi-'+iso(new Date())+'.json';a.click()}
+function importer(inp){const f=inp.files[0];if(!f)return;f.text().then(t=>{try{const n=JSON.parse(t);if(!n.opskrifter)throw 0;if(!confirm('Erstat alle data med kopien?'))return;const s=snap();D=n;save();vis();toast('Kopien er hentet',fortrydTil(s))}catch(e){alert('Filen kan ikke læses')}})}
+
+vis();
+
+// Læg appen på telefonen
+const erIOS=/iPhone|iPad|iPod/.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
+const erMobil=erIOS||/Android/i.test(navigator.userAgent);
+const erInstalleret=navigator.standalone===true||matchMedia('(display-mode: standalone)').matches;
+let androidPrompt=null;
+addEventListener('beforeinstallprompt',e=>{e.preventDefault();androidPrompt=e});
+function visGuide(){
+  const chrome=/CriOS/.test(navigator.userAgent);
+  let trin;
+  if(erIOS)trin=[
+    ['⬆️',chrome?'Tryk på <b>Del</b> ⬆ oppe i adresselinjen.':'Tryk på <b>Del</b> ⬆ nederst på skærmen. Kan du ikke se den, så tryk først på <b>•••</b>.'],
+    ['➕','Rul lidt ned og tryk på <b>Føj til hjemmeskærm</b>.'],
+    ['✅','Tryk på <b>Tilføj</b> øverst til højre. Færdig!']];
+  else trin=[['⋮','Tryk på menuen <b>⋮</b> øverst til højre.'],['➕','Tryk på <b>Installér app</b> eller <b>Føj til startskærm</b>.'],['✅','Tryk på <b>Installér</b>. Færdig!']];
+  dlgin.innerHTML=`<h2>📲 Læg appen på din telefon</h2><p class="muted" style="margin-top:-6px">Det tager under et minut. Så ligger den som en app med sit eget ikon, og den virker også uden internet.</p>
+  ${!erIOS&&androidPrompt?`<button class="b" style="width:100%;font-size:19px;padding:14px" onclick="androidPrompt.prompt();androidPrompt.userChoice.then(()=>dlg.close())">Installér nu</button><p class="muted" style="text-align:center">eller gør sådan her:</p>`:''}
+  ${trin.map((t,i)=>`<div style="display:flex;gap:12px;align-items:center;background:var(--acc2);border-radius:12px;padding:12px;margin:8px 0"><div style="font-size:28px;width:40px;text-align:center">${t[0]}</div><div><b>${i+1}.</b> ${t[1]}</div></div>`).join('')}
+  <p class="muted">Dine tal bliver gemt på din egen telefon.</p>
+  <div class="row"><button class="b" style="flex:1" onclick="localStorage.setItem(KEY+'-guide','set');dlg.close()">OK</button><button class="l" onclick="localStorage.setItem(KEY+'-guide','senere');dlg.close()">Senere</button></div>`;
+  if(!dlg.open)dlg.showModal();
+}
+if(erMobil&&!erInstalleret){
+  document.getElementById('instknap').style.display='';
+  if(!localStorage.getItem(KEY+'-guide'))setTimeout(visGuide,800);
+}
+if('serviceWorker' in navigator&&(location.protocol==='https:'||location.hostname==='localhost'||location.hostname==='127.0.0.1'))navigator.serviceWorker.register('sw.js');
+</script>
+</body>
+</html>
