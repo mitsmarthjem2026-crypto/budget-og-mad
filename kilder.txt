@@ -274,3 +274,7 @@ Tjenester nævnt i privatlivsteksten
 - GitHub General Privacy Statement (IP-adresse m.m. logges): https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement
 - Supabase (kodetjek), jsDelivr (hjælpeprogrammer), Open Food Facts (stregkode-opslag) – se tjenesternes egne privatlivspolitikker.
 - Supabase-projektets region: West EU (Ireland), eu-west-1 (fra ejerens skærmbillede af Supabase, 24/11-2026).
+
+Brud på reglerne (tilføjet 24/11-2026)
+- Ophavsretsloven § 83 (LBK nr. 1093 af 20/08/2023): den, der forsætligt eller uagtsomt krænker ophavsretten, skal betale rimeligt vederlag for brugen og erstatning for yderligere skade (bl.a. tabt fortjeneste og krænkerens uberettigede gevinst): https://www.lovguiden.dk/loven/ophavsretsloven/83
+- Faste bøder/konventionalbod i forbrugervilkår kan tilsidesættes som urimelige (aftaleloven §§ 36 og 38 c): https://lex.dk/ugyldige_forbrugeraftaler og https://www.lovguiden.dk/praksisoversigt/urimelige-aftalevilkaar-aftaleloven-36-38c – derfor ingen fast bøde i reglerne, kun dokumenteret tab, lukning af koden og ophavsretslovens regler.
