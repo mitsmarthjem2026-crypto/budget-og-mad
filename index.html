@@ -28,6 +28,7 @@
 <title>Budget og Mad</title>
 <script src="opskrifter.js"></script>
 <script>
+window.FEJLLOG=[];(function(){function gem(o){try{var l=JSON.parse(localStorage.getItem('madapp-v1-fejllog')||'[]');l.push(o);l=l.slice(-20);localStorage.setItem('madapp-v1-fejllog',JSON.stringify(l))}catch(e){}}addEventListener('error',function(e){gem({tid:new Date().toISOString(),fejl:String(e.message||'').slice(0,200),linje:e.lineno||0,kol:e.colno||0,fil:String(e.filename||'').split('/').pop().split('?')[0]})});addEventListener('unhandledrejection',function(e){gem({tid:new Date().toISOString(),fejl:'Promise: '+String((e.reason&&e.reason.message)||e.reason||'').slice(0,200)})})})();
 addEventListener('error',function(ev){try{var mn=document.getElementById('main');if(mn&&!mn.innerHTML.trim()){mn.innerHTML='<div style="background:#fff;border-radius:20px;padding:20px;margin:20px;font:17px system-ui"><b>Ups – appen kunne ikke starte.</b><p>Tag et skærmbillede af denne besked, og send det til Søren.</p><p style="color:#a33;font-size:14px">'+String(ev.message||'').replace(/</g,'&lt;')+' (linje '+(ev.lineno||'?')+')</p><button onclick="location.reload()" style="font:inherit;padding:10px 16px;border-radius:12px;border:0;background:#e8553e;color:#fff">Prøv igen</button></div>'}}catch(x){}try{if(localStorage.getItem('madapp-v1-test')&&navigator.serviceWorker&&navigator.serviceWorker.controller){localStorage.removeItem('madapp-v1-test');localStorage.setItem('madapp-v1-fejl','1');navigator.serviceWorker.controller.postMessage('TILBAGE');setTimeout(function(){location.reload()},400)}}catch(e){}});
 </script>
 <style>
@@ -269,7 +270,7 @@ button.b,label.b{box-shadow:0 6px 16px rgba(232,85,62,.3)}
 <style>@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}</style>
 </head>
 <body>
-<header><h1><img src="ikoner/ikon-192.png" alt="" style="width:1.3em;height:1.3em;border-radius:.3em;vertical-align:-.3em;margin-right:.35em">Budget og Mad</h1><button id="instknap" onclick="visGuide()" style="display:none;border:1px solid #fff;background:none;color:#fff;border-radius:10px;padding:6px 10px;font:inherit;font-size:14px;cursor:pointer">📲<span class="itxt"> Installér</span></button><button id="fortrydknap" hidden onclick="fortrydSidste()">↩️<span class="ftxt"> Fortryd</span></button><button id="indstilknap" onclick="visIndstillinger()" title="Indstillinger">⚙️</button><span class="ver" id="ver">version 41</span></header>
+<header><h1><img src="ikoner/ikon-192.png" alt="" style="width:1.3em;height:1.3em;border-radius:.3em;vertical-align:-.3em;margin-right:.35em">Budget og Mad</h1><button id="instknap" onclick="visGuide()" style="display:none;border:1px solid #fff;background:none;color:#fff;border-radius:10px;padding:6px 10px;font:inherit;font-size:14px;cursor:pointer">📲<span class="itxt"> Installér</span></button><button id="fortrydknap" hidden onclick="fortrydSidste()">↩️<span class="ftxt"> Fortryd</span></button><button id="indstilknap" onclick="visIndstillinger()" title="Indstillinger">⚙️</button><span class="ver" id="ver">version 42</span></header>
 <nav id="nav">
   <button data-p="forside"><span class="ic">🏠</span>Hjem</button>
   <button data-p="opskrifter"><span class="ic">📖</span>Opskrifter</button>
@@ -283,7 +284,7 @@ button.b,label.b{box-shadow:0 6px 16px rgba(232,85,62,.3)}
 <dialog id="dlg"><div class="in" id="dlgin"></div></dialog>
 
 <script>
-const KEY='madapp-v1';const ENHED=(()=>{let e=localStorage.getItem('madapp-v1-enhed');if(!e){e=(crypto.randomUUID?crypto.randomUUID():Date.now().toString(36)+Math.random().toString(36).slice(2));localStorage.setItem('madapp-v1-enhed',e)}return e})();const APP_VERSION=41, EJER='Søren';
+const KEY='madapp-v1';const ENHED=(()=>{let e=localStorage.getItem('madapp-v1-enhed');if(!e){e=(crypto.randomUUID?crypto.randomUUID():Date.now().toString(36)+Math.random().toString(36).slice(2));localStorage.setItem('madapp-v1-enhed',e)}return e})();const APP_VERSION=42, EJER='Søren';
 let D;try{D=JSON.parse(localStorage.getItem(KEY)||'null')}catch(e){D=null;try{localStorage.setItem(KEY+'-skadet-'+Date.now(),localStorage.getItem(KEY))}catch(x){}}
 if(!D||typeof D!=='object')D={};
 ['opskrifter','indkob','lager','stdSlettet','gemteLister'].forEach(k=>{if(!Array.isArray(D[k]))D[k]=[]});
@@ -933,6 +934,7 @@ function visIndstillinger(){
   <h3>🖼️ Billedet øverst</h3><div class="row" style="flex-wrap:nowrap;align-items:center"><div style="width:110px;height:70px;border-radius:14px;background:url('${valgtFoto()}') center/cover;flex:none"></div><button class="b" style="flex:1" onclick="vaelgFoto()">Skift billedet øverst</button></div>
   <p class="muted" style="font-size:13px">Vælg mellem 20 billeder eller dit eget foto. Billederne på knapperne skifter du med 🖼️ på hver knap.</p>
   <h3>💬 Brug for hjælp til appen?</h3>${hjaelpIndstil()}
+  <button class="l" style="width:100%;margin-top:10px" onclick="visFejlrapport()">🛠️ Noget virker ikke – send en fejlrapport</button>
   <h3>🎨 Farver</h3><div class="temaer"><button class="tema ${!D.indstil.tema?'on':''}" style="background:linear-gradient(135deg,#ff8a3d,#e8364f)" onclick="setIndstil('tema','')"><span>Standard</span></button>${Object.entries(TEMAER).filter(([k])=>k!=='solnedgang').map(([k,v])=>`<button class="tema ${D.indstil.tema===k?'on':''}" style="background:linear-gradient(135deg,${v[1]},${v[2]})" onclick="setIndstil('tema','${k}')"><span>${v[0]}</span></button>`).join('')}</div>
   <h3>🖼️ Baggrund</h3><div class="galleri g3">${BAGGRUNDE.map(([p,n])=>`<button class="gfoto ${(D.indstil.baggrund||'ingen')===p?'on':''}" style="${p==='ingen'?'background:var(--felt)':'background-image:url('+p+')'}" onclick="setIndstil('baggrund','${p}')"><span>${n}</span></button>`).join('')}</div>
   <p class="muted" style="font-size:13px">Billedet til forsiden og knapperne vælger du med »🖼️ Skift billede« på forsiden.</p>
@@ -1252,6 +1254,38 @@ function delFlere(){
 }
 function saetHvem(vid,n){const x=D.indkob.find(y=>y.id===vid);if(!x)return;x.hvem=x.hvem===n?'':n;save();const st=document.querySelector('dialog').scrollTop;delFlere();document.querySelector('dialog').scrollTop=st}
 function sendHvem(n){const l=D.indkob.filter(x=>!x.kobt&&x.hvem===n);delTekst('Indkøb til '+n,'🛒 '+n+' køber:\n'+l.map(x=>'• '+ingTekst(x)).join('\n'))}
+
+// ---------- Fejlrapport (version 42) ----------
+// Kun teknisk info. Ingen tal, lister, opskrifter eller beskeder fra appen.
+function fejlrapport(){
+  let log=[];try{log=JSON.parse(localStorage.getItem(KEY+'-fejllog')||'[]')}catch(e){}
+  const ua=navigator.userAgent,iphone=/iPhone/.test(ua),ios=(ua.match(/OS (\d+)_(\d+)/)||[]).slice(1).join('.');
+  const linjer=['FEJLRAPPORT – Budget og Mad','Version: '+APP_VERSION,'Tid: '+new Date().toLocaleString('da-DK'),
+   'Enhed: '+(iphone?'iPhone'+(ios?' (iOS '+ios+')':''):/Android/.test(ua)?'Android':'PC/andet'),
+   'Browser: '+((ua.match(/(CriOS|Chrome|Safari|Firefox|Edg)\/[\d.]+/)||[''])[0]),
+   'Skærm: '+screen.width+'x'+screen.height+', vindue '+innerWidth+'x'+innerHeight,
+   'Installeret som app: '+((navigator.standalone===true||matchMedia('(display-mode: standalone)').matches)?'ja':'nej'),
+   'Online: '+(navigator.onLine?'ja':'nej'),'Side: '+side,
+   'Antal i appen: '+D.opskrifter.length+' opskrifter, '+D.indkob.length+' på indkøbsliste, '+D.lager.length+' på lager (kun antal)',
+   '',log.length?'Seneste fejl ('+log.length+'):':'Ingen fejl er registreret.'];
+  log.slice(-10).reverse().forEach(l=>linjer.push('• '+new Date(l.tid).toLocaleString('da-DK')+' – '+l.fejl+(l.linje?' ('+l.fil+' linje '+l.linje+':'+l.kol+')':'')));
+  return linjer.join('\n');
+}
+function visFejlrapport(){
+  const r=fejlrapport();
+  dlgin.innerHTML=`<h2>🛠️ Fejlrapport</h2><p class="muted" style="margin-top:-6px">Appen har selv skrevet rapporten. Det er kun teknisk info – ingen af dine tal, lister eller beskeder. Du kan se præcis, hvad der sendes:</p>
+  <pre style="white-space:pre-wrap;background:var(--felt);border-radius:14px;padding:12px;font-size:12px;max-height:40vh;overflow:auto">${esc(r)}</pre>
+  <label>Hvad skete der? (valgfrit)</label><textarea id="fejlhvad" style="min-height:60px" placeholder="Fx: Jeg trykkede på Gem, og så skete der ingenting"></textarea>
+  <div class="row" style="margin-top:12px"><button class="b" style="flex:1" onclick="sendFejlrapport()">📤 Send til ${esc(EJER)}</button><button class="l" onclick="dlg.close()">Luk</button></div>
+  <button class="l" style="width:100%;margin-top:8px;font-size:13px" onclick="if(confirm('Slet listen over fejl?')){localStorage.removeItem(KEY+'-fejllog');visFejlrapport()}">Ryd fejllisten</button>`;
+  if(!dlg.open)dlg.showModal();
+}
+async function sendFejlrapport(){
+  const hvad=document.getElementById('fejlhvad').value.trim();
+  const tekst='Hej '+EJER+'! Der er noget galt med Budget og Mad.\n'+(hvad?'\nDet skete: '+hvad+'\n':'')+'\n'+fejlrapport();
+  if(navigator.share){try{await navigator.share({title:'Fejlrapport – Budget og Mad',text:tekst});dlg.close();toast('Tak – rapporten er sendt');return}catch(e){if(e.name==='AbortError')return}}
+  location.href='mailto:?subject='+encodeURIComponent('Fejlrapport – Budget og Mad')+'&body='+encodeURIComponent(tekst);
+}
 
 // ---------- Gemte indkøbslister (version 14) ----------
 function sletHeleListen(){const n=D.indkob.filter(x=>!x.kobt).length;if(!n)return;const s=snap();D.indkob=D.indkob.filter(x=>x.kobt);save();vis();toast(n+' varer slettet 🗑️',fortrydTil(s))}
