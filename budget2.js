@@ -120,7 +120,7 @@ function ejerHentKort() {
   let ejer = false; try { ejer = erEjer() } catch (e) {}
   if (!ejer) return '';
   return `<div class="card" style="border:2px dashed var(--acc)"><b>📥 Hent mine tal fra Mit Smart Hjem PRO</b> <span class="muted">– kun dig (ejer)</span>
-  <p class="muted" style="margin:6px 0 8px">I Mit Smart Hjem PRO: tryk »Gem alt i én fil« og gem filen i Filer. Vælg filen her. Den læses kun på denne telefon – intet sendes nogen steder hen. Du ser tallene, før de bliver gemt.</p>
+  <p class="muted" style="margin:6px 0 8px">I Mit Smart Hjem PRO: tryk ⚙ Indstillinger → knappen øverst »💰 Gem mit budget i en fil« → »Arkiver i Filer«. Vælg filen her. Den læses kun på denne telefon – intet sendes nogen steder hen. Du ser tallene, før de bliver gemt.</p>
   <label class="b" style="font:inherit;display:block;text-align:center;cursor:pointer;margin:0;color:#fff;background:var(--acc);border-radius:10px;padding:10px 16px">📂 Vælg filen<input type="file" accept=".json,application/json" hidden onchange="mshLaes(this)"></label>
   ${msh ? mshVis() : ''}</div>`;
 }
@@ -152,11 +152,18 @@ function mshLaes(inp) {
         if (!navn || !(maal > 0) || /^Eksempel:/i.test(navn)) return;
         poster.push({hvor: 'maal', tekst: navn, belob: maal, har});
       });
+      // »Privat Budget PRO« (6 felter: indtægt 1, indtægt 2, bolig, faste regninger, madbudget, transport og øvrige)
+      try {
+        const m = JSON.parse(fil.ls['privat-budget-pro-monthly'] || 'null');
+        if (Array.isArray(m)) [['ind', 'Indtægt 1'], ['ind', 'Indtægt 2'], ['fast', 'Bolig'], ['fast', 'Faste regninger'], ['madb', 'Madbudget pr. måned'], ['fast', 'Transport og øvrige udgifter']].forEach(([hvor, tekst], i) => {
+          const b = mshTal(m[i]); if (b > 0) poster.push(hvor === 'ind' ? {hvor, tekst, belob: b, dato: md + '-01'} : {hvor, tekst, belob: b});
+        });
+      } catch (e) {}
       poster.forEach(p => p.findes = mshFindes(p));
       poster.forEach(p => p.valgt = !p.findes);
       msh = {poster, navn: f.name};
       vis(); toast(poster.length ? poster.length + ' poster fundet – se dem igennem' : 'Der var ingen budgettal i filen');
-    } catch (e) { alert('Det er ikke en fil fra Mit Smart Hjem PRO (»Gem alt i én fil«).') }
+    } catch (e) { alert('Det er ikke en fil fra Mit Smart Hjem PRO (»💰 Gem mit budget i en fil«).') }
     inp.value = '';
   };
   r.readAsText(f);
@@ -166,13 +173,14 @@ function mshFindes(p) {
   if (p.hvor === 'ind') return D.budget.ind.some(x => s(x.tekst) === s(p.tekst) && x.belob === p.belob && x.dato.slice(0, 7) === p.dato.slice(0, 7));
   if (p.hvor === 'fast') return D.budget.faste.some(x => s(x.tekst) === s(p.tekst) && x.belob === p.belob);
   if (p.hvor === 'kob') return D.budget.udgifter.some(x => s(x.tekst) === s(p.tekst) && x.belob === p.belob && x.dato === p.dato);
+  if (p.hvor === 'madb') return (D.budget.maaned || 0) === p.belob;
   return D.budget.maal.some(x => s(x.navn) === s(p.tekst));
 }
 function mshVis() {
-  const navn = {ind: '💵 Penge ind', fast: '🏦 Faste udgifter (hver måned)', kob: '🛒 Køb (én gang)', maal: '🐷 Sparemål'};
+  const navn = {ind: '💵 Penge ind', fast: '🏦 Faste udgifter (hver måned)', kob: '🛒 Køb (én gang)', madb: '🍽️ Budget til mad', maal: '🐷 Sparemål'};
   const valgt = msh.poster.filter(p => p.valgt).length;
   return `<div style="margin-top:12px"><b>Er det rigtigt?</b> <span class="muted">Fjern fluebenet ved det, du ikke vil have med.</span>
-  ${['ind', 'fast', 'kob', 'maal'].map(h => { const l = msh.poster.map((p, i) => [p, i]).filter(([p]) => p.hvor === h); return l.length ? `<div style="margin-top:10px"><b style="font-size:14px">${navn[h]}</b>${l.map(([p, i]) => `<label class="row" style="margin:6px 0;gap:8px;cursor:pointer;font-weight:400"><input type="checkbox" ${p.valgt ? 'checked' : ''} onchange="msh.poster[${i}].valgt=this.checked;vis()" style="width:22px;height:22px;flex:none"><span style="flex:1">${esc(p.tekst)}${p.dag ? ` <span class="muted">d. ${p.dag}</span>` : ''}${p.findes ? ' <span class="muted">(har du allerede)</span>' : ''}</span><b>${kr(p.belob)}</b></label>`).join('')}</div>` : '' }).join('')}
+  ${['ind', 'fast', 'madb', 'kob', 'maal'].map(h => { const l = msh.poster.map((p, i) => [p, i]).filter(([p]) => p.hvor === h); return l.length ? `<div style="margin-top:10px"><b style="font-size:14px">${navn[h]}</b>${l.map(([p, i]) => `<label class="row" style="margin:6px 0;gap:8px;cursor:pointer;font-weight:400"><input type="checkbox" ${p.valgt ? 'checked' : ''} onchange="msh.poster[${i}].valgt=this.checked;vis()" style="width:22px;height:22px;flex:none"><span style="flex:1">${esc(p.tekst)}${p.dag ? ` <span class="muted">d. ${p.dag}</span>` : ''}${p.findes ? ' <span class="muted">(har du allerede)</span>' : ''}</span><b>${kr(p.belob)}</b></label>`).join('')}</div>` : '' }).join('')}
   <div class="row" style="margin-top:12px"><button class="b" style="flex:1" onclick="mshGem()" ${valgt ? '' : 'disabled'}>✓ Læg ${valgt} ind i mit budget</button><button class="l" onclick="msh=null;vis()">Annullér</button></div></div>`;
 }
 function mshGem() {
@@ -183,6 +191,7 @@ function mshGem() {
     if (p.hvor === 'ind') D.budget.ind.push({id: id(), dato: p.dato, tekst: p.tekst, belob: p.belob});
     else if (p.hvor === 'fast') D.budget.faste.push({id: id(), tekst: p.tekst, belob: p.belob, dag: p.dag || null});
     else if (p.hvor === 'kob') D.budget.udgifter.push({id: id(), dato: p.dato, tekst: p.tekst, belob: p.belob});
+    else if (p.hvor === 'madb') { D.budget.maaned = p.belob; D.budget.madPeriode = {type: 'maaned', belob: p.belob}; }
     else D.budget.maal.push({id: id(), navn: p.tekst, emoji: maalEmoji(p.tekst), maal: p.belob, ind: p.har > 0 ? [{dato: '2000-01-01', belob: p.har}] : [] /* gammel dato, så det ikke trækkes fra »Tilbage« i denne måned */});
   });
   msh = null; save(); vis(); toast(n + ' poster lagt ind i dit budget', fortrydTil(s));
