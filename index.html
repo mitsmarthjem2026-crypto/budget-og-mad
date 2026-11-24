@@ -215,6 +215,7 @@ button.x{font-size:18px}
 .hjdel{background:var(--felt);border-radius:14px;padding:10px 14px;margin:8px 0}.hjdel summary{cursor:pointer;list-style:none}.hjdel summary::after{content:' ▾';color:var(--muted)}.hjdel ul{margin:8px 0 2px;padding-left:20px}.hjdel li{margin:5px 0}
 header h1{min-width:0;overflow:hidden;text-overflow:ellipsis}@media (max-width:760px){.ftxt{display:none}#fortrydknap{padding:6px 10px}header .ver{display:none}}
 #indstilknap{border:0;background:rgba(255,255,255,.22);color:#fff;border-radius:50%;width:36px;height:36px;font-size:18px;cursor:pointer;flex:none}
+.nivboks{background:var(--felt);border-radius:16px;padding:10px 12px;margin-top:12px}.nivboks .l{background:var(--card);font-size:14px;padding:8px 10px}
 /* Version 8: fotofarver og forside */
 :root{--bg:#fff6ef;--acc:#e8553e;--acc2:#ffe7df;--grad:linear-gradient(135deg,#ff8a3d 0%,#e8364f 100%);--felt:#fff1e9;--line:#f1e2d8}
 @media (prefers-color-scheme:dark){:root{--bg:#140d0a;--card:#211612;--acc:#ff8a5c;--acc2:#3a1d14;--felt:#1a110d;--line:#3a2a22}}
@@ -248,7 +249,7 @@ button.b,label.b{box-shadow:0 6px 16px rgba(232,85,62,.3)}
 <style>@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}</style>
 </head>
 <body>
-<header><h1><img src="ikoner/ikon-192.png" alt="" style="width:1.3em;height:1.3em;border-radius:.3em;vertical-align:-.3em;margin-right:.35em">Budget og Mad</h1><button id="instknap" onclick="visGuide()" style="display:none;border:1px solid #fff;background:none;color:#fff;border-radius:10px;padding:6px 10px;font:inherit;font-size:14px;cursor:pointer">📲<span class="itxt"> Installér</span></button><button id="fortrydknap" hidden onclick="fortrydSidste()">↩️<span class="ftxt"> Fortryd</span></button><button id="indstilknap" onclick="visIndstillinger()" title="Indstillinger">⚙️</button><span class="ver" id="ver">version 8</span></header>
+<header><h1><img src="ikoner/ikon-192.png" alt="" style="width:1.3em;height:1.3em;border-radius:.3em;vertical-align:-.3em;margin-right:.35em">Budget og Mad</h1><button id="instknap" onclick="visGuide()" style="display:none;border:1px solid #fff;background:none;color:#fff;border-radius:10px;padding:6px 10px;font:inherit;font-size:14px;cursor:pointer">📲<span class="itxt"> Installér</span></button><button id="fortrydknap" hidden onclick="fortrydSidste()">↩️<span class="ftxt"> Fortryd</span></button><button id="indstilknap" onclick="visIndstillinger()" title="Indstillinger">⚙️</button><span class="ver" id="ver">version 20</span></header>
 <nav id="nav">
   <button data-p="forside"><span class="ic">🏠</span>Hjem</button>
   <button data-p="opskrifter"><span class="ic">📖</span>Opskrifter</button>
@@ -262,7 +263,7 @@ button.b,label.b{box-shadow:0 6px 16px rgba(232,85,62,.3)}
 <dialog id="dlg"><div class="in" id="dlgin"></div></dialog>
 
 <script>
-const KEY='madapp-v1';const APP_VERSION=19, EJER='Søren';
+const KEY='madapp-v1';const APP_VERSION=20, EJER='Søren';
 let D=JSON.parse(localStorage.getItem(KEY)||'null')||{opskrifter:[],indkob:[],lager:[],madplan:{},budget:{maaned:0,udgifter:[]}};
 
 // Faste opskrifter (klassiske, billige retter). Fotos: se kilder.txt
@@ -282,7 +283,7 @@ flet();
 let budgetMd=new Date().getFullYear()+'-'+String(new Date().getMonth()+1).padStart(2,'0');
 let side='forside';if(['#forside','#opskrifter','#madplan','#indkob','#lager','#budget'].includes(location.hash))side=location.hash.slice(1);
 let ugeStart=mandag(new Date());
-let STD_IDS=null;function erStd(x){if(!STD_IDS)STD_IDS=new Set(STD_OPSKRIFTER.map(s=>s.id));return STD_IDS.has(x)}
+var STD_IDS=null;function erStd(x){if(!STD_IDS)STD_IDS=new Set(STD_OPSKRIFTER.map(s=>s.id));return STD_IDS.has(x)}
 const tilGem=()=>JSON.stringify({...D,opskrifter:D.opskrifter.filter(o=>!erStd(o.id)||o.rettet)});
 function flet(){D.opskrifter=(D.opskrifter||[]).filter(o=>!erStd(o.id)||o.rettet);D.stdSlettet=D.stdSlettet||[];
   STD_OPSKRIFTER.forEach(s=>{if(!D.opskrifter.some(o=>o.id===s.id)&&!D.stdSlettet.includes(s.id))D.opskrifter.push({...s,ing:s.ing.map(parseIng),trin:[...s.trin],tags:[...s.tags]})})}
@@ -443,11 +444,12 @@ let visPort=null;
 function skal(i,o,p){if(i.maengde==null||!o.portioner)return{...i};let v=i.maengde*p/o.portioner;v=['','stk','fed','dåse','dåser'].includes(i.enhed)?Math.max(.5,Math.round(v*2)/2):Math.round(v*10)/10;return{...i,maengde:v}}
 function visOpskrift(oid,p){
   const o=D.opskrifter.find(x=>x.id===oid);if(!o)return;
-  p=p||o.portioner||4;visPort=p;const ing=o.ing.map(i=>skal(i,o,p)),mt=match(o);
+  p=p||o.portioner||4;visPort=p;const niv=(window._niv||{})[o.id]||0,vr=variant(o.ing.map(i=>skal(i,o,p)),niv),ing=vr.ing,mt=match(o);
   const dage=[...Array(7)].map((_,k)=>{const d=new Date();d.setHours(0,0,0,0);d.setDate(d.getDate()+k);return d});
   dlgin.innerHTML=`${o.foto?`<div class="dfoto" style="background-image:url(${o.foto})"></div>`:''}<h2>${esc(o.navn)}</h2>
   <div>${o.tid?`<span class="tag">⏱️ ${o.tid} min</span>`:''}${(o.tags||[]).map(x=>`<span class="tag">${x}</span>`).join('')}${D.lager.length?`<span class="tag">🥫 Du har ${mt.har}/${mt.af}</span>`:''}</div>
   ${o.portioner?`<div class="port" style="margin-top:12px"><button class="l" onclick="visOpskrift('${o.id}',${Math.max(1,p-1)})">−</button><input type="number" min="1" max="50" inputmode="numeric" value="${p}" style="width:76px;text-align:center;font-weight:800" onchange="visOpskrift('${o.id}',Math.max(1,Math.min(50,parseInt(this.value)||1)))"><b>personer</b><button class="l" onclick="visOpskrift('${o.id}',${p+1})">+</button></div>`:''}
+  ${prisNivKort(o,niv,vr)}
   ${(()=>{const har=ing.filter(i=>iLager(i.navn)),mangler=ing.filter(i=>!iLager(i.navn)),pr=prisOverslag(mangler.length?mangler:ing,p);
    return `<div class="infobar"><span>⏱️ <b>${o.tid?o.tid+' min':'–'}</b><br><small>tid</small></span><span>👥 <b>${p}</b><br><small>personer</small></span><span>💰 <b>${pr.sum?'ca. '+kr(pr.sum):'?'}</b><br><small>${pr.sum?'at købe':'ingen priser endnu'}</small></span></div>
    ${pr.sum?`<p class="muted" style="font-size:13px;margin:4px 0 0">Det er ca. prisen for ${pr.n} af de ${pr.af} varer, du skal købe – hele pakker, ud fra de priser, du selv har skrevet. Du får rester med hjem til næste gang.</p>`:`<p class="muted" style="font-size:13px;margin:4px 0 0">Skriv priser på dine indkøb, så regner appen prisen ud her. Jeg gætter aldrig priser.</p>`}
@@ -462,7 +464,7 @@ function visOpskrift(oid,p){
 }
 function lavRet(oid){
   const o=D.opskrifter.find(x=>x.id===oid);if(!o)return;const s=snap();let n=0;
-  o.ing.map(i=>skal(i,o,visPort||o.portioner)).forEach(i=>{const l=iLager(i.navn);if(!l||l.basis)return;n++;
+  variant(o.ing.map(i=>skal(i,o,visPort||o.portioner)),(window._niv||{})[o.id]||0).ing.forEach(i=>{const l=iLager(i.navn);if(!l||l.basis)return;n++;
     if(l.maengde==null){D.lager=D.lager.filter(x=>x!==l);return}if(i.maengde==null)return;const a=base(l),b=base(i);if(a.k!==b.k)return;const rest=(a.v-b.v)/(ENH[l.enhed]?ENH[l.enhed][1]:1);if(rest<=0.0001)D.lager=D.lager.filter(x=>x!==l);else l.maengde=Math.round(rest*100)/100});
   save();dlg.close();vis();toast(n?'Velbekomme! '+n+' varer er trukket fra lageret 😋':'Velbekomme! 😋',n?fortrydTil(s):null);
 }
@@ -488,7 +490,7 @@ function gemOpskrift(oid){
   save();dlg.close();vis();toast('Opskriften er gemt');
 }
 function sletOpskrift(oid){const s=snap();if(erStd(oid))D.stdSlettet.push(oid);D.opskrifter=D.opskrifter.filter(x=>x.id!==oid);save();dlg.close();vis();toast('Opskriften er slettet',fortrydTil(s))}
-function opskriftTilIndkob(oid){const s=snap();const o=D.opskrifter.find(x=>x.id===oid);const n=tilIndkob(o.ing.map(i=>skal(i,o,visPort||o.portioner)));save();dlg.close();vis();toast(n?n+' varer lagt på indkøbslisten':'Du har det hele på lageret',n?fortrydTil(s):null)}
+function opskriftTilIndkob(oid){const s=snap();const o=D.opskrifter.find(x=>x.id===oid);const n=tilIndkob(variant(o.ing.map(i=>skal(i,o,visPort||o.portioner)),(window._niv||{})[o.id]||0).ing);save();dlg.close();vis();toast(n?n+' varer lagt på indkøbslisten':'Du har det hele på lageret',n?fortrydTil(s):null)}
 
 // Madplan
 function skiftUge(n){ugeStart.setDate(ugeStart.getDate()+7*n);vis()}
@@ -905,6 +907,55 @@ async function fotoOpskrift(inp){
   }catch(e){st.textContent=e.message==='net'?'Kræver internet første gang.':'Billedet kunne ikke læses. Prøv et skarpere billede.'}
 }
 brugIndstil();
+
+// ---------- Billigere / finere i trin (version 20) ----------
+// Fornuftige, almindelige udskiftninger. Kun regler, der passer til retten, bruges.
+const BILLIGERE=[
+ {fra:/hakket oksekød|hakket kalvekød/,til:'hakket svinekød',tekst:'Hakket oksekød byttes til hakket svinekød'},
+ {fra:/kyllingebryst/,til:'kyllingelår uden ben',tekst:'Kyllingebryst byttes til kyllingelår'},
+ {fra:/^laks$|^laks /,til:'sej',tekst:'Laks byttes til sej'},
+ {fra:/parmesan/,til:'revet ost',tekst:'Parmesan byttes til almindelig revet ost'},
+ {fra:/mozzarella|cheddar|feta/,til:'revet ost',tekst:'Specialost byttes til almindelig revet ost'},
+ {fra:/madlavningsfløde|piskefløde/,til:'mælk',tekst:'Fløde byttes til mælk (rør 1 spsk mel i, så sovsen bliver tyk)'},
+ {fra:/frisk spinat/,til:'frossen spinat',tekst:'Frisk spinat byttes til frossen spinat'},
+ {fra:/cherrytomater/,til:'hakkede tomater',tekst:'Cherrytomater byttes til hakkede tomater på dåse',enhed:'dåse',maengde:1},
+ {fra:/rejer|kammuslinger/,til:'frosne rejer',tekst:'Friske skaldyr byttes til frosne rejer'},
+ {kod:true,tekst:'Halvdelen af kødet byttes til røde linser'},
+ {fra:/champignon/,til:'champignon på dåse',tekst:'Friske champignon byttes til champignon på dåse'},
+ {fra:/^olie$|olivenolie/,til:'rapsolie',tekst:'Brug almindelig rapsolie'}
+];
+const FINERE=[
+ {fra:/^revet ost$/,til:'revet parmesan',tekst:'Revet ost byttes til parmesan'},
+ {fra:/hakket svinekød/,til:'hakket oksekød',tekst:'Hakket svinekød byttes til hakket oksekød'},
+ {fra:/kyllingelår/,til:'kyllingebryst',tekst:'Kyllingelår byttes til kyllingebryst'},
+ {fra:/^mælk$/,til:'piskefløde',tekst:'Mælk byttes til fløde (mere cremet)',kunSovs:true},
+ {fra:/oregano/,til:'frisk basilikum',tekst:'Tørret oregano byttes til frisk basilikum',enhed:'bundt',maengde:1},
+ {fra:/^pasta$|^spaghetti$|^penne$|^tagliatelle$/,til:'frisk pasta',tekst:'Tør pasta byttes til frisk pasta'},
+ {fra:/^olie$|rapsolie/,til:'olivenolie (ekstra jomfru)',tekst:'Olie byttes til god olivenolie'},
+ {fra:/^ris$/,til:'jasminris',tekst:'Almindelige ris byttes til jasminris'},
+ {fra:/hakkede tomater/,til:'San Marzano-tomater',tekst:'Hakkede tomater byttes til San Marzano-tomater'},
+ {fra:/sej|torsk/,til:'laks',tekst:'Hvid fisk byttes til laks'},
+ {fra:/smør/,til:'smør (økologisk)',tekst:'Smør byttes til økologisk smør'},
+ {fra:/^løg$/,til:'skalotteløg',tekst:'Løg byttes til skalotteløg'}
+];
+function variant(ing,niv){
+  ing=ing.map(i=>({...i}));const aendr=[];if(!niv)return{ing,aendr,max:{ned:muligeRegler(ing,BILLIGERE).length,op:muligeRegler(ing,FINERE).length}};
+  const regler=muligeRegler(ing,niv<0?BILLIGERE:FINERE).slice(0,Math.abs(niv));
+  for(const r of regler){
+    if(r.kod){const k=ing.find(i=>/hakket|kød/.test(norm(i.navn))&&i.maengde&&i.enhed==='g');if(k){const halv=Math.round(k.maengde/2);k.maengde=halv;ing.push({navn:'røde linser',maengde:Math.round(halv/2),enhed:'g'});aendr.push(r.tekst)}continue}
+    ing.forEach(i=>{if(r.fra.test(norm(i.navn))){i.navn=r.til;if(r.enhed){i.enhed=r.enhed;i.maengde=r.maengde}}});aendr.push(r.tekst);
+  }
+  return{ing,aendr,max:{ned:muligeRegler(ing,BILLIGERE).length,op:muligeRegler(ing,FINERE).length}};
+}
+function muligeRegler(ing,liste){return liste.filter(r=>r.kod?ing.some(i=>/hakket|kød/.test(norm(i.navn))&&i.maengde&&i.enhed==='g'&&i.maengde>=200):ing.some(i=>r.fra.test(norm(i.navn))))}
+function prisNivKort(o,niv,vr){
+  const ned=muligeRegler(o.ing,BILLIGERE).length,op=muligeRegler(o.ing,FINERE).length;if(!ned&&!op)return '';
+  const pf=prisOverslag(vr.ing),p0=prisOverslag(o.ing.map(i=>skal(i,o,visPort||o.portioner)));
+  return `<div class="nivboks"><div class="row" style="flex-wrap:nowrap;justify-content:space-between"><button class="l" ${niv<=-Math.min(10,ned)?'disabled style="opacity:.4"':''} onclick="setNiv('${o.id}',${niv-1})">💸 Billigere</button><b style="text-align:center">${niv===0?'Original':niv<0?'Billigere · trin '+(-niv):'Finere · trin '+niv}</b><button class="l" ${niv>=Math.min(10,op)?'disabled style="opacity:.4"':''} onclick="setNiv('${o.id}',${niv+1})">✨ Finere</button></div>
+  ${vr.aendr.length?`<ul style="margin:8px 0 0;padding-left:20px;font-size:14px">${vr.aendr.map(x=>`<li>${esc(x)}</li>`).join('')}</ul><button class="l" style="margin-top:8px;font-size:14px" onclick="setNiv('${o.id}',0)">↺ Tilbage til original</button>`:`<div class="muted" style="font-size:13px;margin-top:6px">Op til ${Math.min(10,ned)} trin billigere og ${Math.min(10,op)} trin finere for denne ret.</div>`}
+  ${niv&&pf.sum&&p0.sum?`<div style="font-size:14px;margin-top:6px">💰 Ca. ${kr(pf.sum)} mod ${kr(p0.sum)} før (ud fra dine egne priser)</div>`:''}</div>`;
+}
+function setNiv(oid,n){window._niv=window._niv||{};const o=D.opskrifter.find(x=>x.id===oid),ned=o?Math.min(10,muligeRegler(o.ing,BILLIGERE).length):0,op=o?Math.min(10,muligeRegler(o.ing,FINERE).length):0;window._niv[oid]=Math.max(-ned,Math.min(op,n));visOpskrift(oid,visPort)}
 
 // ---------- Gemte indkøbslister (version 14) ----------
 function sletHeleListen(){const n=D.indkob.filter(x=>!x.kobt).length;if(!n)return;const s=snap();D.indkob=D.indkob.filter(x=>x.kobt);save();vis();toast(n+' varer slettet 🗑️',fortrydTil(s))}
