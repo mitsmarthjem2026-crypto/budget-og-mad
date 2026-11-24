@@ -71,10 +71,13 @@ function motionKort(){
   <div class="row" style="margin-top:10px"><button class="b mobtn" style="flex:1" onclick="event.stopPropagation();moStart('vaagn')">▶ Træn 5 min</button><button class="l" style="flex:1" onclick="event.stopPropagation();moFane='motion';gaaTil('motion');setTimeout(()=>{const e=document.getElementById('moudf');if(e)e.scrollIntoView({behavior:'smooth',block:'center'})},50)">${udfOk?'✅ Udfordring klaret':'🎯 Dagens udfordring'}</button></div></div>`;
 }
 
+// Tekst på fotoknappen (version 52)
+function motionInfo(){const st=moStreak(),v=moVaegtSort(),s=v[v.length-1];return st?'🔥 '+st+(st===1?' dag':' dage')+' i træk · '+moMin(moIdag())+' min i dag':s?'Seneste vægt: '+moKg(s.kg):'Træn, drej hjulet, følg din vægt'}
+
 // ---------- Siden ----------
 function motionSide(){
   const p=moPoint(),nv=moNiveau(p);
-  return `<div class="mohero"><div class="moh1">💪 Motion og vægttab</div><div class="moh2">${nv.e} ${nv.navn} · ${p} point</div>
+  return `<div class="mohero"><div class="moh2" style="margin-top:0">${nv.e} ${nv.navn} · ${p} point</div>
   <div class="mobar mobar2"><i style="width:${nv.pct}%"></i></div><div class="moh3">${nv.nx?`${nv.nx[0]-p} point til ${nv.nx[1]} ${nv.nx[2]}`:'Du har nået toppen! 🏆'}</div></div>
   <div class="mofaner">${[['motion','🏃 Motion'],['vaegt','⚖️ Vægt'],['maerker','🏅 Mærker']].map(([k,t])=>`<button class="${moFane===k?'on':''}" onclick="moFane='${k}';vis()">${t}</button>`).join('')}</div>
   ${moFane==='vaegt'?moVaegtFane():moFane==='maerker'?moMaerkerFane():moMotionFane()}`;

@@ -283,3 +283,5 @@ Brugsstatistik (tilføjet 24/11-2026)
 - Tal knyttet til en kode med et navn er personoplysninger (ikke anonyme). Grundlag: samtykke, GDPR art. 6, stk. 1, litra a; kan trækkes tilbage når som helst (art. 7, stk. 3).
 - Under 15 år kræver samtykke til informationssamfundstjenester forældrenes samtykke (databeskyttelsesloven § 6, stk. 2, se ovenfor).
 - I appen: jura.js juraStatistikOK() er kun sand, når brugeren selv har sat flueben (ikke forudvalgt) eller trykket Ja under Indstillinger.
+Motion og vægttab-knappen (version 52, Unsplash, gratis efter Unsplash-licensen, hentet 24-11-2026):
+Motion: Gabin Vallet – https://unsplash.com/photos/J154nEkpzlQ
