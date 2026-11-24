@@ -225,6 +225,13 @@ header h1{min-width:0;overflow:hidden;text-overflow:ellipsis}@media (max-width:7
 body.medbg{background:linear-gradient(color-mix(in srgb,var(--bg) 72%,transparent),color-mix(in srgb,var(--bg) 72%,transparent)),var(--bgfoto) center/cover fixed!important}
 .egetknap{display:flex;align-items:center;justify-content:center;background:var(--felt)!important;border:2px dashed var(--acc)!important;cursor:pointer}.egetknap span{position:static!important;background:none!important;color:var(--acc)!important;text-align:center!important}
 .skiftfoto.egetfoto{right:auto;left:12px}
+
+.overblik{padding:16px}
+.obgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
+.ob{background:var(--felt);border-radius:18px;padding:12px;display:flex;flex-direction:column;gap:2px}
+.ob small{color:var(--muted);font-size:13px;font-weight:600}.ob b{font-size:26px;font-weight:800;letter-spacing:-.5px}.ob span{font-size:14px;font-weight:700;color:var(--acc)}
+.obbar{display:flex;height:16px;border-radius:10px;overflow:hidden;margin:14px 0 8px;background:var(--felt)}.obbar i{display:block;height:100%}
+.oblegend{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:13px}.oblegend span{display:flex;align-items:center;gap:5px}.oblegend i{width:10px;height:10px;border-radius:50%;display:inline-block}
 /* Version 8: fotofarver og forside */
 :root{--bg:#fff6ef;--acc:#e8553e;--acc2:#ffe7df;--grad:linear-gradient(135deg,#ff8a3d 0%,#e8364f 100%);--felt:#fff1e9;--line:#f1e2d8}
 @media (prefers-color-scheme:dark){:root{--bg:#140d0a;--card:#211612;--acc:#ff8a5c;--acc2:#3a1d14;--felt:#1a110d;--line:#3a2a22}}
@@ -258,7 +265,7 @@ button.b,label.b{box-shadow:0 6px 16px rgba(232,85,62,.3)}
 <style>@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}</style>
 </head>
 <body>
-<header onclick="if(event.target===this||event.target.tagName==='H1'||event.target.tagName==='IMG')vaelgFoto()" style="cursor:pointer"><h1><img src="ikoner/ikon-192.png" alt="" style="width:1.3em;height:1.3em;border-radius:.3em;vertical-align:-.3em;margin-right:.35em">Budget og Mad</h1><button id="instknap" onclick="visGuide()" style="display:none;border:1px solid #fff;background:none;color:#fff;border-radius:10px;padding:6px 10px;font:inherit;font-size:14px;cursor:pointer">📲<span class="itxt"> Installér</span></button><button id="fortrydknap" hidden onclick="fortrydSidste()">↩️<span class="ftxt"> Fortryd</span></button><button id="indstilknap" onclick="visIndstillinger()" title="Indstillinger">⚙️</button><span class="ver" id="ver">version 28</span></header>
+<header onclick="if(event.target===this||event.target.tagName==='H1'||event.target.tagName==='IMG')vaelgFoto()" style="cursor:pointer"><h1><img src="ikoner/ikon-192.png" alt="" style="width:1.3em;height:1.3em;border-radius:.3em;vertical-align:-.3em;margin-right:.35em">Budget og Mad</h1><button id="instknap" onclick="visGuide()" style="display:none;border:1px solid #fff;background:none;color:#fff;border-radius:10px;padding:6px 10px;font:inherit;font-size:14px;cursor:pointer">📲<span class="itxt"> Installér</span></button><button id="fortrydknap" hidden onclick="fortrydSidste()">↩️<span class="ftxt"> Fortryd</span></button><button id="indstilknap" onclick="visIndstillinger()" title="Indstillinger">⚙️</button><span class="ver" id="ver">version 29</span></header>
 <nav id="nav">
   <button data-p="forside"><span class="ic">🏠</span>Hjem</button>
   <button data-p="opskrifter"><span class="ic">📖</span>Opskrifter</button>
@@ -272,7 +279,7 @@ button.b,label.b{box-shadow:0 6px 16px rgba(232,85,62,.3)}
 <dialog id="dlg"><div class="in" id="dlgin"></div></dialog>
 
 <script>
-const KEY='madapp-v1';const APP_VERSION=28, EJER='Søren';
+const KEY='madapp-v1';const APP_VERSION=29, EJER='Søren';
 let D;try{D=JSON.parse(localStorage.getItem(KEY)||'null')}catch(e){D=null;try{localStorage.setItem(KEY+'-skadet-'+Date.now(),localStorage.getItem(KEY))}catch(x){}}
 if(!D||typeof D!=='object')D={};
 ['opskrifter','indkob','lager','stdSlettet','gemteLister'].forEach(k=>{if(!Array.isArray(D[k]))D[k]=[]});
@@ -412,6 +419,7 @@ budget(){
   <div class="big" style="font-size:40px;color:${tilbage<0?'var(--warn)':'var(--acc)'}">${kr(tilbage)}</div>
   ${erNu&&tilbage>0?`<div class="muted">Det er ca. ${kr(Math.floor(tilbage/dageIgen))} pr. dag resten af måneden (${dageIgen} dage)</div>`:''}
   <div class="row" style="justify-content:center;gap:18px;margin-top:10px"><span>💵 Ind: <b>${kr(sumInd)}</b></span><span>🏠 Faste: <b>${kr(sumFaste)}</b></span><span>🛒 Køb: <b>${kr(brugt)}</b></span>${D.budget.maal.length?`<span>🐷 Sparet: <b>${kr(sparetMd)}</b></span>`:''}</div></div>
+  ${overblikKort(md,erNu)}
   ${madIDagKort(md,erNu,dageIgen)}
   ${tipsKort(sumInd,sumFaste,brugt,tilbage,erNu)}
   <div class="card" style="border:2px solid var(--acc)"><b>⚡ Hurtigt: sig det, skriv det eller tag et billede</b>
@@ -1009,6 +1017,30 @@ function findRetter(){
   l.sort((a,b)=>a.mangler.length-b.mangler.length||b.har-a.har).splice(30);
   document.getElementById('harres').innerHTML=`<h3>${l.length?(l.length===1?'1 ret':l.length+' retter')+(kun?' du kan lave med det, du har':' der passer'):'Ingen retter passer'}</h3>
   ${l.length?`<div class="mini">${l.map(x=>`<button class="minikort" onclick="visOpskrift('${x.o.id}')"><span class="rfoto ${x.o.foto?'':'tom'}" ${x.o.foto?`style="background-image:url(${x.o.foto})"`:''}>${x.o.foto?'':'🍽️'}</span><b>${esc(x.o.navn)}</b><span class="muted">${x.mangler.length?'Mangler: '+esc(x.mangler.slice(0,3).map(i=>i.navn).join(', '))+(x.mangler.length>3?' …':''):'✅ Du har det hele'}</span></button>`).join('')}</div>`:`<p class="muted">${kun?'Ingen retter kan laves med kun de varer. Fjern fluebenet ved »Jeg har kun det« for at se retter, hvor du mangler lidt.':'Prøv at skrive flere eller andre varer.'}</p>`}`;
+}
+
+// ---------- Smart budget-overblik (version 29) ----------
+function naesteLoen(md){
+  const ind=D.budget.ind.filter(x=>x.dato.slice(0,7)===md&&/løn|su/i.test(x.tekst)).sort((a,b)=>b.belob-a.belob)[0];
+  const nu=new Date();nu.setHours(0,0,0,0);
+  if(ind){const dag=+ind.dato.slice(8,10);let n=new Date(nu.getFullYear(),nu.getMonth(),dag);if(n<=nu)n=new Date(nu.getFullYear(),nu.getMonth()+1,Math.min(dag,new Date(nu.getFullYear(),nu.getMonth()+2,0).getDate()));return{dato:n,dage:Math.max(1,Math.round((n-nu)/864e5)),kendt:true}}
+  const slut=new Date(nu.getFullYear(),nu.getMonth()+1,1);return{dato:slut,dage:Math.max(1,Math.round((slut-nu)/864e5)),kendt:false};
+}
+function overblikKort(md,erNu){
+  const b=budgetTal(md);if(!b.ind&&!b.faste&&!b.kob)return `<div class="card overblik"><b>📊 Dit overblik</b><p class="muted" style="margin:6px 0 0">Skriv din løn eller SU under »Penge ind« og dine faste udgifter i »Bank-budget«. Så regner appen ud, hvad du har tilbage – i alt, til mad og pr. dag.</p></div>`;
+  const nl=erNu?naesteLoen(md):null,dage=nl?nl.dage:new Date(+md.slice(0,4),+md.slice(5,7),0).getDate();
+  const mb=D.budget.maaned||0,madTilbage=mb?mb-b.kob:null;
+  const tot=Math.max(b.ind,b.faste+b.kob+b.sparet,1),pct=v=>Math.max(0,v/tot*100);
+  const dele=[['Faste',b.faste,'#64748b'],['Køb',b.kob,'#f59e0b'],['Opsparing',b.sparet,'#a855f7'],['Tilbage',Math.max(0,b.tilbage),'var(--acc)']].filter(d=>d[1]>0);
+  return `<div class="card overblik"><div class="row" style="justify-content:space-between"><b>📊 Dit overblik</b>${nl?`<span class="muted" style="font-size:14px">${nl.kendt?'Næste løn':'Måneden slutter'} ${nl.dato.toLocaleDateString('da-DK',{day:'numeric',month:'short'})} · <b>${nl.dage} ${nl.dage===1?'dag':'dage'}</b></span>`:''}</div>
+  <div class="obgrid">
+   <div class="ob"><small>💰 Tilbage i alt</small><b style="color:${b.tilbage<0?'var(--warn)':'inherit'}">${kr(b.tilbage)}</b>${erNu?`<span>${b.tilbage>0?kr(Math.floor(b.tilbage/dage))+' pr. dag':'Intet tilbage'}</span>`:''}</div>
+   <div class="ob"><small>🍽️ Tilbage til mad</small>${mb?`<b style="color:${madTilbage<0?'var(--warn)':'inherit'}">${kr(madTilbage)}</b>${erNu?`<span>${madTilbage>0?kr(Math.floor(madTilbage/dage))+' pr. dag':'Madbudgettet er brugt'}</span>`:''}`:`<b>–</b><span>Sæt et madbudget nedenfor</span>`}</div>
+  </div>
+  <div class="obbar">${dele.map(d=>`<i style="width:${pct(d[1])}%;background:${d[2]}" title="${d[0]}"></i>`).join('')}</div>
+  <div class="oblegend">${dele.map(d=>`<span><i style="background:${d[2]}"></i>${d[0]} ${kr(d[1])}</span>`).join('')}</div>
+  ${erNu&&b.tilbage>0&&mb&&madTilbage>b.tilbage?`<p class="muted" style="font-size:13px;margin:8px 0 0">⚠️ Du har mindre tilbage i alt end i madbudgettet. Hold øje med de andre køb.</p>`:''}
+  <p class="muted" style="font-size:12px;margin:6px 0 0">Alt er regnet ud fra de tal, du selv har skrevet ind.</p></div>`;
 }
 
 // ---------- Gemte indkøbslister (version 14) ----------
