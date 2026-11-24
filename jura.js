@@ -42,7 +42,9 @@ function juraVilkaar() {
 <p>Kommer der nye regler, viser appen dem, og du bliver spurgt igen.</p>
 <h3>12. Alder</h3>
 <p>Er du under 18, så vis gerne reglerne til en forælder.</p>
-<h3>13. Lov</h3>
+<h3>13. Appen tilhører Søren</h3>
+<p>Appen, teksterne og opskrifterne må ikke kopieres, sælges eller lægges ud et andet sted uden Sørens lov. Fotos er fra Unsplash og bruges efter deres regler. Dine egne ting i appen er dine.</p>
+<h3>14. Lov</h3>
 <p>Dansk lov gælder. Har du et problem, så skriv til Søren først – så finder vi som regel en løsning.</p>`;
 }
 
