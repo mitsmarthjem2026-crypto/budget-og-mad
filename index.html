@@ -339,7 +339,7 @@ body{padding-top:env(safe-area-inset-top)}
 <dialog id="dlg"><div class="in" id="dlgin"></div></dialog>
 
 <script>
-const KEY='madapp-v1';const ENHED=(()=>{let e=localStorage.getItem('madapp-v1-enhed');if(!e){e=(crypto.randomUUID?crypto.randomUUID():Date.now().toString(36)+Math.random().toString(36).slice(2));localStorage.setItem('madapp-v1-enhed',e)}return e})();const APP_VERSION=57, EJER='Søren';
+const KEY='madapp-v1';const ENHED=(()=>{let e=localStorage.getItem('madapp-v1-enhed');if(!e){e=(crypto.randomUUID?crypto.randomUUID():Date.now().toString(36)+Math.random().toString(36).slice(2));localStorage.setItem('madapp-v1-enhed',e)}return e})();const APP_VERSION=58, EJER='Søren';
 let D;try{D=JSON.parse(localStorage.getItem(KEY)||'null')}catch(e){D=null;try{localStorage.setItem(KEY+'-skadet-'+Date.now(),localStorage.getItem(KEY))}catch(x){}}
 if(!D||typeof D!=='object')D={};
 ['opskrifter','indkob','lager','stdSlettet','gemteLister'].forEach(k=>{if(!Array.isArray(D[k]))D[k]=[]});
@@ -1021,6 +1021,7 @@ function stemmer(){return window.speechSynthesis?speechSynthesis.getVoices():[]}
 function visIndstillinger(){
   D.indstil=D.indstil||{};const v=D.indstil,st=stemmer(),da=st.filter(x=>/^da/i.test(x.lang)),andre=st.filter(x=>!/^da/i.test(x.lang));
   dlgin.innerHTML=`<h2>⚙️ Indstillinger</h2><p class="muted" style="margin:-6px 0 8px;font-size:14px">Version ${APP_VERSION}</p>
+  <button class="b" style="width:100%" onclick="soegOpdatering(this)">🔄 Søg efter opdatering</button><div id="opdstatus" class="muted" style="font-size:14px;margin:4px 0 6px"></div>
   <h3>🔠 Tekststørrelse</h3><div class="chips">${[['lille','Lille'],['normal','Normal'],['stor','Stor'],['kaempe','Meget stor']].map(([k,n])=>`<button class="chip ${ (v.str||'normal')===k?'on':''}" onclick="setIndstil('str','${k}')">${n}</button>`).join('')}</div>
   <h3>✍️ Skrifttype</h3><div class="chips">${[['rund','Rund'],['klassisk','Klassisk'],['enkel','Enkel'],['laese','Let at læse']].map(([k,n])=>`<button class="chip ${(v.font||'rund')===k?'on':''}" style="font-family:${FONTE[k]||'inherit'}" onclick="setIndstil('font','${k}')">${n}</button>`).join('')}</div>
   <h3>🖼️ Billedet øverst</h3><div class="row" style="flex-wrap:nowrap;align-items:center"><div style="width:110px;height:70px;border-radius:14px;background:url('${valgtFoto()}') center/cover;flex:none"></div><button class="b" style="flex:1" onclick="vaelgFoto()">Skift billedet øverst</button></div>
@@ -1750,6 +1751,29 @@ if(erMobil&&!erInstalleret){
 // ---------- Sikre opdateringer (version 8) ----------
 document.getElementById('ver').textContent='version '+APP_VERSION;
 if(localStorage.getItem(KEY+'-fejl')){localStorage.removeItem(KEY+'-fejl');setTimeout(()=>toast('Den nye opdatering havde en fejl. Du kører videre på den gamle version – intet er tabt.'),600)}
+// version 58: »🔄 Søg efter opdatering« under ⚙️ Indstillinger – virker også, hvis man har trykket »Vent«
+async function soegOpdatering(knap){
+  const st=document.getElementById('opdstatus'),sig=x=>{if(st)st.textContent=x};
+  if(knap)knap.disabled=true;
+  try{
+    if(navigator.onLine===false){sig('Du har ikke internet. Prøv igen, når du har net.');return}
+    sig('⏳ Søger …');
+    const v=await fetch('version.json?t='+Date.now(),{cache:'no-store'}).then(r=>r.json());
+    if(!(v.version>APP_VERSION)){sig('✓ Du har den nyeste version ('+APP_VERSION+').');return}
+    localStorage.removeItem(KEY+'-vent');
+    const reg=window._swReg||(navigator.serviceWorker&&await navigator.serviceWorker.getRegistration());
+    if(!reg){sig('Version '+v.version+' er klar. Luk appen helt, og åbn den igen.');return}
+    sig('⏳ Henter version '+v.version+' … det kan tage et minut. Lad appen være åben.');
+    const vis=w=>{try{dlg.close()}catch(e){};visOpdatering(w)};
+    if(reg.waiting){vis(reg.waiting);return}
+    await reg.update();
+    if(reg.waiting){vis(reg.waiting);return}
+    const w=reg.installing;
+    if(w)w.addEventListener('statechange',()=>{if(w.state==='installed')vis(w);else if(w.state==='redundant')sig('Det lykkedes ikke at hente opdateringen. Tjek dit net, og prøv igen.')});
+    else sig('Version '+v.version+' er klar. Luk appen helt, og åbn den igen.');
+  }catch(e){sig('Det lykkedes ikke at søge. Prøv igen om lidt.')}
+  finally{if(knap)knap.disabled=false}
+}
 function visOpdatering(w){
   if(document.getElementById('opd'))return;
   if(Date.now()<+(localStorage.getItem(KEY+'-vent')||0))return;
@@ -1769,6 +1793,9 @@ if('serviceWorker' in navigator&&(location.protocol==='https:'||location.hostnam
     tjek();
     reg.addEventListener('updatefound',()=>{const w=reg.installing;w&&w.addEventListener('statechange',()=>{if(w.state==='installed')tjek()})});
     setInterval(()=>reg.update().catch(()=>{}),30*60*1000);
+    window._swReg=reg;
+    // version 58: iPhone genstarter ikke appen, når man skifter tilbage til den – så tjek også her
+    document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')reg.update().then(tjek).catch(()=>{})});
   });
 }
 
