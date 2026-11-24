@@ -203,6 +203,12 @@ dialog .dfoto{height:210px;background-size:cover;background-position:center;marg
 a.tilbud{font-size:12px;font-weight:700;color:var(--acc);text-decoration:none;background:var(--acc2);padding:2px 8px;border-radius:10px;margin-left:6px;white-space:nowrap}
 .hjknap{width:100%;margin-top:14px;border:0;border-radius:22px;padding:16px;display:grid;grid-template-columns:auto 1fr;grid-template-rows:auto auto;column-gap:14px;align-items:center;text-align:left;background:linear-gradient(135deg,#a855f7,#ff4d8d);color:#fff;font:inherit;cursor:pointer;box-shadow:0 8px 22px rgba(168,85,247,.35);transition:transform .12s}
 .hjknap:active{transform:scale(.97)}.hjknap span{grid-row:1/3;font-size:32px}.hjknap b{font-size:19px}.hjknap small{opacity:.9}
+
+#fortrydknap{border:0;border-radius:20px;padding:6px 12px;background:rgba(255,255,255,.92);color:#1d130e;font:inherit;font-size:14px;font-weight:800;cursor:pointer;white-space:nowrap;animation:pop .25s ease}
+#fortrydknap[hidden]{display:none}
+.datarow{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:10px}.datarow>*{white-space:nowrap;font-size:15px!important;padding:11px 6px!important;text-align:center;margin:0!important}
+.list li{position:relative;touch-action:pan-y}
+button.x{font-size:18px}
 /* Version 8: fotofarver og forside */
 :root{--bg:#fff6ef;--acc:#e8553e;--acc2:#ffe7df;--grad:linear-gradient(135deg,#ff8a3d 0%,#e8364f 100%);--felt:#fff1e9;--line:#f1e2d8}
 @media (prefers-color-scheme:dark){:root{--bg:#140d0a;--card:#211612;--acc:#ff8a5c;--acc2:#3a1d14;--felt:#1a110d;--line:#3a2a22}}
@@ -236,7 +242,7 @@ button.b,label.b{box-shadow:0 6px 16px rgba(232,85,62,.3)}
 <style>@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}</style>
 </head>
 <body>
-<header><h1><img src="ikoner/ikon-192.png" alt="" style="width:1.3em;height:1.3em;border-radius:.3em;vertical-align:-.3em;margin-right:.35em">Budget og Mad</h1><button id="instknap" onclick="visGuide()" style="display:none;border:1px solid #fff;background:none;color:#fff;border-radius:10px;padding:6px 10px;font:inherit;font-size:14px;cursor:pointer">📲<span class="itxt"> Installér</span></button><span class="ver" id="ver">version 8</span></header>
+<header><h1><img src="ikoner/ikon-192.png" alt="" style="width:1.3em;height:1.3em;border-radius:.3em;vertical-align:-.3em;margin-right:.35em">Budget og Mad</h1><button id="instknap" onclick="visGuide()" style="display:none;border:1px solid #fff;background:none;color:#fff;border-radius:10px;padding:6px 10px;font:inherit;font-size:14px;cursor:pointer">📲<span class="itxt"> Installér</span></button><button id="fortrydknap" hidden onclick="fortrydSidste()">↩️ Fortryd</button><span class="ver" id="ver">version 8</span></header>
 <nav id="nav">
   <button data-p="forside"><span class="ic">🏠</span>Hjem</button>
   <button data-p="opskrifter"><span class="ic">📖</span>Opskrifter</button>
@@ -250,7 +256,7 @@ button.b,label.b{box-shadow:0 6px 16px rgba(232,85,62,.3)}
 <dialog id="dlg"><div class="in" id="dlgin"></div></dialog>
 
 <script>
-const KEY='madapp-v1';const APP_VERSION=10, EJER='Søren';
+const KEY='madapp-v1';const APP_VERSION=11, EJER='Søren';
 let D=JSON.parse(localStorage.getItem(KEY)||'null')||{opskrifter:[],indkob:[],lager:[],madplan:{},budget:{maaned:0,udgifter:[]}};
 
 // Faste opskrifter (klassiske, billige retter). Fotos: se kilder.txt
@@ -361,7 +367,10 @@ STD_OPSKRIFTER.forEach(s=>{if(!D.opskrifter.some(o=>o.id===s.id)&&!D.stdSlettet.
 let budgetMd=new Date().getFullYear()+'-'+String(new Date().getMonth()+1).padStart(2,'0');
 let side='forside';if(['#forside','#opskrifter','#madplan','#indkob','#lager','#budget'].includes(location.hash))side=location.hash.slice(1);
 let ugeStart=mandag(new Date());
-const save=()=>localStorage.setItem(KEY,JSON.stringify(D));
+let HIST=[],sidst=localStorage.getItem(KEY);
+const save=()=>{const ny=JSON.stringify(D);if(ny===sidst)return;if(sidst){HIST.push(sidst);if(HIST.length>30)HIST.shift()}sidst=ny;try{localStorage.setItem(KEY,ny)}catch(e){alert('Telefonen har ikke mere plads til appens data. Gem en kopi, og slet evt. dit eget foto.')}visFortrydKnap()};
+function visFortrydKnap(){const b=document.getElementById('fortrydknap');if(b){b.hidden=!HIST.length;b.title='Fortryd ('+HIST.length+')'}}
+function fortrydSidste(){if(!HIST.length)return;const s=HIST.pop();D=JSON.parse(s);sidst=s;localStorage.setItem(KEY,s);if(window.brugFoto)brugFoto();if(dlg.open)dlg.close();vis();visFortrydKnap();toast('↩️ Fortrudt'+(HIST.length?' – tryk igen for at fortryde mere':''))}
 const id=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,6);
 const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const kr=n=>{n=Math.round(n*100)/100;return n.toLocaleString('da-DK',{minimumFractionDigits:n%1?2:0,maximumFractionDigits:2})+' kr'};
@@ -370,7 +379,7 @@ function mandag(d){d=new Date(d);d.setHours(0,0,0,0);d.setDate(d.getDate()-((d.g
 const DAGE=['Mandag','Tirsdag','Onsdag','Torsdag','Fredag','Lørdag','Søndag'];
 
 let undoFn=null,tT;
-function toast(msg,undo){const t=document.getElementById('toast');document.getElementById('tmsg').textContent=msg;undoFn=undo;document.getElementById('tundo').style.display=undo?'':'none';t.style.display='flex';clearTimeout(tT);tT=setTimeout(()=>t.style.display='none',6000)}
+function toast(msg,undo){const t=document.getElementById('toast');document.getElementById('tmsg').textContent=msg;undoFn=undo;document.getElementById('tundo').style.display=undo?'':'none';t.style.display='flex';clearTimeout(tT);tT=setTimeout(()=>t.style.display='none',8000)}
 document.getElementById('tundo').onclick=()=>{if(undoFn){undoFn();save();if(window.brugFoto)brugFoto();vis()}document.getElementById('toast').style.display='none'};
 function snap(){return JSON.stringify(D)}
 function fortrydTil(s){return()=>{D=JSON.parse(s)}}
@@ -417,7 +426,7 @@ madplan(){
   const uge=ugenr(ugeStart);const idag=iso(new Date());
   return `<h2>Madplan</h2>
   <div class="row" style="margin-bottom:14px"><button class="l" onclick="skiftUge(-1)">‹ Forrige</button><b style="flex:1;text-align:center">Uge ${uge} · ${dage[0].toLocaleDateString('da-DK',{day:'numeric',month:'short'})} – ${dage[6].toLocaleDateString('da-DK',{day:'numeric',month:'short'})}</b><button class="l" onclick="skiftUge(1)">Næste ›</button></div>
-  <div class="week">${dage.map((d,i)=>{const k=iso(d),v=D.madplan[k]||{};return `<div class="day ${k===idag?'today':''}"><b>${DAGE[i]}</b><span class="muted">${d.toLocaleDateString('da-DK',{day:'numeric',month:'short'})}</span>
+  <div class="week">${dage.map((d,i)=>{const k=iso(d),v=D.madplan[k]||{};return `<div class="day ${k===idag?'today':''}">${v.opskrift||v.tekst?`<button class="x" style="float:right" title="Ryd dagen" onclick="rydDag('${k}')">🗑️</button>`:''}<b>${DAGE[i]}</b><span class="muted">${d.toLocaleDateString('da-DK',{day:'numeric',month:'short'})}</span>
     <select onchange="setPlan('${k}','opskrift',this.value)"><option value="">– vælg opskrift –</option>${D.opskrifter.map(o=>`<option value="${o.id}" ${v.opskrift===o.id?'selected':''}>${esc(o.navn)}</option>`).join('')}</select>
     <input placeholder="eller skriv selv" value="${esc(v.tekst||'')}" onchange="setPlan('${k}','tekst',this.value)">${(()=>{const o=v.opskrift&&D.opskrifter.find(x=>x.id===v.opskrift);return o&&o.foto?`<div class="dimg" style="background-image:url(${o.foto})" onclick="visOpskrift('${o.id}')"></div>`:''})()}</div>`}).join('')}</div>
   <div class="row" style="margin-top:14px"><button class="b" onclick="ugeTilIndkob()">🛒 Læg ugens ingredienser på indkøbslisten</button><button class="b" style="background:linear-gradient(135deg,#a855f7,#ff4d8d)!important" onclick="foreslaaUge()">✨ Foreslå ugen</button><button class="l" onclick="del('madplan')">📤 Del ugen</button></div>
@@ -425,7 +434,7 @@ madplan(){
 },
 indkob(){
   const ikke=D.indkob.filter(x=>!x.kobt),kobt=D.indkob.filter(x=>x.kobt);
-  const li=x=>`<li class="${x.kobt?'done':''}"><input type="checkbox" ${x.kobt?'checked':''} onchange="kobt('${x.id}',this.checked)" style="width:22px;height:22px"><span class="n">${esc(ingTekst(x))}${x.kobt?'':` <a class="tilbud" href="https://etilbudsavis.dk/soeg/${encodeURIComponent(x.navn)}" target="_blank" rel="noopener">🔎 tilbud</a>`}</span><input type="number" min="0" step="0.01" placeholder="pris kr" value="${x.pris??''}" style="width:100px" onchange="setPris('${x.id}',this.value)"><button class="x" title="Slet" onclick="sletVare('${x.id}')">✕</button></li>`;
+  const li=x=>`<li class="${x.kobt?'done':''}"><input type="checkbox" ${x.kobt?'checked':''} onchange="kobt('${x.id}',this.checked)" style="width:22px;height:22px"><span class="n">${esc(ingTekst(x))}${x.kobt?'':` <a class="tilbud" href="https://etilbudsavis.dk/soeg/${encodeURIComponent(x.navn)}" target="_blank" rel="noopener">🔎 tilbud</a>`}</span><input type="number" min="0" step="0.01" placeholder="pris kr" value="${x.pris??''}" style="width:100px" onchange="setPris('${x.id}',this.value)"><button class="x" title="Slet" onclick="sletVare('${x.id}')">🗑️</button></li>`;
   return `<h2>Indkøb</h2>
   <div class="card"><div class="row"><input class="grow" id="nyvare" placeholder="Fx 1 l mælk"><button class="b" onclick="tilfojVare()">Tilføj</button><button class="l" onclick="del('indkob')">📤 Del listen</button></div></div>
   <div class="card"><ul class="list">${ikke.length?ikke.map(li).join(''):'<li class="empty" style="justify-content:center">Indkøbslisten er tom.</li>'}</ul><p class="muted" style="margin:10px 0 0;font-size:14px">🔎 »tilbud« viser ugens rigtige tilbud på varen hos eTilbudsavis.</p>${(()=>{const p=ikke.filter(x=>x.pris);return p.length?`<p class="muted" style="margin:10px 0 0">💡 Ca. ${kr(p.reduce((s,x)=>s+x.pris,0))} for ${p.length} af ${ikke.length} varer – ud fra dine egne priser.</p>`:''})()}</div>
@@ -443,7 +452,7 @@ lager(){
   <div class="card"><ul class="list">${s.length?s.map(x=>{const dage=x.udlob?Math.round((new Date(x.udlob)-idag)/864e5):null;const soon=dage!=null&&dage<=3;
     return `<li class="${soon?'soon':''}"><span class="n">${esc(ingTekst(x))}</span>
     <span class="exp muted">${x.udlob?(dage<0?'Udløbet':dage===0?'Udløber i dag':'Holdbar til '+new Date(x.udlob).toLocaleDateString('da-DK',{day:'numeric',month:'short'})):''}</span>
-    <button class="l" onclick="brugLager('${x.id}')">Brugt</button></li>`}).join(''):'<li class="empty" style="justify-content:center">Lageret er tomt.</li>'}</ul></div>
+    <button class="l" onclick="brugLager('${x.id}')">Brugt</button><button class="x" title="Slet" onclick="sletLager('${x.id}')">🗑️</button></li>`}).join(''):'<li class="empty" style="justify-content:center">Lageret er tomt.</li>'}</ul></div>
   ${kanLave()}
   <p class="muted">Varer der udløber inden for 3 dage, er farvet.</p>`;
 },
@@ -473,10 +482,10 @@ budget(){
    <div class="row" style="margin-top:8px"><button class="b" onclick="gemForslag()">✓ Gem</button><button class="l" onclick="fs=null;hStatus='';vis()">Annullér</button></div></div>`:''}</div>
   <div class="card"><b>💵 Penge ind</b> <span class="muted">– fx løn eller SU, når du får den</span>
   <div class="row" style="margin-top:8px"><input class="grow" id="itekst" placeholder="Løn" value="Løn"><input type="text" inputmode="decimal" id="ibelob" placeholder="kr" style="width:120px"><button class="b" onclick="tilfojInd()">Tilføj</button></div>
-  <ul class="list">${ind.map(x=>`<li><span class="muted" style="width:70px">${kort(x)}</span><span class="n">${esc(x.tekst)}</span><b>${kr(x.belob)}</b><button class="x" title="Slet" onclick="sletInd('${x.id}')">✕</button></li>`).join('')}</ul></div>
+  <ul class="list">${ind.map(x=>`<li><span class="muted" style="width:70px">${kort(x)}</span><span class="n">${esc(x.tekst)}</span><b>${kr(x.belob)}</b><button class="x" title="Slet" onclick="sletInd('${x.id}')">🗑️</button></li>`).join('')}</ul></div>
   <div class="card"><b>🏠 Faste udgifter hver måned</b> <span class="muted">– fx husleje, mobil, transport</span>
   <div class="row" style="margin-top:8px"><input class="grow" id="ftekst" placeholder="Fx Husleje"><input type="text" inputmode="decimal" id="fbelob" placeholder="kr" style="width:120px"><button class="b" onclick="tilfojFast()">Tilføj</button></div>
-  <ul class="list">${D.budget.faste.map(x=>`<li><span class="n">${esc(x.tekst)}</span><b>${kr(x.belob)}</b><button class="x" title="Slet" onclick="sletFast('${x.id}')">✕</button></li>`).join('')}</ul></div>
+  <ul class="list">${D.budget.faste.map(x=>`<li><span class="n">${esc(x.tekst)}</span><b>${kr(x.belob)}</b><button class="x" title="Slet" onclick="sletFast('${x.id}')">🗑️</button></li>`).join('')}</ul></div>
   ${opsparingKort()}
   <h2 style="margin-top:22px">🛒 Køb</h2>
   <div class="card"><div class="row"><label style="margin:0">Budget til mad pr. måned</label><input type="text" inputmode="decimal" id="mbudget" value="${b||''}" placeholder="kr" style="width:140px"><button class="l" onclick="setBudget()">Gem</button></div>
@@ -485,7 +494,7 @@ budget(){
   <div class="card"><div class="muted">Tilbage</div><div class="big" style="color:${b&&brugt>b?'var(--warn)':'inherit'}">${b?kr(b-brugt):'–'}</div></div>
   <div class="card"><div class="muted">Antal køb</div><div class="big">${u.length}</div></div></div>
   <div class="card"><div class="row"><input type="date" id="udato" value="${datoIMd()}"><input class="grow" id="utekst" placeholder="Fx Netto"><input type="text" inputmode="decimal" id="ubelob" placeholder="kr" style="width:110px"><button class="b" onclick="tilfojUdgift()">Tilføj</button></div></div>
-  <div class="card"><ul class="list">${u.length?u.map(x=>`<li><span class="muted" style="width:70px">${new Date(x.dato).toLocaleDateString('da-DK',{day:'numeric',month:'short'})}</span><span class="n">${esc(x.tekst)}</span><b>${kr(x.belob)}</b><button class="x" onclick="sletUdgift('${x.id}')">✕</button></li>`).join(''):'<li class="empty" style="justify-content:center">Ingen køb i denne måned.</li>'}</ul></div>
+  <div class="card"><ul class="list">${u.length?u.map(x=>`<li><span class="muted" style="width:70px">${new Date(x.dato).toLocaleDateString('da-DK',{day:'numeric',month:'short'})}</span><span class="n">${esc(x.tekst)}</span><b>${kr(x.belob)}</b><button class="x" onclick="sletUdgift('${x.id}')">🗑️</button></li>`).join(''):'<li class="empty" style="justify-content:center">Ingen køb i denne måned.</li>'}</ul></div>
   <div class="card"><b>📄 CSV-fil</b><p class="muted">Gem ${navn} som en fil, der kan åbnes i Excel.</p><button class="b" onclick="csv()">⬇ Gem som CSV</button></div>
   <div class="card"><b>Sikkerhedskopi</b><p class="muted">Gem alle dine data i en fil, eller hent dem igen.</p><div class="row"><button class="l" onclick="eksport()">⬇ Gem kopi</button><label class="l" style="margin:0;cursor:pointer;color:inherit;border:1px solid var(--line);border-radius:10px;padding:9px 14px">⬆ Hent kopi<input type="file" accept=".json" onchange="importer(this)" hidden></label></div></div>`;
 }};
@@ -606,7 +615,7 @@ function budgetTal(md){const ind=D.budget.ind.filter(x=>x.dato.slice(0,7)===md).
 function maalEmoji(n){n=norm(n);const l=[['ferie|rejse|tur','✈️'],['telefon|iphone|mobil','📱'],['computer|pc|mac','💻'],['bil|kørekort','🚗'],['cykel','🚲'],['koncert|festival|billet','🎟️'],['gave|jul','🎁'],['buffer|nød|uforudset','🛟'],['tøj|sko','👟'],['spil|playstation|xbox','🎮'],['flytte|lejlighed|depositum','🏠']];for(const[k,e]of l)if(new RegExp(k).test(n))return e;return '🎯'}
 function opsparingKort(){
   return `<div class="card"><b>🐷 Opsparing</b> <span class="muted">– spar op til noget, du drømmer om</span>
-  ${D.budget.maal.map(g=>{const s=g.ind.reduce((a,x)=>a+x.belob,0),p=Math.min(100,g.maal?s/g.maal*100:0);return `<div class="maal"><div class="row"><span style="font-size:28px">${g.emoji}</span><b style="flex:1">${esc(g.navn)}</b><span><b>${kr(s)}</b> / ${kr(g.maal)}</span><button class="x" title="Slet" onclick="sletMaal('${g.id}')">✕</button></div>
+  ${D.budget.maal.map(g=>{const s=g.ind.reduce((a,x)=>a+x.belob,0),p=Math.min(100,g.maal?s/g.maal*100:0);return `<div class="maal"><div class="row"><span style="font-size:28px">${g.emoji}</span><b style="flex:1">${esc(g.navn)}</b><span><b>${kr(s)}</b> / ${kr(g.maal)}</span><button class="x" title="Slet" onclick="sletMaal('${g.id}')">🗑️</button></div>
    <div class="bar"><i style="width:${p}%"></i></div>${p>=100?'<div style="font-weight:800">🎉 Mål nået! Sejt gået!</div>':`<div class="muted" style="font-size:14px">${kr(g.maal-s)} tilbage · ${Math.round(p)} %</div>`}
    <div class="row" style="margin-top:8px"><input type="text" inputmode="decimal" id="ms-${g.id}" placeholder="kr" style="flex:1 1 90px"><button class="b" onclick="spar('${g.id}',1)">+ Læg til</button><button class="l" onclick="spar('${g.id}',-1)">− Tag ud</button></div></div>`}).join('')}
   <div class="row" style="margin-top:12px"><input id="mnavn" class="grow" placeholder="Fx Ny telefon, Ferie, Buffer"><input id="mbelob" type="text" inputmode="decimal" placeholder="Mål i kr" style="width:120px"><button class="b" onclick="nytMaal()">+ Nyt mål</button></div>
@@ -722,7 +731,10 @@ async function kvittering(inp){
   }catch(e){hStatus=e.message==='net'?'Kræver internet første gang. Prøv igen, når du er online.':'Billedet kunne ikke læses. Prøv et skarpere billede.';vis()}
 }
 function sletUdgift(uid){const s=snap();D.budget.udgifter=D.budget.udgifter.filter(x=>x.id!==uid);save();vis();toast('Købet er slettet',fortrydTil(s))}
-function eksport(){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(D,null,1)],{type:'application/json'}));a.download='budget-og-mad-kopi-'+iso(new Date())+'.json';a.click()}
+async function eksport(){const navn='budget-og-mad-kopi-'+iso(new Date())+'.json',blob=new Blob([JSON.stringify(D,null,1)],{type:'application/json'});
+  const fil=new File([blob],navn,{type:'application/json'});
+  if(navigator.canShare&&navigator.canShare({files:[fil]})){try{await navigator.share({files:[fil],title:'Kopi af Budget og Mad'});localStorage.setItem(KEY+'-sidstkopi',Date.now());toast('Kopien er gemt 💾');vis();return}catch(e){if(e.name==='AbortError')return}}
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=navn;a.click();localStorage.setItem(KEY+'-sidstkopi',Date.now());toast('Kopien er gemt i Overførsler 💾')}
 function importer(inp){const f=inp.files[0];if(!f)return;f.text().then(t=>{try{const n=JSON.parse(t);if(!n.opskrifter)throw 0;if(!confirm('Erstat alle data med kopien?'))return;const s=snap();D=n;save();vis();toast('Kopien er hentet',fortrydTil(s))}catch(e){alert('Filen kan ikke læses')}})}
 
 
@@ -797,6 +809,32 @@ async function kvitteringTilLager(inp){
     document.getElementById('kvok').onclick=()=>{const s=snap();let n=0;varer.forEach((v,i)=>{if(!document.getElementById('kv'+i).checked)return;const navn=document.getElementById('kn'+i).value.trim();if(!navn)return;D.lager.push({id:id(),navn,maengde:null,enhed:'',udlob:''});if(v.pris>0)D.priser[norm(navn)]=v.pris;n++});save();dlg.close();vis();toast(n+' varer lagt på lager 🥫',fortrydTil(s))};
   }catch(e){st.textContent=e.message==='net'?'Kræver internet første gang.':'Billedet kunne ikke læses. Prøv et skarpere billede.'}
 }
+
+// ---------- Gem sikkert på mobilen (version 11) ----------
+if(navigator.storage&&navigator.storage.persist)navigator.storage.persisted().then(p=>{if(!p)navigator.storage.persist()}).catch(()=>{});
+(function autoKopi(){try{const k=KEY+'-auto-'+iso(new Date());if(!localStorage.getItem(k)){localStorage.setItem(k,JSON.stringify(D));Object.keys(localStorage).filter(x=>x.startsWith(KEY+'-auto-')).sort().reverse().slice(3).forEach(x=>localStorage.removeItem(x))}}catch(e){}})();
+function dataKort(){
+  const s=+localStorage.getItem(KEY+'-sidstkopi')||0,dage=s?Math.floor((Date.now()-s)/864e5):null;
+  return `<div class="card" style="margin-top:14px"><div class="row"><span style="font-size:26px">💾</span><div style="flex:1"><b>Dine data er gemt på telefonen</b><div class="muted" style="font-size:14px">${s?'Sidste kopi: '+(dage===0?'i dag':dage===1?'i går':dage+' dage siden'):'Du har ikke gemt en kopi endnu'}</div></div></div>
+  <div class="datarow"><button class="b" onclick="eksport()">💾 Gem kopi</button><label class="l" style="margin:0;cursor:pointer;color:inherit;background:var(--felt);border-radius:14px;padding:10px 14px;font-weight:600">📂 Hent kopi<input type="file" accept=".json,application/json" onchange="importer(this)" hidden></label><button class="l" onclick="visAutoKopier()">🕒 Tidligere</button></div></div>`;
+}
+function visAutoKopier(){
+  const l=Object.keys(localStorage).filter(x=>x.startsWith(KEY+'-auto-')).sort().reverse();
+  dlgin.innerHTML=`<h2>🕒 Automatiske kopier</h2><p class="muted" style="margin-top:-6px">Appen gemmer selv en kopi hver dag på telefonen (de sidste 3 dage).</p>
+  <ul class="ingl">${l.map(k=>{const d=k.slice((KEY+'-auto-').length);return `<li class="row"><span style="flex:1">${new Date(d).toLocaleDateString('da-DK',{weekday:'long',day:'numeric',month:'long'})}</span><button class="l" onclick="gendan('${k}')">Gendan</button></li>`}).join('')||'<li class="muted">Ingen kopier endnu</li>'}</ul>
+  <div class="row" style="margin-top:12px"><button class="l" style="flex:1" onclick="dlg.close()">Luk</button></div>`;
+  if(!dlg.open)dlg.showModal();
+}
+function gendan(k){if(!confirm('Vil du gå tilbage til kopien? Du kan fortryde bagefter.'))return;const s=snap();D=JSON.parse(localStorage.getItem(k));save();if(window.brugFoto)brugFoto();dlg.close();vis();toast('Kopien er gendannet',fortrydTil(s))}
+function sletLager(lid){const s=snap();D.lager=D.lager.filter(x=>x.id!==lid);save();vis();toast('Slettet fra lager 🗑️',fortrydTil(s))}
+function rydDag(k){const s=snap();delete D.madplan[k];save();vis();toast('Dagen er ryddet 🗑️',fortrydTil(s))}
+// Stryg til venstre for at slette
+(function(){let x0=0,y0=0,li=null;const m=document.getElementById('main');
+  m.addEventListener('touchstart',e=>{li=e.target.closest('li');if(!li||!li.querySelector('button.x')||e.target.closest('input,select,textarea')){li=null;return}x0=e.touches[0].clientX;y0=e.touches[0].clientY;li.style.transition='none'},{passive:true});
+  m.addEventListener('touchmove',e=>{if(!li)return;const dx=e.touches[0].clientX-x0,dy=e.touches[0].clientY-y0;if(Math.abs(dy)>Math.abs(dx)){li.style.transform='';li=null;return}if(dx<0){li.style.transform=`translateX(${dx}px)`;li.style.background=dx<-70?'var(--warnbg)':''}},{passive:true});
+  m.addEventListener('touchend',e=>{if(!li)return;const dx=(e.changedTouches[0].clientX-x0);li.style.transition='transform .2s';if(dx<-70){li.style.transform='translateX(-110%)';const b=li.querySelector('button.x');setTimeout(()=>b&&b.click(),180)}else{li.style.transform='';li.style.background=''}li=null});
+})();
+visFortrydKnap();
 
 // ---------- Billedgalleri (version 9) ----------
 const GALLERI=[['madlavning','Madlavning derhjemme'],['koekken','Venner i køkkenet'],['picnic','Picnic med venner'],['udenfor','Madlavning udenfor'],['bord','Fyldt bord'],['salat','Slik og hygge'],['frugt','Frugt og bær']];
@@ -918,7 +956,7 @@ function visHjaelp(){
   <div style="background:var(--felt);border-radius:14px;padding:12px;margin-top:10px"><b>ℹ️ Om appen</b><p class="muted" style="margin:6px 0 0;font-size:14px">Budget og Mad – version ${APP_VERSION}. © ${esc(EJER)}. Appen tilhører ${esc(EJER)}, og kun ${esc(EJER)} kan sende opdateringer. Den må ikke kopieres eller deles videre uden tilladelse. Dine tal ligger kun på din egen telefon. Fotos fra Unsplash. Varedata fra Open Food Facts.</p></div>`;
   if(!dlg.open)dlg.showModal();
 }
-function hjaelpKort(){return `<button class="hjknap" onclick="visHjaelp()"><span>💬</span><b>Brug for hjælp?</b><small>Skriv til ${esc(EJER)}</small></button>`}
+function hjaelpKort(){return dataKort()+`<button class="hjknap" onclick="visHjaelp()"><span>💬</span><b>Brug for hjælp?</b><small>Skriv til ${esc(EJER)}</small></button>`}
 
 localStorage.removeItem(KEY+'-test'); // appen startede fint
 </script>
