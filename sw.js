@@ -1,7 +1,7 @@
 // Budget og Mad – gemmer appen på telefonen, så den virker uden internet.
 // Sikre opdateringer: en ny version bliver først brugt, når brugeren selv trykker »Opdater«.
 // Har den nye version fejl, bliver den ikke taget i brug, og appen kører videre på den gamle.
-const VERSION = 11;
+const VERSION = 12;
 const CACHE = 'bom-v' + VERSION;
 const META = 'bom-meta';
 const FILER = ['./', './index.html', './manifest.json', './version.json',
@@ -10,7 +10,7 @@ const FILER = ['./', './index.html', './manifest.json', './version.json',
   './fotos/retter/frikadeller.jpg', './fotos/retter/boller.jpg', './fotos/retter/biksemad.jpg', './fotos/retter/braendende.jpg',
   './fotos/retter/millionbof.jpg', './fotos/retter/porresuppe.jpg', './fotos/retter/gulearter.jpg', './fotos/retter/risengrod.jpg',
   './fotos/retter/pandekager.jpg', './fotos/retter/kyllingkarry.jpg', './fotos/retter/spaghetti.jpg', './fotos/retter/chili.jpg',
-  './fotos/retter/havregrod.jpg', './fotos/retter/lasagne.jpg', './fotos/retter/tomatsuppe.jpg', './fotos/retter/linsesuppe.jpg', './fotos/retter/stegtris.jpg', './fotos/retter/carbonara.jpg', './fotos/retter/shakshuka.jpg', './fotos/retter/tacos.jpg', './fotos/retter/pizza.jpg', './fotos/retter/wraps.jpg', './fotos/retter/pesto.jpg', './fotos/retter/aeblecrumble.jpg'];
+  './fotos/retter/havregrod.jpg', './fotos/retter/lasagne.jpg', './fotos/retter/tomatsuppe.jpg', './fotos/retter/linsesuppe.jpg', './fotos/retter/stegtris.jpg', './fotos/retter/carbonara.jpg', './fotos/retter/shakshuka.jpg', './fotos/retter/tacos.jpg', './fotos/retter/pizza.jpg', './fotos/retter/wraps.jpg', './fotos/retter/pesto.jpg', './fotos/retter/aeblecrumble.jpg', './fotos/retter/kyllingpasta.jpg', './fotos/retter/wok.jpg', './fotos/retter/spejlaeg.jpg', './fotos/retter/tunsalat.jpg', './fotos/retter/omelet.jpg', './fotos/retter/burger.jpg', './fotos/retter/chilicon.jpg', './fotos/retter/dhal.jpg', './fotos/retter/taerte.jpg', './fotos/retter/quesadilla.jpg', './fotos/retter/falafel.jpg'];
 
 async function hentAktiv() {
   const m = await caches.open(META);

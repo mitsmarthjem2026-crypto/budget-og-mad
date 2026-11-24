@@ -256,7 +256,7 @@ button.b,label.b{box-shadow:0 6px 16px rgba(232,85,62,.3)}
 <dialog id="dlg"><div class="in" id="dlgin"></div></dialog>
 
 <script>
-const KEY='madapp-v1';const APP_VERSION=11, EJER='Søren';
+const KEY='madapp-v1';const APP_VERSION=12, EJER='Søren';
 let D=JSON.parse(localStorage.getItem(KEY)||'null')||{opskrifter:[],indkob:[],lager:[],madplan:{},budget:{maaned:0,udgifter:[]}};
 
 // Faste opskrifter (klassiske, billige retter). Fotos: se kilder.txt
@@ -350,7 +350,43 @@ const STD_OPSKRIFTER=[
  trin:['Hak løget, og skær gulerødder og selleri i skiver.','Kog vand og bouillon op, og kom grøntsagerne i. Kog 10 minutter.','Skær kyllingen i tern, kom den i, og kog i 10 minutter, til den er gennemkogt.','Kom nudlerne i de sidste 4 minutter.','Smag til med salt.']},
 {id:'std-aeblecrumble',navn:'Æblecrumble',foto:'fotos/retter/aeblecrumble.jpg',tid:40,portioner:4,tags:['vegetar'],
  ing:['6 æbler','2 spsk sukker','1 tsk kanel','100 g hvedemel','100 g havregryn','100 g sukker','100 g smør'],
- trin:['Skræl æblerne, skær dem i både, og læg dem i et ovnfast fad. Drys med sukker og kanel.','Smuldr mel, havregryn, sukker og smør sammen med fingrene.','Fordel smuldret over æblerne.','Bag ved 200 °C i ca. 25 minutter, til toppen er gylden.','Server lun – gerne med lidt yoghurt.']}
+ trin:['Skræl æblerne, skær dem i både, og læg dem i et ovnfast fad. Drys med sukker og kanel.','Smuldr mel, havregryn, sukker og smør sammen med fingrene.','Fordel smuldret over æblerne.','Bag ved 200 °C i ca. 25 minutter, til toppen er gylden.','Server lun – gerne med lidt yoghurt.']},
+{id:'std-kyllingepasta',navn:'Cremet kyllingepasta med bacon og champignon',foto:'fotos/retter/kyllingpasta.jpg',tid:30,portioner:4,tags:['hurtig'],
+ ing:['400 g pasta','400 g kyllingebryst','150 g bacon','250 g champignon','1 løg','2 fed hvidløg','1 spsk olie','2,5 dl madlavningsfløde','50 g revet parmesan','1 tsk salt','1 knsp peber'],
+ trin:['Kog pastaen i saltet vand efter pakken.','Skær kylling i tern, og steg den gennem i olie. Tag den af panden.','Steg bacon i tern, og kom champignon i skiver, hakket løg og hvidløg på.','Hæld fløden på, og lad det simre 3 minutter. Kom kyllingen i igen.','Vend pastaen i sovsen, drys ost over, og smag til med salt og peber.']},
+{id:'std-wok',navn:'Wok med kylling, grøntsager og nudler',foto:'fotos/retter/wok.jpg',tid:25,portioner:4,tags:['hurtig'],
+ ing:['250 g nudler','400 g kyllingebryst','2 spsk olie','1 løg','2 gulerødder','1 stk rød peberfrugt','200 g broccoli','2 fed hvidløg','4 spsk soja','1 spsk sød chilisauce'],
+ trin:['Kog nudlerne efter pakken, og skyl dem i koldt vand.','Skær kylling og grøntsager i tynde strimler.','Steg kyllingen ved høj varme i olie på en wok eller stor pande, til den er gennemstegt.','Kom grøntsager og hvidløg på, og steg 4 minutter – de skal stadig være sprøde.','Vend nudler, soja og chilisauce i, og varm det hele igennem.']},
+{id:'std-spejlaeg-rugbroed',navn:'Spejlæg på rugbrød med avocado',foto:'fotos/retter/spejlaeg.jpg',tid:10,portioner:2,tags:['vegetar','hurtig'],
+ ing:['4 skiver rugbrød','2 stk avocado','4 æg','1 spsk smør','1 knsp salt','1 knsp peber','1 knsp chiliflager'],
+ trin:['Skær avocadoerne over, tag stenen ud, og mos kødet med en gaffel. Smag til med salt.','Smør avocado på rugbrødet.','Steg æggene i smør ved middel varme, til hviden er stiv.','Læg et spejlæg på hver skive, og drys med peber og lidt chili.']},
+{id:'std-tunsalat-pita',navn:'Tunsalat i pita',foto:'fotos/retter/tunsalat.jpg',tid:10,portioner:2,tags:['hurtig'],
+ ing:['1 dåse tun i vand','2 spsk mayonnaise','2 spsk creme fraiche','0,5 løg','1 dåse majs','4 stk pitabrød','1 stk iceberg','1 knsp salt','1 knsp peber'],
+ trin:['Hæld vandet fra tun og majs.','Hak løget meget fint.','Rør tun, mayonnaise, creme fraiche, løg og majs sammen. Smag til med salt og peber.','Rist pitabrødene kort, og skær dem op.','Fyld dem med salat og tunsalat.']},
+{id:'std-omelet',navn:'Omelet med skinke, ost og purløg',foto:'fotos/retter/omelet.jpg',tid:10,portioner:1,tags:['hurtig'],
+ ing:['3 æg','2 spsk mælk','50 g skinke','30 g revet ost','1 spsk purløg','1 tsk smør','1 knsp salt'],
+ trin:['Pisk æg, mælk og salt sammen.','Smelt smørret på en pande ved middel varme, og hæld æggene på.','Træk forsigtigt æggemassen ind mod midten, så den stivner jævnt.','Drys skinke, ost og klippet purløg på den ene halvdel.','Fold omeletten sammen, og lad osten smelte et øjeblik.']},
+{id:'std-tortillapizza',navn:'Tortilla-pizza',foto:'',tid:15,portioner:2,tags:['hurtig'],
+ ing:['4 stk tortillas','4 spsk tomatpuré','1 tsk oregano','100 g skinke','150 g revet mozzarella'],
+ trin:['Tænd ovnen på 225 °C.','Læg tortillas på en bageplade med bagepapir.','Rør tomatpuré med lidt vand og oregano, og smør det tyndt på.','Fordel skinke og ost – eller rester fra køleskabet.','Bag 6–8 minutter, til osten er smeltet og kanten sprød.']},
+{id:'std-burgere',navn:'Hjemmelavede burgere med ovnkartofler',foto:'fotos/retter/burger.jpg',tid:45,portioner:4,tags:[],
+ ing:['500 g hakket oksekød','4 stk burgerboller','1 kg kartofler','2 spsk olie','1 stk iceberg','2 tomater','1 løg','4 skiver ost','4 spsk ketchup','1 tsk salt','1 knsp peber'],
+ trin:['Tænd ovnen på 220 °C. Skær kartoflerne i både, vend dem i olie og salt, og bag dem i ca. 35 minutter.','Form kødet til 4 bøffer, lidt større end bollerne. Drys med salt og peber.','Steg bøfferne 3–4 minutter på hver side. Læg ost på til sidst.','Rist bollerne, og snit salat, tomat og løg.','Byg burgerne med ketchup og grønt, og server med ovnkartofler.']},
+{id:'std-chili-con-carne',navn:'Chili con carne',foto:'fotos/retter/chilicon.jpg',tid:40,portioner:4,tags:[],
+ ing:['500 g hakket oksekød','1 løg','2 fed hvidløg','1 stk rød peberfrugt','2 tsk chilipulver','1 tsk spidskommen','2 dåser hakkede tomater','2 dåser kidneybønner','3 dl ris','2 dl creme fraiche','150 g nachos','1 tsk salt'],
+ trin:['Kog risene efter pakken.','Brun kødet i en gryde med hakket løg, hvidløg og peberfrugt.','Rør chili og spidskommen i, og kom tomater og skyllede bønner i.','Lad det simre i 20 minutter. Smag til med salt.','Server med ris, creme fraiche og nachos.']},
+{id:'std-dhal',navn:'Dhal (indisk linsegryde) med naanbrød',foto:'fotos/retter/dhal.jpg',tid:35,portioner:4,tags:['vegetar'],
+ ing:['250 g røde linser','1 løg','3 fed hvidløg','1 spsk frisk ingefær','2 spsk olie','2 tsk karry','1 tsk gurkemeje','1 dåse kokosmælk','6 dl vand','1 stk bouillonterning','4 stk naanbrød','1 tsk salt'],
+ trin:['Hak løg, hvidløg og ingefær, og svits dem i olie med karry og gurkemeje i 2 minutter.','Skyl linserne, og kom dem i gryden med kokosmælk, vand og bouillon.','Kog i ca. 20 minutter under omrøring, til linserne er møre og gryden tyk.','Smag til med salt.','Varm naanbrødene i ovnen, og server dem til.']},
+{id:'std-groentsagstaerte',navn:'Grøntsagstærte med feta og spinat',foto:'fotos/retter/taerte.jpg',tid:60,portioner:4,tags:['vegetar'],
+ ing:['1 pakke færdig tærtedej','250 g frossen spinat','150 g feta','1 løg','4 æg','2 dl mælk','1 knsp muskatnød','1 tsk salt','1 knsp peber'],
+ trin:['Tænd ovnen på 200 °C. Læg dejen i en tærteform, og prik bunden med en gaffel.','Tø spinaten op, og pres vandet ud. Hak løget, og steg det blødt.','Fordel spinat, løg og smuldret feta i bunden.','Pisk æg, mælk, salt, peber og muskat sammen, og hæld det over.','Bag tærten i ca. 35 minutter, til fyldet er stivnet og gyldent.']},
+{id:'std-quesadillas',navn:'Quesadillas med bønner, majs og cheddar',foto:'fotos/retter/quesadilla.jpg',tid:20,portioner:4,tags:['vegetar','hurtig'],
+ ing:['8 stk tortillas','1 dåse sorte bønner','1 dåse majs','150 g revet cheddar','1 tsk spidskommen','1 spsk olie','2 dl creme fraiche'],
+ trin:['Skyl bønner og majs, og bland dem med spidskommen.','Drys ost, bønner og majs på 4 tortillas, og læg en tortilla ovenpå hver.','Steg dem på en pande med lidt olie, ca. 2–3 minutter på hver side, til osten smelter.','Skær dem i trekanter, og server med creme fraiche.']},
+{id:'std-falafel-pita',navn:'Pita med falafel og dressing',foto:'fotos/retter/falafel.jpg',tid:30,portioner:4,tags:['vegetar'],
+ ing:['2 dåser kikærter','1 løg','2 fed hvidløg','1 bundt persille','2 tsk spidskommen','3 spsk hvedemel','3 spsk olie','4 stk pitabrød','2 dl yoghurt naturel','1 agurk','2 tomater','1 tsk salt'],
+ trin:['Hæld vandet fra kikærterne, og blend dem groft med løg, hvidløg, persille, spidskommen, mel og salt.','Form små boller, og tryk dem lidt flade.','Steg dem i olie på en pande, ca. 3 minutter på hver side, til de er sprøde.','Rør yoghurt med lidt revet agurk og salt til en dressing.','Fyld pitabrødene med falafel, tomat, agurk og dressing.']}
 ];
 const BASIS=['salt','peber','vand'];
 const norm=s=>String(s||'').toLowerCase().replace(/[^a-zæøå ]/g,' ').replace(/\s+/g,' ').trim();
