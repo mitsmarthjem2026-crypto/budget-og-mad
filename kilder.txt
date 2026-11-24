@@ -278,3 +278,8 @@ Tjenester nævnt i privatlivsteksten
 Brud på reglerne (tilføjet 24/11-2026)
 - Ophavsretsloven § 83 (LBK nr. 1093 af 20/08/2023): den, der forsætligt eller uagtsomt krænker ophavsretten, skal betale rimeligt vederlag for brugen og erstatning for yderligere skade (bl.a. tabt fortjeneste og krænkerens uberettigede gevinst): https://www.lovguiden.dk/loven/ophavsretsloven/83
 - Faste bøder/konventionalbod i forbrugervilkår kan tilsidesættes som urimelige (aftaleloven §§ 36 og 38 c): https://lex.dk/ugyldige_forbrugeraftaler og https://www.lovguiden.dk/praksisoversigt/urimelige-aftalevilkaar-aftaleloven-36-38c – derfor ingen fast bøde i reglerne, kun dokumenteret tab, lukning af koden og ophavsretslovens regler.
+Brugsstatistik (tilføjet 24/11-2026)
+- Statistik om brug kræver samtykke efter cookiebekendtgørelsen § 3 (Digitaliseringsstyrelsens tillægsvejledning: statistik og annoncer er ikke teknisk nødvendigt): https://digst.dk/media/lonblbzi/gode-raad-tillaeg-til-faelles-vejledning.pdf
+- Tal knyttet til en kode med et navn er personoplysninger (ikke anonyme). Grundlag: samtykke, GDPR art. 6, stk. 1, litra a; kan trækkes tilbage når som helst (art. 7, stk. 3).
+- Under 15 år kræver samtykke til informationssamfundstjenester forældrenes samtykke (databeskyttelsesloven § 6, stk. 2, se ovenfor).
+- I appen: jura.js juraStatistikOK() er kun sand, når brugeren selv har sat flueben (ikke forudvalgt) eller trykket Ja under Indstillinger.

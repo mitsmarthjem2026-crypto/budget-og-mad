@@ -29,7 +29,7 @@ function juraVilkaar() {
 <h3>6. Andre mennesker i appen</h3>
 <p>Kontakter, fødselsdage og billeder af andre må du gemme til dit eget private brug. Vil du dele billeder eller oplysninger om andre, så spørg dem først. Det er dit ansvar, hvad du deler.</p>
 <h3>7. Din kode</h3>
-<p>Din kode er personlig. Giv den ikke videre. Søren kan slukke en kode, fx hvis den bliver misbrugt eller delt. Prøv ikke at bryde ind i appen eller serveren.</p>
+<p>Din kode er personlig. Giv den ikke videre. Søren kan slukke en kode, fx hvis den bliver misbrugt eller delt. En kode kan have en slutdato og kan give adgang til kun nogle dele af appen. Søren kan sende beskeder til alle, der bruger appen. Prøv ikke at bryde ind i appen eller serveren.</p>
 <h3>8. Appen kan ændre sig</h3>
 <p>Appen er gratis og kommer, som den er. Den kan få fejl, blive ændret eller holde op med at virke. Der er ingen garanti for, at den altid virker.</p>
 <h3>9. Ansvar</h3>
@@ -56,7 +56,7 @@ function juraPrivat() {
 <h3>Kort fortalt</h3>
 <ul><li>Det, du skriver i appen, bliver på din egen telefon. Søren kan ikke se det.</li>
 <li>Kun din kode bliver tjekket på en server.</li>
-<li>Ingen reklamer, ingen sporing, ingen statistik om dig.</li></ul>
+<li>Ingen reklamer og ingen sporing. Brugsstatistik kun, hvis du selv siger ja.</li></ul>
 <h3>Hvem står for appen?</h3>
 <p>${juraHvem()}</p>
 <h3>Det, der bliver på din telefon</h3>
@@ -70,6 +70,14 @@ function juraPrivat() {
 <li><b>Vareinfo (Open Food Facts):</b> Scanner du en vare, sendes kun stregkodens nummer for at finde varens navn.</li>
 <li><b>Links:</b> Trykker du på »Kort«, tilbud eller lignende, åbnes en anden side (fx Google Maps eller eTilbudsavis), og den får det, du søger på.</li>
 </ul>
+<h3>Brugsstatistik – kun hvis du siger ja</h3>
+<p>Siger du ja, sender appen tal om, <i>hvor meget</i> du bruger den – aldrig <i>hvad</i> du skriver. Det er: hvilke dage du har brugt appen, hvor mange gange du åbner den, hvor mange minutter, og hvilke dele du bruger (fx Budget eller Opskrifter). Tallene hører til din kode, så Søren kan se dem ud for det navn, koden har.</p>
+<ul><li><b>Formål:</b> at gøre appen bedre og se, hvad der bliver brugt.</li>
+<li><b>Grundlag:</b> dit samtykke (GDPR art. 6, stk. 1, litra a, og cookiereglerne). Siger du nej, virker appen præcis lige så godt.</li>
+<li><b>Hvor:</b> Supabase, server i EU (Irland).</li>
+<li><b>Hvor længe:</b> til du siger nej igen, din kode bliver slettet, eller du beder Søren slette det.</li>
+<li><b>Fortryd:</b> Du kan altid slå det fra under ⚙️ Indstillinger → Regler og privatliv. Så sendes der ikke mere.</li>
+<li>Er du under 15 år, skal en forælder sige ja for dig.</li></ul>
 <h3>Andre mennesker i appen</h3>
 <p>Kontakter og billeder af andre ligger kun på din telefon. Persondataloven (GDPR) gælder ikke for rent private ting, du gemmer for dig selv. Deler du dem med andre, er det dit ansvar at have lov.</p>
 <h3>Dine rettigheder</h3>
@@ -97,6 +105,7 @@ function juraVisFoersteGang() {
    <li>Råd om penge, mad og motion er gode råd – tjek selv, og spørg en læge, hvis du er i tvivl.</li>
    <li>Appen kommer, som den er. Husk »Gem kopi« en gang imellem.</li>
   </ul>
+  <label style="display:flex;gap:10px;align-items:flex-start;background:var(--felt);border-radius:14px;padding:12px;margin-bottom:10px;font-size:15px;cursor:pointer"><input type="checkbox" id="jurastat" style="width:22px;height:22px;flex:none;margin:0"><span>Søren må gerne se, <b>hvor meget</b> jeg bruger appen – ikke hvad jeg skriver. <span class="muted">(Frivilligt. Under 15 år: spørg en forælder.)</span></span></label>
   <button class="l" style="width:100%;margin-bottom:10px" onclick="juraVis('alt')">📜 Læs alle regler</button>
   <button class="b" style="width:100%;font-size:19px;padding:14px" onclick="juraAccepter()">✅ Jeg accepterer</button>
   <p class="muted" style="font-size:13px;text-align:center;margin:10px 0 0">Du kan altid læse reglerne igen under ⚙️ Indstillinger.</p></div>`;
@@ -104,6 +113,7 @@ function juraVisFoersteGang() {
 }
 function juraAccepter() {
   try { localStorage.setItem(JURA_KEY, JSON.stringify({ v: JURA_VERSION, dato: new Date().toISOString() })) } catch (e) {}
+  var cb = document.getElementById('jurastat'); if (cb) juraSaetStatistik(cb.checked, true);
   var b = document.getElementById('jurabox'); if (b) b.remove();
   if (typeof toast === 'function') toast('Tak – god fornøjelse 🎉');
 }
@@ -123,5 +133,14 @@ function juraIndstil() {
   var a = juraAccepteret();
   return `<h3>📜 Regler og privatliv</h3>
   <div class="row"><button class="l" style="flex:1" onclick="juraVis('regler')">📜 Regler for brug</button><button class="l" style="flex:1" onclick="juraVis('privat')">🔒 Privatliv</button></div>
-  <p class="muted" style="font-size:13px">${a ? 'Du accepterede reglerne den ' + new Date(a.dato).toLocaleDateString('da-DK') + '.' : 'Du har ikke accepteret reglerne endnu.'}</p>`;
+  <p class="muted" style="font-size:13px">${a ? 'Du accepterede reglerne den ' + new Date(a.dato).toLocaleDateString('da-DK') + '.' : 'Du har ikke accepteret reglerne endnu.'}</p>
+  <p style="margin:10px 0 4px"><b>📊 Må Søren se, hvor meget du bruger appen?</b><br><span class="muted" style="font-size:13px">Kun hvor meget – aldrig hvad du skriver.</span></p>
+  <div class="chips"><button class="chip ${juraStatistikOK() ? 'on' : ''}" onclick="juraSaetStatistik(true)">Ja</button><button class="chip ${juraStatistikOK() ? '' : 'on'}" onclick="juraSaetStatistik(false)">Nej</button></div>`;
+}
+// Brugsstatistik: KUN når brugeren selv har sagt ja (samtykke). Koden, der sender tal, SKAL spørge juraStatistikOK() først.
+var JURA_STAT_KEY = 'madapp-v1-statistik';
+function juraStatistikOK() { try { var s = JSON.parse(localStorage.getItem(JURA_STAT_KEY) || 'null'); return !!(s && s.ja) } catch (e) { return false } }
+function juraSaetStatistik(ja, stille) {
+  try { localStorage.setItem(JURA_STAT_KEY, JSON.stringify({ ja: !!ja, dato: new Date().toISOString() })) } catch (e) {}
+  if (!stille) { if (typeof toast === 'function') toast(ja ? 'Tak – brugsstatistik er slået til' : 'Brugsstatistik er slået fra'); if (typeof visIndstillinger === 'function') visIndstillinger() }
 }
