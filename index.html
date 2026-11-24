@@ -27,6 +27,7 @@
 <link rel="apple-touch-startup-image" href="ikoner/start-1260x2736.png" media="(device-width: 420px) and (device-height: 912px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)">
 <title>Budget og Mad</title>
 <script src="opskrifter.js"></script>
+<script src="motion.js"></script>
 <script>
 window.FEJLLOG=[];(function(){function gem(o){try{var l=JSON.parse(localStorage.getItem('madapp-v1-fejllog')||'[]');l.push(o);l=l.slice(-20);localStorage.setItem('madapp-v1-fejllog',JSON.stringify(l))}catch(e){}}addEventListener('error',function(e){gem({tid:new Date().toISOString(),fejl:String(e.message||'').slice(0,200),linje:e.lineno||0,kol:e.colno||0,fil:String(e.filename||'').split('/').pop().split('?')[0]})});addEventListener('unhandledrejection',function(e){gem({tid:new Date().toISOString(),fejl:'Promise: '+String((e.reason&&e.reason.message)||e.reason||'').slice(0,200)})})})();
 addEventListener('error',function(ev){try{var mn=document.getElementById('main');if(mn&&!mn.innerHTML.trim()){mn.innerHTML='<div style="background:#fff;border-radius:20px;padding:20px;margin:20px;font:17px system-ui"><b>Ups – appen kunne ikke starte.</b><p>Tag et skærmbillede af denne besked, og send det til Søren.</p><p style="color:#a33;font-size:14px">'+String(ev.message||'').replace(/</g,'&lt;')+' (linje '+(ev.lineno||'?')+')</p><button onclick="location.reload()" style="font:inherit;padding:10px 16px;border-radius:12px;border:0;background:#e8553e;color:#fff">Prøv igen</button></div>'}}catch(x){}try{if(localStorage.getItem('madapp-v1-test')&&navigator.serviceWorker&&navigator.serviceWorker.controller){localStorage.removeItem('madapp-v1-test');localStorage.setItem('madapp-v1-fejl','1');navigator.serviceWorker.controller.postMessage('TILBAGE');setTimeout(function(){location.reload()},400)}}catch(e){}});
@@ -327,7 +328,7 @@ body{padding-top:env(safe-area-inset-top)}
 <dialog id="dlg"><div class="in" id="dlgin"></div></dialog>
 
 <script>
-const KEY='madapp-v1';const ENHED=(()=>{let e=localStorage.getItem('madapp-v1-enhed');if(!e){e=(crypto.randomUUID?crypto.randomUUID():Date.now().toString(36)+Math.random().toString(36).slice(2));localStorage.setItem('madapp-v1-enhed',e)}return e})();const APP_VERSION=47, EJER='Søren';
+const KEY='madapp-v1';const ENHED=(()=>{let e=localStorage.getItem('madapp-v1-enhed');if(!e){e=(crypto.randomUUID?crypto.randomUUID():Date.now().toString(36)+Math.random().toString(36).slice(2));localStorage.setItem('madapp-v1-enhed',e)}return e})();const APP_VERSION=48, EJER='Søren';
 let D;try{D=JSON.parse(localStorage.getItem(KEY)||'null')}catch(e){D=null;try{localStorage.setItem(KEY+'-skadet-'+Date.now(),localStorage.getItem(KEY))}catch(x){}}
 if(!D||typeof D!=='object')D={};
 ['opskrifter','indkob','lager','stdSlettet','gemteLister'].forEach(k=>{if(!Array.isArray(D[k]))D[k]=[]});
@@ -763,11 +764,14 @@ SIDER.forside=function(){
   info.kalender=kalInfo();const h=nu.getHours(),hilsen=h<10?'Godmorgen':h<17?'Hej':'Godaften';
   return `<div class="fhero" style="background-image:url('${valgtFoto()}')"><div><div class="fh1">${hilsen} 👋</div><div class="fh2">Hvad skal vi i dag?</div></div></div>
   <div class="tiles">${Object.entries(FOTO).map(([k,f])=>`<button class="tile t-${k}" onclick="gaaTil('${k}')" style="background-image:url(${knapFoto(k)})"><span class="te">${f[1]}</span><span class="tskift" role="button" title="Skift billede" onclick="event.stopPropagation();vaelgKnapFoto('${k}')">🖼️</span><span class="tn">${f[2]}</span><span class="ti">${esc(info[k])}</span></button>`).join('')}</div>
+  ${typeof motionKort==='function'?motionKort():''}
   ${erEjer()?'<button class="b" style="width:100%;font-size:19px;padding:16px;margin:14px 0 4px" onclick="visAndreBrugere()">👥 Til andre app brugere</button>':''}
   ${forsideTips()}
   ${hjaelpKort()}`;
 };
 
+// Motion og vægttab (version 48) – selve koden ligger i motion.js
+SIDER.motion=()=>typeof motionSide==='function'?motionSide():'';
 // ---------- Pris ud fra egne priser (version 10) ----------
 function prisOverslag(ing,p){let sum=0,n=0;ing.forEach(i=>{const pr=D.priser[norm(i.navn)];if(pr){sum+=pr;n++}});return{sum:Math.round(sum),n,af:ing.length}}
 // ---------- Scan stregkode -> lager (Open Food Facts, gratis) ----------
