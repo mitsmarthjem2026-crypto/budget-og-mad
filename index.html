@@ -269,7 +269,7 @@ button.b,label.b{box-shadow:0 6px 16px rgba(232,85,62,.3)}
 <style>@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}</style>
 </head>
 <body>
-<header><h1><img src="ikoner/ikon-192.png" alt="" style="width:1.3em;height:1.3em;border-radius:.3em;vertical-align:-.3em;margin-right:.35em">Budget og Mad</h1><button id="instknap" onclick="visGuide()" style="display:none;border:1px solid #fff;background:none;color:#fff;border-radius:10px;padding:6px 10px;font:inherit;font-size:14px;cursor:pointer">📲<span class="itxt"> Installér</span></button><button id="fortrydknap" hidden onclick="fortrydSidste()">↩️<span class="ftxt"> Fortryd</span></button><button id="indstilknap" onclick="visIndstillinger()" title="Indstillinger">⚙️</button><span class="ver" id="ver">version 39</span></header>
+<header><h1><img src="ikoner/ikon-192.png" alt="" style="width:1.3em;height:1.3em;border-radius:.3em;vertical-align:-.3em;margin-right:.35em">Budget og Mad</h1><button id="instknap" onclick="visGuide()" style="display:none;border:1px solid #fff;background:none;color:#fff;border-radius:10px;padding:6px 10px;font:inherit;font-size:14px;cursor:pointer">📲<span class="itxt"> Installér</span></button><button id="fortrydknap" hidden onclick="fortrydSidste()">↩️<span class="ftxt"> Fortryd</span></button><button id="indstilknap" onclick="visIndstillinger()" title="Indstillinger">⚙️</button><span class="ver" id="ver">version 40</span></header>
 <nav id="nav">
   <button data-p="forside"><span class="ic">🏠</span>Hjem</button>
   <button data-p="opskrifter"><span class="ic">📖</span>Opskrifter</button>
@@ -283,7 +283,7 @@ button.b,label.b{box-shadow:0 6px 16px rgba(232,85,62,.3)}
 <dialog id="dlg"><div class="in" id="dlgin"></div></dialog>
 
 <script>
-const KEY='madapp-v1';const ENHED=(()=>{let e=localStorage.getItem('madapp-v1-enhed');if(!e){e=(crypto.randomUUID?crypto.randomUUID():Date.now().toString(36)+Math.random().toString(36).slice(2));localStorage.setItem('madapp-v1-enhed',e)}return e})();const APP_VERSION=39, EJER='Søren';
+const KEY='madapp-v1';const ENHED=(()=>{let e=localStorage.getItem('madapp-v1-enhed');if(!e){e=(crypto.randomUUID?crypto.randomUUID():Date.now().toString(36)+Math.random().toString(36).slice(2));localStorage.setItem('madapp-v1-enhed',e)}return e})();const APP_VERSION=40, EJER='Søren';
 let D;try{D=JSON.parse(localStorage.getItem(KEY)||'null')}catch(e){D=null;try{localStorage.setItem(KEY+'-skadet-'+Date.now(),localStorage.getItem(KEY))}catch(x){}}
 if(!D||typeof D!=='object')D={};
 ['opskrifter','indkob','lager','stdSlettet','gemteLister'].forEach(k=>{if(!Array.isArray(D[k]))D[k]=[]});
@@ -929,7 +929,7 @@ function visIndstillinger(){
   <h3>✍️ Skrifttype</h3><div class="chips">${[['rund','Rund'],['klassisk','Klassisk'],['enkel','Enkel'],['laese','Let at læse']].map(([k,n])=>`<button class="chip ${(v.font||'rund')===k?'on':''}" style="font-family:${FONTE[k]||'inherit'}" onclick="setIndstil('font','${k}')">${n}</button>`).join('')}</div>
   <h3>🖼️ Billedet øverst</h3><div class="row" style="flex-wrap:nowrap;align-items:center"><div style="width:110px;height:70px;border-radius:14px;background:url('${valgtFoto()}') center/cover;flex:none"></div><button class="b" style="flex:1" onclick="vaelgFoto()">Skift billedet øverst</button></div>
   <p class="muted" style="font-size:13px">Vælg mellem 20 billeder eller dit eget foto. Billederne på knapperne skifter du med 🖼️ på hver knap.</p>
-  <h3>💬 Hjælp</h3>${hjaelpIndstil()}
+  <h3>💬 Brug for hjælp til appen?</h3>${hjaelpIndstil()}
   <h3>🎨 Farver</h3><div class="temaer"><button class="tema ${!D.indstil.tema?'on':''}" style="background:linear-gradient(135deg,#ff8a3d,#e8364f)" onclick="setIndstil('tema','')"><span>Standard</span></button>${Object.entries(TEMAER).filter(([k])=>k!=='solnedgang').map(([k,v])=>`<button class="tema ${D.indstil.tema===k?'on':''}" style="background:linear-gradient(135deg,${v[1]},${v[2]})" onclick="setIndstil('tema','${k}')"><span>${v[0]}</span></button>`).join('')}</div>
   <h3>🖼️ Baggrund</h3><div class="galleri g3">${BAGGRUNDE.map(([p,n])=>`<button class="gfoto ${(D.indstil.baggrund||'ingen')===p?'on':''}" style="${p==='ingen'?'background:var(--felt)':'background-image:url('+p+')'}" onclick="setIndstil('baggrund','${p}')"><span>${n}</span></button>`).join('')}</div>
   <p class="muted" style="font-size:13px">Billedet til forsiden og knapperne vælger du med »🖼️ Skift billede« på forsiden.</p>
@@ -1349,7 +1349,7 @@ function visHjaelp(){
   <div style="background:var(--felt);border-radius:14px;padding:12px;margin-top:10px"><b>ℹ️ Om appen</b><p class="muted" style="margin:6px 0 0;font-size:14px">Budget og Mad – version ${APP_VERSION}. Kun ejeren kan sende opdateringer. Appen må ikke kopieres eller deles videre uden tilladelse. Dine tal ligger kun på din egen telefon. Fotos fra Unsplash. Varedata fra Open Food Facts.</p></div>`;
   if(!dlg.open)dlg.showModal();
 }
-function hjaelpKort(){return dataKort()+`<button class="hjknap" onclick="visHjaelp()"><span>💬</span><b>Brug for hjælp?</b><small>Skriv til ${esc(EJER)}</small></button>`}
+function hjaelpKort(){return dataKort()}
 
 localStorage.removeItem(KEY+'-test'); // appen startede fint
 </script>
