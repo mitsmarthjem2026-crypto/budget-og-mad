@@ -265,7 +265,7 @@ button.b,label.b{box-shadow:0 6px 16px rgba(232,85,62,.3)}
 <style>@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}</style>
 </head>
 <body>
-<header onclick="if(event.target===this||event.target.tagName==='H1'||event.target.tagName==='IMG')vaelgFoto()" style="cursor:pointer"><h1><img src="ikoner/ikon-192.png" alt="" style="width:1.3em;height:1.3em;border-radius:.3em;vertical-align:-.3em;margin-right:.35em">Budget og Mad</h1><button id="instknap" onclick="visGuide()" style="display:none;border:1px solid #fff;background:none;color:#fff;border-radius:10px;padding:6px 10px;font:inherit;font-size:14px;cursor:pointer">📲<span class="itxt"> Installér</span></button><button id="fortrydknap" hidden onclick="fortrydSidste()">↩️<span class="ftxt"> Fortryd</span></button><button id="indstilknap" onclick="visIndstillinger()" title="Indstillinger">⚙️</button><span class="ver" id="ver">version 29</span></header>
+<header onclick="if(event.target===this||event.target.tagName==='H1'||event.target.tagName==='IMG')vaelgFoto()" style="cursor:pointer"><h1><img src="ikoner/ikon-192.png" alt="" style="width:1.3em;height:1.3em;border-radius:.3em;vertical-align:-.3em;margin-right:.35em">Budget og Mad</h1><button id="instknap" onclick="visGuide()" style="display:none;border:1px solid #fff;background:none;color:#fff;border-radius:10px;padding:6px 10px;font:inherit;font-size:14px;cursor:pointer">📲<span class="itxt"> Installér</span></button><button id="fortrydknap" hidden onclick="fortrydSidste()">↩️<span class="ftxt"> Fortryd</span></button><button id="indstilknap" onclick="visIndstillinger()" title="Indstillinger">⚙️</button><span class="ver" id="ver">version 30</span></header>
 <nav id="nav">
   <button data-p="forside"><span class="ic">🏠</span>Hjem</button>
   <button data-p="opskrifter"><span class="ic">📖</span>Opskrifter</button>
@@ -279,7 +279,7 @@ button.b,label.b{box-shadow:0 6px 16px rgba(232,85,62,.3)}
 <dialog id="dlg"><div class="in" id="dlgin"></div></dialog>
 
 <script>
-const KEY='madapp-v1';const APP_VERSION=29, EJER='Søren';
+const KEY='madapp-v1';const APP_VERSION=30, EJER='Søren';
 let D;try{D=JSON.parse(localStorage.getItem(KEY)||'null')}catch(e){D=null;try{localStorage.setItem(KEY+'-skadet-'+Date.now(),localStorage.getItem(KEY))}catch(x){}}
 if(!D||typeof D!=='object')D={};
 ['opskrifter','indkob','lager','stdSlettet','gemteLister'].forEach(k=>{if(!Array.isArray(D[k]))D[k]=[]});
@@ -892,6 +892,7 @@ function visIndstillinger(){
   dlgin.innerHTML=`<h2>⚙️ Indstillinger</h2>
   <h3>🔠 Tekststørrelse</h3><div class="chips">${[['lille','Lille'],['normal','Normal'],['stor','Stor'],['kaempe','Meget stor']].map(([k,n])=>`<button class="chip ${ (v.str||'normal')===k?'on':''}" onclick="setIndstil('str','${k}')">${n}</button>`).join('')}</div>
   <h3>✍️ Skrifttype</h3><div class="chips">${[['rund','Rund'],['klassisk','Klassisk'],['enkel','Enkel'],['laese','Let at læse']].map(([k,n])=>`<button class="chip ${(v.font||'rund')===k?'on':''}" style="font-family:${FONTE[k]||'inherit'}" onclick="setIndstil('font','${k}')">${n}</button>`).join('')}</div>
+  <h3>💬 Hjælp</h3>${hjaelpIndstil()}
   <h3>🎨 Farver</h3><div class="temaer"><button class="tema ${!D.indstil.tema?'on':''}" style="background:linear-gradient(135deg,#ff8a3d,#e8364f)" onclick="setIndstil('tema','')"><span>Standard</span></button>${Object.entries(TEMAER).filter(([k])=>k!=='solnedgang').map(([k,v])=>`<button class="tema ${D.indstil.tema===k?'on':''}" style="background:linear-gradient(135deg,${v[1]},${v[2]})" onclick="setIndstil('tema','${k}')"><span>${v[0]}</span></button>`).join('')}</div>
   <h3>🖼️ Baggrund</h3><div class="galleri g3">${BAGGRUNDE.map(([p,n])=>`<button class="gfoto ${(D.indstil.baggrund||'ingen')===p?'on':''}" style="${p==='ingen'?'background:var(--felt)':'background-image:url('+p+')'}" onclick="setIndstil('baggrund','${p}')"><span>${n}</span></button>`).join('')}</div>
   <p class="muted" style="font-size:13px">Billedet til forsiden og knapperne vælger du med »🖼️ Skift billede« på forsiden.</p>
@@ -1043,6 +1044,38 @@ function overblikKort(md,erNu){
   <p class="muted" style="font-size:12px;margin:6px 0 0">Alt er regnet ud fra de tal, du selv har skrevet ind.</p></div>`;
 }
 
+// ---------- Hjælp begge veje (version 30) ----------
+// Kun beskeder og billeder. Ingen adgang til hinandens data.
+function hjaelpIndstil(){
+  D.beskeder=Array.isArray(D.beskeder)?D.beskeder:[];
+  return `<p class="muted" style="margin-top:-6px;font-size:14px">Her kan du skrive med ${esc(EJER)}. Kun beskeder og billeder sendes – ingen andre data fra din app.</p>
+  <button class="b" style="width:100%" onclick="visHjaelp()">✍️ Skriv til ${esc(EJER)} (du kan sætte billeder på)</button>
+  <div style="background:var(--felt);border-radius:14px;padding:10px 12px;margin-top:10px"><b>📩 Beskeder fra ${esc(EJER)}</b>
+   ${D.beskeder.length?`<ul class="ingl">${[...D.beskeder].reverse().map(b=>`<li><span class="muted" style="font-size:12px">${new Date(b.dato).toLocaleDateString('da-DK',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'})}</span><br>${esc(b.tekst).replace(/\n/g,'<br>')}</li>`).join('')}</ul>`:'<p class="muted" style="margin:6px 0 0;font-size:14px">Ingen beskeder endnu. Når du får et svar-link fra '+esc(EJER)+', så tryk på det – så kommer beskeden her.</p>'}</div>
+  <details class="hjdel"><summary><b>🧑‍🏫 Jeg er hjælper – send et svar</b></summary>
+   <p class="muted" style="font-size:13px">Skriv dit svar. Appen laver et link, du sender til den unge (fx på SMS). Når de trykker på linket, kommer svaret ind under »Beskeder«. Billeder sender du bare med i SMS'en.</p>
+   <textarea id="svartekst" placeholder="Skriv dit svar…" style="min-height:80px"></textarea>
+   <button class="b" style="width:100%;margin-top:8px" onclick="sendSvar()">📤 Send svar</button></details>`;
+}
+async function sendSvar(){
+  const tekst=document.getElementById('svartekst').value.trim();if(!tekst){alert('Skriv et svar');return}
+  const data={fra:EJER,tekst:tekst.slice(0,2000),dato:new Date().toISOString()};
+  const url=location.origin+location.pathname+'#hjaelp='+encodeURIComponent(btoa(unescape(encodeURIComponent(JSON.stringify(data)))));
+  const msg='Svar fra '+EJER+' i Budget og Mad – tryk på linket:';
+  if(navigator.share){try{await navigator.share({title:'Svar fra '+EJER,text:msg,url});return}catch(e){if(e.name==='AbortError')return}}
+  try{await navigator.clipboard.writeText(msg+'\n'+url);toast('Linket er kopieret – send det til den unge')}catch(e){prompt('Kopiér linket og send det:',url)}
+}
+function modtagSvar(){
+  if(!location.hash.startsWith('#hjaelp='))return;
+  let p;try{p=JSON.parse(decodeURIComponent(escape(atob(decodeURIComponent(location.hash.slice(8))))))}catch(e){return}
+  history.replaceState(null,'',location.pathname);
+  if(!p||typeof p.tekst!=='string')return;
+  const b={tekst:String(p.tekst).slice(0,2000),dato:String(p.dato||new Date().toISOString())};
+  D.beskeder=Array.isArray(D.beskeder)?D.beskeder:[];if(!D.beskeder.some(x=>x.dato===b.dato&&x.tekst===b.tekst)){D.beskeder.push(b);save()}
+  dlgin.innerHTML=`<h2>📩 Besked fra ${esc(EJER)}</h2><div style="background:var(--felt);border-radius:14px;padding:12px;white-space:pre-wrap">${esc(b.tekst)}</div><p class="muted" style="font-size:13px">Beskeden er gemt under ⚙️ Indstillinger → 💬 Hjælp.</p><div class="row"><button class="b" style="flex:1" onclick="visHjaelp()">✍️ Svar</button><button class="l" onclick="dlg.close()">OK</button></div>`;
+  dlg.showModal();
+}
+
 // ---------- Gemte indkøbslister (version 14) ----------
 function sletHeleListen(){const n=D.indkob.filter(x=>!x.kobt).length;if(!n)return;const s=snap();D.indkob=D.indkob.filter(x=>x.kobt);save();vis();toast(n+' varer slettet 🗑️',fortrydTil(s))}
 function gemteListerKort(ikke){
@@ -1174,6 +1207,7 @@ function modtagDel(){
     save();dlg.close();gaaTil(p.type==='indkob'?'indkob':p.type==='madplan'?'madplan':'opskrifter');toast('Tilføjet ✔',fortrydTil(s))};
 }
 modtagDel();
+modtagSvar();
 
 // ---------- Skriv til hjælperen ----------
 let hjaelpFiler=[];
