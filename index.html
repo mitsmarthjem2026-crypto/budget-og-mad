@@ -258,7 +258,7 @@ button.b,label.b{box-shadow:0 6px 16px rgba(232,85,62,.3)}
 <dialog id="dlg"><div class="in" id="dlgin"></div></dialog>
 
 <script>
-const KEY='madapp-v1';const APP_VERSION=13, EJER='Søren';
+const KEY='madapp-v1';const APP_VERSION=14, EJER='Søren';
 let D=JSON.parse(localStorage.getItem(KEY)||'null')||{opskrifter:[],indkob:[],lager:[],madplan:{},budget:{maaned:0,udgifter:[]}};
 
 // Faste opskrifter (klassiske, billige retter). Fotos: se kilder.txt
@@ -356,10 +356,11 @@ indkob(){
   const li=x=>`<li class="${x.kobt?'done':''}"><input type="checkbox" ${x.kobt?'checked':''} onchange="kobt('${x.id}',this.checked)" style="width:22px;height:22px"><span class="n">${esc(ingTekst(x))}${x.kobt?'':` <a class="tilbud" href="https://etilbudsavis.dk/soeg/${encodeURIComponent(x.navn)}" target="_blank" rel="noopener">🔎 tilbud</a>`}</span><input type="number" min="0" step="0.01" placeholder="pris kr" value="${x.pris??''}" style="width:100px" onchange="setPris('${x.id}',this.value)"><button class="x" title="Slet" onclick="sletVare('${x.id}')">🗑️</button></li>`;
   return `<h2>Indkøb</h2>
   <div class="card"><div class="row"><input class="grow" id="nyvare" placeholder="Fx 1 l mælk"><button class="b" onclick="tilfojVare()">Tilføj</button><button class="l" onclick="del('indkob')">📤 Del listen</button></div></div>
-  <div class="card"><ul class="list">${ikke.length?ikke.map(li).join(''):'<li class="empty" style="justify-content:center">Indkøbslisten er tom.</li>'}</ul><p class="muted" style="margin:10px 0 0;font-size:14px">🔎 »tilbud« viser ugens rigtige tilbud på varen hos eTilbudsavis.</p>${(()=>{const p=ikke.filter(x=>x.pris);return p.length?`<p class="muted" style="margin:10px 0 0">💡 Ca. ${kr(p.reduce((s,x)=>s+x.pris,0))} for ${p.length} af ${ikke.length} varer – ud fra dine egne priser.</p>`:''})()}</div>
+  <div class="card"><ul class="list">${ikke.length?ikke.map(li).join(''):'<li class="empty" style="justify-content:center">Indkøbslisten er tom.</li>'}</ul>${ikke.length?`<div class="row" style="margin-top:12px"><button class="l" onclick="sletHeleListen()">🗑️ Slet hele listen</button><button class="l" onclick="document.getElementById('lnavn').focus()">💾 Gem listen</button></div>`:''}<p class="muted" style="margin:10px 0 0;font-size:14px">🔎 »tilbud« viser ugens rigtige tilbud på varen hos eTilbudsavis.</p>${(()=>{const p=ikke.filter(x=>x.pris);return p.length?`<p class="muted" style="margin:10px 0 0">💡 Ca. ${kr(p.reduce((s,x)=>s+x.pris,0))} for ${p.length} af ${ikke.length} varer – ud fra dine egne priser.</p>`:''})()}</div>
   ${kobt.length?`<div class="card"><b>Købt (${kobt.length})</b><ul class="list">${kobt.map(li).join('')}</ul>
   <div class="row" style="margin-top:10px"><button class="b" onclick="kobtTilLager()">🥫 Flyt købte til lager</button></div>
-  <p class="muted">Priser du har skrevet, bliver lagt i budgettet.</p></div>`:''}`;
+  <p class="muted">Priser du har skrevet, bliver lagt i budgettet.</p></div>`:''}
+  ${gemteListerKort(ikke)}`;
 },
 lager(){
   const idag=new Date();idag.setHours(0,0,0,0);
@@ -755,6 +756,22 @@ function rydDag(k){const s=snap();delete D.madplan[k];save();vis();toast('Dagen 
   m.addEventListener('touchend',e=>{if(!li)return;const dx=(e.changedTouches[0].clientX-x0);li.style.transition='transform .2s';if(dx<-70){li.style.transform='translateX(-110%)';const b=li.querySelector('button.x');setTimeout(()=>b&&b.click(),180)}else{li.style.transform='';li.style.background=''}li=null});
 })();
 visFortrydKnap();
+
+// ---------- Gemte indkøbslister (version 14) ----------
+function sletHeleListen(){const n=D.indkob.filter(x=>!x.kobt).length;if(!n)return;const s=snap();D.indkob=D.indkob.filter(x=>x.kobt);save();vis();toast(n+' varer slettet 🗑️',fortrydTil(s))}
+function gemteListerKort(ikke){
+  D.gemteLister=D.gemteLister||[];
+  const forslag='Ugens indkøb '+new Date().toLocaleDateString('da-DK',{day:'numeric',month:'short'});
+  return `<div class="card"><b>📋 Gemte lister</b> <span class="muted">– gem en liste, og brug den igen senere</span>
+  <div class="row" style="margin-top:8px"><input id="lnavn" class="grow" placeholder="${forslag}"><button class="b" onclick="gemListe()" ${ikke.length?'':'disabled style="opacity:.5"'}>💾 Gem listen</button></div>
+  <ul class="list">${D.gemteLister.map(g=>`<li><span class="n"><b>${esc(g.navn)}</b><br><span class="muted" style="font-size:13px">${g.varer.length} varer · gemt ${new Date(g.dato).toLocaleDateString('da-DK',{day:'numeric',month:'short'})}</span></span><button class="l" onclick="hentListe('${g.id}')">📂 Brug</button><button class="x" title="Slet" onclick="sletListe('${g.id}')">🗑️</button></li>`).join('')||'<li class="empty" style="justify-content:center">Ingen gemte lister endnu.</li>'}</ul></div>`;
+}
+function gemListe(){const ikke=D.indkob.filter(x=>!x.kobt);if(!ikke.length){toast('Listen er tom');return}const e=document.getElementById('lnavn'),navn=(e.value.trim()||e.placeholder);const s=snap();
+  D.gemteLister=D.gemteLister||[];D.gemteLister.unshift({id:id(),navn,dato:iso(new Date()),varer:ikke.map(x=>({navn:x.navn,maengde:x.maengde,enhed:x.enhed}))});save();vis();toast('Listen »'+navn+'« er gemt 💾',fortrydTil(s))}
+function hentListe(gid){const g=(D.gemteLister||[]).find(x=>x.id===gid);if(!g)return;const s=snap();let n=0;
+  g.varer.forEach(v=>{const fin=D.indkob.find(x=>!x.kobt&&sammeNavn(x.navn,v.navn)&&x.enhed===v.enhed);if(fin)return;D.indkob.push({id:id(),navn:v.navn,maengde:v.maengde,enhed:v.enhed,pris:D.priser[norm(v.navn)]??null,kobt:false});n++});
+  save();vis();scrollTo(0,0);toast(n?n+' varer lagt på listen fra »'+g.navn+'«':'Varerne er allerede på listen',n?fortrydTil(s):null)}
+function sletListe(gid){const s=snap();D.gemteLister=D.gemteLister.filter(x=>x.id!==gid);save();vis();toast('Den gemte liste er slettet 🗑️',fortrydTil(s))}
 
 // ---------- Billedgalleri (version 9) ----------
 const GALLERI=[['madlavning','Madlavning derhjemme'],['koekken','Venner i køkkenet'],['picnic','Picnic med venner'],['udenfor','Madlavning udenfor'],['bord','Fyldt bord'],['salat','Slik og hygge'],['frugt','Frugt og bær']];
