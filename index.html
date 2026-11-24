@@ -28,6 +28,7 @@
 <title>Budget og Mad</title>
 <script src="opskrifter.js"></script>
 <script src="motion.js"></script>
+<script src="jura.js"></script>
 <script>
 window.FEJLLOG=[];(function(){function gem(o){try{var l=JSON.parse(localStorage.getItem('madapp-v1-fejllog')||'[]');l.push(o);l=l.slice(-20);localStorage.setItem('madapp-v1-fejllog',JSON.stringify(l))}catch(e){}}addEventListener('error',function(e){gem({tid:new Date().toISOString(),fejl:String(e.message||'').slice(0,200),linje:e.lineno||0,kol:e.colno||0,fil:String(e.filename||'').split('/').pop().split('?')[0]})});addEventListener('unhandledrejection',function(e){gem({tid:new Date().toISOString(),fejl:'Promise: '+String((e.reason&&e.reason.message)||e.reason||'').slice(0,200)})})})();
 addEventListener('error',function(ev){try{var mn=document.getElementById('main');if(mn&&!mn.innerHTML.trim()){mn.innerHTML='<div style="background:#fff;border-radius:20px;padding:20px;margin:20px;font:17px system-ui"><b>Ups – appen kunne ikke starte.</b><p>Tag et skærmbillede af denne besked, og send det til Søren.</p><p style="color:#a33;font-size:14px">'+String(ev.message||'').replace(/</g,'&lt;')+' (linje '+(ev.lineno||'?')+')</p><button onclick="location.reload()" style="font:inherit;padding:10px 16px;border-radius:12px;border:0;background:#e8553e;color:#fff">Prøv igen</button></div>'}}catch(x){}try{if(localStorage.getItem('madapp-v1-test')&&navigator.serviceWorker&&navigator.serviceWorker.controller){localStorage.removeItem('madapp-v1-test');localStorage.setItem('madapp-v1-fejl','1');navigator.serviceWorker.controller.postMessage('TILBAGE');setTimeout(function(){location.reload()},400)}}catch(e){}});
@@ -328,7 +329,7 @@ body{padding-top:env(safe-area-inset-top)}
 <dialog id="dlg"><div class="in" id="dlgin"></div></dialog>
 
 <script>
-const KEY='madapp-v1';const ENHED=(()=>{let e=localStorage.getItem('madapp-v1-enhed');if(!e){e=(crypto.randomUUID?crypto.randomUUID():Date.now().toString(36)+Math.random().toString(36).slice(2));localStorage.setItem('madapp-v1-enhed',e)}return e})();const APP_VERSION=48, EJER='Søren';
+const KEY='madapp-v1';const ENHED=(()=>{let e=localStorage.getItem('madapp-v1-enhed');if(!e){e=(crypto.randomUUID?crypto.randomUUID():Date.now().toString(36)+Math.random().toString(36).slice(2));localStorage.setItem('madapp-v1-enhed',e)}return e})();const APP_VERSION=49, EJER='Søren';
 let D;try{D=JSON.parse(localStorage.getItem(KEY)||'null')}catch(e){D=null;try{localStorage.setItem(KEY+'-skadet-'+Date.now(),localStorage.getItem(KEY))}catch(x){}}
 if(!D||typeof D!=='object')D={};
 ['opskrifter','indkob','lager','stdSlettet','gemteLister'].forEach(k=>{if(!Array.isArray(D[k]))D[k]=[]});
@@ -992,6 +993,7 @@ function visIndstillinger(){
    <label>Hastighed</label><input type="range" min="0.6" max="1.4" step="0.1" value="${v.hast||1}" style="width:100%" onchange="setIndstil('hast',parseFloat(this.value),true)">
    <button class="l" style="margin-top:8px" onclick="sig('Hej! Sådan lyder jeg, når jeg læser dine opskrifter op.')">▶️ Prøv stemmen</button>
    ${da.length?'':'<p class="muted" style="font-size:13px">Der er ingen dansk stemme på denne enhed. På iPhone: Indstillinger → Tilgængelighed → Oplæst indhold → Stemmer → Dansk.</p>'}`:'<p class="muted">Oplæsning virker ikke i denne browser.</p>'}
+  ${typeof juraIndstil==='function'?juraIndstil():''}
   <details class="hjdel" style="margin-top:14px"><summary><b>❓ Hjælp til indstillinger</b></summary><ul>
    <li>Tekststørrelse gør alt i appen større eller mindre.</li><li>Skrifttype ændrer, hvordan bogstaverne ser ud. »Let at læse« har ekstra tydelige bogstaver.</li>
    <li>Oplæsning bruger telefonens egen stemme – det er gratis og virker uden internet. Tryk »🔊 Læs op« inde i en opskrift.</li>
@@ -1740,6 +1742,8 @@ function visHjaelp(){
 }
 function hjaelpKort(){return dataKort()}
 
+// Regler og privatliv (version 49) – vises én gang med »Jeg accepterer«. Koden ligger i jura.js
+try{if(typeof juraVisFoersteGang==='function')juraVisFoersteGang()}catch(e){}
 localStorage.removeItem(KEY+'-test'); // appen startede fint
 </script>
 </body>

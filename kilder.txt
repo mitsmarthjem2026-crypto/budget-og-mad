@@ -239,3 +239,37 @@ Version 35 – genkendelse af varer på foto: TensorFlow.js + COCO-SSD (gratis, 
 
 Kalender-knappen (version 47, Unsplash, gratis efter Unsplash-licensen, hentet 24-11-2026):
 Kalender: Eric Rothermel – https://unsplash.com/photos/FoKO4DpXamQ
+
+
+==== Regler og privatliv (version 49, 24. november 2026) – juridiske kilder ====
+Vigtigt: Teksterne i jura.js er skrevet ud fra kilderne herunder, men er IKKE juridisk rådgivning. Lad en advokat læse dem igennem.
+
+Persondata (GDPR / databeskyttelsesloven)
+- GDPR art. 2, stk. 2, litra c + betragtning 18 (rent personlige aktiviteter, fx adresselister, er undtaget; men den, der stiller midlerne til rådighed, er ikke undtaget): https://gdpr-text.com/da/read/article-2/
+- GDPR art. 13 (oplysningspligt: hvem er dataansvarlig, kontakt, formål, grundlag, modtagere, opbevaring, rettigheder, klage til tilsyn): https://eur-lex.europa.eu/eli/reg/2016/679/oj
+- Databeskyttelsesloven § 6, stk. 2: aldersgrænsen for børns eget samtykke til informationssamfundstjenester blev hævet fra 13 til 15 år pr. 1. januar 2024: https://www.ft.dk/ripdf/samling/20231/lovforslag/l79/20231_l79_som_fremsat.pdf og https://ft.dk/samling/20231/almdel/diu/spm/216/svar/2078033/2921323.pdf
+  (Appen bygger ikke på samtykke til login – kodetjek er nødvendigt for at levere tjenesten – derfor ingen aldersgrænse i appen, men en opfordring til at vise reglerne til en forælder.)
+- Datatilsynet om billeder af andre på nettet (helhedsvurdering, samtykke ofte nødvendigt ved deling): https://admin.datatilsynet.dk/media/7658/sociale-netvaerk-og-internettet.pdf og https://www.danskerhverv.dk/presse-og-nyheder/nyheder/2019/oktober/datatilsynet-skelner-ikke-langere-mellem-portratbilleder-og-situationsbilleder/
+
+Cookies / lagring på telefonen
+- Cookiebekendtgørelsen (BEK nr. 1148 af 09/12/2011) § 3 (samtykke til lagring på brugerens udstyr) og § 4 (undtagelse for det, der er teknisk nødvendigt for den tjeneste, brugeren selv har bedt om): https://www.retsinformation.dk/eli/lta/2011/1148/pdf
+- Fælles vejledning Digitaliseringsstyrelsen + Datatilsynet (reglerne er teknologineutrale – gælder også fx localStorage; statistik/annoncer kræver samtykke): https://digst.dk/media/oy1btb02/faellesvejledning-med-datatilsynet.pdf
+- Tjekket 24/11-2026: Supabase-adressen sætter cookien __cf_bm (Cloudflare, HttpOnly, udløber efter 30 min.) – en teknisk beskyttelse mod robotter.
+
+Ansvar og ansvarsfraskrivelse
+- Aftaleloven § 36 (urimelige vilkår kan tilsidesættes) og lex.dk om ansvarsfraskrivelse (ugyldig hvis i strid med ufravigelige regler): https://lex.dk/ansvarsfraskrivelse og https://lex.dk/ugyldige_forbrugeraftaler
+- Forsæt og grov uagtsomhed: i praksis undtages de næsten altid fra ansvarsbegrænsninger, og det er omdiskuteret, om ansvar for grov uagtsomhed overhovedet kan fraskrives – derfor er de undtaget i teksten. (Bør bekræftes af advokat.)
+- Produktansvarsloven § 12: kan ikke fraviges ved forudgående aftale til skade for skadelidte: https://themis.dk/synopsis/docs/Lovsamling/Produktansvarsloven.html
+- Nyt produktansvarsdirektiv (EU) 2024/2853: software er et produkt; skal være gennemført senest 9. december 2026; fri og open source-software uden for erhvervsmæssig aktivitet er undtaget: https://eur-lex.europa.eu/eli/dir/2024/2853
+- Værgemålsloven § 1 (under 18 år er umyndig): https://www.retsinformation.dk (søg »værgemålsloven«)
+
+Sundhed / motion
+- Lægemiddelstyrelsen: om en app er medicinsk udstyr afhænger af det formål, fabrikanten selv beskriver. Appen beskriver kun almindelige gode råd, ikke diagnose eller behandling: https://laegemiddelstyrelsen.dk/da/udstyr/lovgivning-og-vejledning/sundhedsstyrelsens-vejledninger/vejledning-til-fabrikanter-om-sundheds-apps-og-software-som-medicinsk-udstyr/~/media/53F2E52FB94C4BE495213EF0ED013A59.ashx
+- LMS – Landsforeningen mod spiseforstyrrelser og selvskade: https://www.lms.dk
+
+Markedsføring
+- Markedsføringsloven – særlige hensyn ved markedsføring rettet mod børn og unge under 18 (Forbrugerombudsmandens vejledning): https://forbrugerombudsmanden.dk/media/49128/born-unge-vejledning-markedsforing.pdf  (Appen har ingen reklamer – hold det sådan, og lov ikke mere, end appen kan.)
+
+Tjenester nævnt i privatlivsteksten
+- GitHub General Privacy Statement (IP-adresse m.m. logges): https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement
+- Supabase (kodetjek), jsDelivr (hjælpeprogrammer), Open Food Facts (stregkode-opslag) – se tjenesternes egne privatlivspolitikker.
