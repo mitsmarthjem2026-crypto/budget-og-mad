@@ -1,7 +1,7 @@
 // Budget og Mad – gemmer appen på telefonen, så den virker uden internet.
 // Sikre opdateringer: en ny version bliver først brugt, når brugeren selv trykker »Opdater«.
 // Har den nye version fejl, bliver den ikke taget i brug, og appen kører videre på den gamle.
-const VERSION = 14;
+const VERSION = 15;
 const CACHE = 'bom-v' + VERSION;
 const META = 'bom-meta';
 const FILER = ['./', './index.html', './opskrifter.js', './manifest.json', './version.json',
@@ -10,7 +10,7 @@ const FILER = ['./', './index.html', './opskrifter.js', './manifest.json', './ve
   './fotos/retter/frikadeller.jpg', './fotos/retter/boller.jpg', './fotos/retter/biksemad.jpg', './fotos/retter/braendende.jpg',
   './fotos/retter/millionbof.jpg', './fotos/retter/porresuppe.jpg', './fotos/retter/gulearter.jpg', './fotos/retter/risengrod.jpg',
   './fotos/retter/pandekager.jpg', './fotos/retter/kyllingkarry.jpg', './fotos/retter/spaghetti.jpg', './fotos/retter/chili.jpg',
-  './fotos/retter/havregrod.jpg', './fotos/retter/lasagne.jpg', './fotos/retter/tomatsuppe.jpg', './fotos/retter/linsesuppe.jpg', './fotos/retter/stegtris.jpg', './fotos/retter/carbonara.jpg', './fotos/retter/shakshuka.jpg', './fotos/retter/tacos.jpg', './fotos/retter/pizza.jpg', './fotos/retter/wraps.jpg', './fotos/retter/pesto.jpg', './fotos/retter/aeblecrumble.jpg', './fotos/retter/kyllingpasta.jpg', './fotos/retter/wok.jpg', './fotos/retter/spejlaeg.jpg', './fotos/retter/tunsalat.jpg', './fotos/retter/omelet.jpg', './fotos/retter/burger.jpg', './fotos/retter/chilicon.jpg', './fotos/retter/dhal.jpg', './fotos/retter/taerte.jpg', './fotos/retter/quesadilla.jpg', './fotos/retter/falafel.jpg'];
+  './fotos/retter/havregrod.jpg', './fotos/retter/lasagne.jpg', './fotos/retter/tomatsuppe.jpg', './fotos/retter/linsesuppe.jpg', './fotos/retter/stegtris.jpg', './fotos/retter/carbonara.jpg', './fotos/retter/shakshuka.jpg', './fotos/retter/tacos.jpg', './fotos/retter/pizza.jpg', './fotos/retter/wraps.jpg', './fotos/retter/pesto.jpg', './fotos/retter/aeblecrumble.jpg', './fotos/retter/kyllingpasta.jpg', './fotos/retter/wok.jpg', './fotos/retter/spejlaeg.jpg', './fotos/retter/tunsalat.jpg', './fotos/retter/omelet.jpg', './fotos/retter/burger.jpg', './fotos/retter/chilicon.jpg', './fotos/retter/dhal.jpg', './fotos/retter/taerte.jpg', './fotos/retter/quesadilla.jpg', './fotos/retter/falafel.jpg', './fotos/retter/pasta/aglio.jpg', './fotos/retter/pasta/alfredo.jpg', './fotos/retter/pasta/arrabbiata.jpg', './fotos/retter/pasta/baconaerter.jpg', './fotos/retter/pasta/broccolipasta.jpg', './fotos/retter/pasta/citronpasta.jpg', './fotos/retter/pasta/fetapasta.jpg', './fotos/retter/pasta/glasnudel.jpg', './fotos/retter/pasta/gnocchisalvie.jpg', './fotos/retter/pasta/gnocchitomat.jpg', './fotos/retter/pasta/graeskar.jpg', './fotos/retter/pasta/kodboller.jpg', './fotos/retter/pasta/kyllingfad.jpg', './fotos/retter/pasta/macncheese.jpg', './fotos/retter/pasta/nudelsuppe.jpg', './fotos/retter/pasta/oksenudler.jpg', './fotos/retter/pasta/padthai.jpg', './fotos/retter/pasta/peanut.jpg', './fotos/retter/pasta/pestokylling.jpg', './fotos/retter/pasta/ramen.jpg', './fotos/retter/pasta/ravioli.jpg', './fotos/retter/pasta/rejepasta.jpg', './fotos/retter/pasta/skinkefad.jpg', './fotos/retter/pasta/squash.jpg', './fotos/retter/pasta/svampepasta.jpg', './fotos/retter/pasta/tortellini.jpg', './fotos/retter/pasta/tunfad.jpg', './fotos/retter/pasta/tunpasta.jpg', './fotos/retter/pasta/vegelasagne.jpg'];
 
 async function hentAktiv() {
   const m = await caches.open(META);
