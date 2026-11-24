@@ -258,7 +258,7 @@ button.b,label.b{box-shadow:0 6px 16px rgba(232,85,62,.3)}
 <style>@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}</style>
 </head>
 <body>
-<header onclick="if(event.target===this||event.target.tagName==='H1'||event.target.tagName==='IMG')vaelgFoto()" style="cursor:pointer"><h1><img src="ikoner/ikon-192.png" alt="" style="width:1.3em;height:1.3em;border-radius:.3em;vertical-align:-.3em;margin-right:.35em">Budget og Mad</h1><button id="instknap" onclick="visGuide()" style="display:none;border:1px solid #fff;background:none;color:#fff;border-radius:10px;padding:6px 10px;font:inherit;font-size:14px;cursor:pointer">📲<span class="itxt"> Installér</span></button><button id="fortrydknap" hidden onclick="fortrydSidste()">↩️<span class="ftxt"> Fortryd</span></button><button id="indstilknap" onclick="visIndstillinger()" title="Indstillinger">⚙️</button><span class="ver" id="ver">version 26</span></header>
+<header onclick="if(event.target===this||event.target.tagName==='H1'||event.target.tagName==='IMG')vaelgFoto()" style="cursor:pointer"><h1><img src="ikoner/ikon-192.png" alt="" style="width:1.3em;height:1.3em;border-radius:.3em;vertical-align:-.3em;margin-right:.35em">Budget og Mad</h1><button id="instknap" onclick="visGuide()" style="display:none;border:1px solid #fff;background:none;color:#fff;border-radius:10px;padding:6px 10px;font:inherit;font-size:14px;cursor:pointer">📲<span class="itxt"> Installér</span></button><button id="fortrydknap" hidden onclick="fortrydSidste()">↩️<span class="ftxt"> Fortryd</span></button><button id="indstilknap" onclick="visIndstillinger()" title="Indstillinger">⚙️</button><span class="ver" id="ver">version 27</span></header>
 <nav id="nav">
   <button data-p="forside"><span class="ic">🏠</span>Hjem</button>
   <button data-p="opskrifter"><span class="ic">📖</span>Opskrifter</button>
@@ -272,7 +272,7 @@ button.b,label.b{box-shadow:0 6px 16px rgba(232,85,62,.3)}
 <dialog id="dlg"><div class="in" id="dlgin"></div></dialog>
 
 <script>
-const KEY='madapp-v1';const APP_VERSION=26, EJER='Søren';
+const KEY='madapp-v1';const APP_VERSION=27, EJER='Søren';
 let D;try{D=JSON.parse(localStorage.getItem(KEY)||'null')}catch(e){D=null;try{localStorage.setItem(KEY+'-skadet-'+Date.now(),localStorage.getItem(KEY))}catch(x){}}
 if(!D||typeof D!=='object')D={};
 ['opskrifter','indkob','lager','stdSlettet','gemteLister'].forEach(k=>{if(!Array.isArray(D[k]))D[k]=[]});
@@ -354,7 +354,7 @@ opskrifter(){
   if(kt)liste=liste.filter(o=>o.kat===kt);
   const antal=liste.length,vis_=window._visN||40;liste=liste.slice(0,vis_);
   return `<h2>Opskrifter</h2>
-  <div class="row" style="margin-bottom:12px"><button class="b" style="flex:1;background:linear-gradient(135deg,#16a34a,#0d9488)!important" onclick="visPengeDialog()">💰 Hvad kan jeg få for pengene?</button><button class="l" onclick="visOpskriftHjaelp()">❓ Hjælp</button></div>
+  <div class="row" style="margin-bottom:12px"><button class="b" style="flex:1;background:linear-gradient(135deg,#16a34a,#0d9488)!important" onclick="visPengeDialog()">💰 Hvad kan jeg få for pengene?</button><button class="b" style="flex:1;background:linear-gradient(135deg,#f59e0b,#ef4444)!important" onclick="visHarDialog()">🧺 Hvad kan jeg lave?</button><button class="l" onclick="visOpskriftHjaelp()">❓ Hjælp</button></div>
   <div class="row" style="margin-bottom:12px"><input class="grow" id="soeg" placeholder="Søg i opskrifter eller ingredienser" value="${esc(window._q||'')}"><button class="b" onclick="redigerOpskrift()">+ Ny opskrift</button><label class="l" style="margin:0;cursor:pointer;color:inherit;background:var(--felt);border-radius:14px;padding:10px 14px;font-weight:600">📷 Foto af opskrift<input type="file" accept="image/*" capture="environment" hidden onchange="fotoOpskrift(this)"></label></div><div id="ostatus" class="muted"></div>
   <div class="chips">${Object.entries(F).map(([k,v])=>`<button class="chip ${fl===k?'on':''}" onclick="window._fl='${k}';window._visN=40;vis()">${v}</button>`).join('')}</div>
   <div class="chips kats"><button class="chip ${kt?'':'on'}" onclick="window._kat='';window._visN=40;vis()">Alle slags</button>${KATS.map(k=>`<button class="chip ${kt===k?'on':''}" onclick="window._kat='${k}';window._visN=40;vis()">${k}</button>`).join('')}</div>
@@ -584,7 +584,7 @@ function forsideTips(){
   const idag=new Date();idag.setHours(0,0,0,0);
   const snart=D.lager.filter(x=>x.udlob&&(new Date(x.udlob)-idag)/864e5<=3);
   if(snart.length){const o=D.opskrifter.find(o=>snart.some(v=>o.ing.some(i=>iLager(i.navn)===v)));return `<div class="card" style="margin-top:14px"><b>⏰ ${esc(snart[0].navn)} udløber snart</b>${o?`<div class="row" style="margin-top:8px"><span style="flex:1">Lav <b>${esc(o.navn)}</b> – så bliver intet smidt ud.</span><button class="b" onclick="visOpskrift('${o.id}')">Se retten</button></div>`:''}</div>`}
-  if(!D.madplan[iso(new Date())])return `<div class="card" style="margin-top:14px"><div class="row"><span style="flex:1">🤔 Ved du ikke, hvad du skal spise? Lad appen foreslå ugens mad.</span><button class="b" onclick="gaaTil('madplan');foreslaaUge()">✨ Foreslå</button></div></div>`;
+  if(!D.madplan[iso(new Date())])return `<div class="card" style="margin-top:14px"><div class="row"><span style="flex:1">🧺 Har du noget i køleskabet? Skriv hvad, og find en ret.</span><button class="b" onclick="visHarDialog()">Hvad kan jeg lave?</button></div></div><div class="card"><div class="row"><span style="flex:1">🤔 Ved du ikke, hvad du skal spise? Lad appen foreslå ugens mad.</span><button class="b" onclick="gaaTil('madplan');foreslaaUge()">✨ Foreslå</button></div></div>`;
   return '';
 }
 function foreslaaUge(){
@@ -981,6 +981,35 @@ function prisNivKort(o,niv,vr){
   ${niv&&pf.sum&&p0.sum?`<div style="font-size:14px;margin-top:6px">💰 Ca. ${kr(pf.sum)} mod ${kr(p0.sum)} før (ud fra dine egne priser)</div>`:''}</div>`;
 }
 function setNiv(oid,n){window._niv=window._niv||{};const o=D.opskrifter.find(x=>x.id===oid),ned=o?Math.min(5,muligeRegler(o.ing,BILLIGERE).length):0,op=o?Math.min(5,muligeRegler(o.ing,FINERE).length):0;window._niv[oid]=Math.max(-ned,Math.min(op,n));visOpskrift(oid,visPort)}
+
+// ---------- Hvad kan jeg lave? (version 27) ----------
+const ALTID=['salt','peber','vand','olie','rapsolie','olivenolie','sukker','smør'];
+function harMatch(o,har){
+  const tokHar=har.map(tok);const findes=n=>{const w=tok(n);if(!w.length)return false;return tokHar.some(a=>a.length&&(a.every(x=>w.includes(x))||w.every(x=>a.includes(x))))};
+  const ing=o.ing.filter(i=>!ALTID.includes(norm(i.navn)));const mangler=ing.filter(i=>!findes(i.navn));
+  return{har:ing.length-mangler.length,af:ing.length,mangler};
+}
+function visHarDialog(){
+  const v=window._har||{tekst:'',kun:false};
+  dlgin.innerHTML=`<h2>🧺 Hvad kan jeg lave?</h2><p class="muted" style="margin-top:-6px">Skriv de madvarer, du har – adskilt med komma eller én pr. linje.</p>
+  <textarea id="hartekst" style="min-height:90px" placeholder="Fx æg, kartofler, løg, bacon">${esc(v.tekst)}</textarea>
+  <div class="row" style="margin:8px 0"><button class="l" onclick="document.getElementById('hartekst').value=D.lager.map(x=>x.navn).join(', ')">🥫 Brug det, jeg har på lager</button></div>
+  <label style="display:flex;align-items:center;gap:10px;color:var(--txt);font-size:16px;margin:6px 0"><input type="checkbox" id="harkun" ${v.kun?'checked':''} style="width:24px;height:24px"> <b>Jeg har kun det</b> <span class="muted" style="font-size:13px">(+ salt, peber, vand, olie, smør, sukker)</span></label>
+  <div class="row" style="margin-top:10px"><button class="b" style="flex:1" onclick="findRetter()">🔎 Find retter</button><button class="l" onclick="dlg.close()">Luk</button></div>
+  <div id="harres"></div>`;
+  if(!dlg.open)dlg.showModal();
+  if(v.tekst)findRetter();
+}
+function findRetter(){
+  const tekst=document.getElementById('hartekst').value,kun=document.getElementById('harkun').checked;
+  const har=tekst.split(/[,\n;]+/).map(s=>s.trim()).filter(Boolean);window._har={tekst,kun};
+  if(!har.length){alert('Skriv mindst én madvare');return}
+  let l=D.opskrifter.map(o=>({o,...harMatch(o,har)})).filter(x=>x.har>0);
+  if(kun)l=l.filter(x=>x.mangler.length===0);
+  l.sort((a,b)=>a.mangler.length-b.mangler.length||b.har-a.har).splice(30);
+  document.getElementById('harres').innerHTML=`<h3>${l.length?(l.length===1?'1 ret':l.length+' retter')+(kun?' du kan lave med det, du har':' der passer'):'Ingen retter passer'}</h3>
+  ${l.length?`<div class="mini">${l.map(x=>`<button class="minikort" onclick="visOpskrift('${x.o.id}')"><span class="rfoto ${x.o.foto?'':'tom'}" ${x.o.foto?`style="background-image:url(${x.o.foto})"`:''}>${x.o.foto?'':'🍽️'}</span><b>${esc(x.o.navn)}</b><span class="muted">${x.mangler.length?'Mangler: '+esc(x.mangler.slice(0,3).map(i=>i.navn).join(', '))+(x.mangler.length>3?' …':''):'✅ Du har det hele'}</span></button>`).join('')}</div>`:`<p class="muted">${kun?'Ingen retter kan laves med kun de varer. Fjern fluebenet ved »Jeg har kun det« for at se retter, hvor du mangler lidt.':'Prøv at skrive flere eller andre varer.'}</p>`}`;
+}
 
 // ---------- Gemte indkøbslister (version 14) ----------
 function sletHeleListen(){const n=D.indkob.filter(x=>!x.kobt).length;if(!n)return;const s=snap();D.indkob=D.indkob.filter(x=>x.kobt);save();vis();toast(n+' varer slettet 🗑️',fortrydTil(s))}
