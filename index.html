@@ -256,7 +256,7 @@ button.b,label.b{box-shadow:0 6px 16px rgba(232,85,62,.3)}
 <style>@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}</style>
 </head>
 <body>
-<header><h1><img src="ikoner/ikon-192.png" alt="" style="width:1.3em;height:1.3em;border-radius:.3em;vertical-align:-.3em;margin-right:.35em">Budget og Mad</h1><button id="instknap" onclick="visGuide()" style="display:none;border:1px solid #fff;background:none;color:#fff;border-radius:10px;padding:6px 10px;font:inherit;font-size:14px;cursor:pointer">📲<span class="itxt"> Installér</span></button><button id="fortrydknap" hidden onclick="fortrydSidste()">↩️<span class="ftxt"> Fortryd</span></button><button id="indstilknap" onclick="visIndstillinger()" title="Indstillinger">⚙️</button><span class="ver" id="ver">version 23</span></header>
+<header><h1><img src="ikoner/ikon-192.png" alt="" style="width:1.3em;height:1.3em;border-radius:.3em;vertical-align:-.3em;margin-right:.35em">Budget og Mad</h1><button id="instknap" onclick="visGuide()" style="display:none;border:1px solid #fff;background:none;color:#fff;border-radius:10px;padding:6px 10px;font:inherit;font-size:14px;cursor:pointer">📲<span class="itxt"> Installér</span></button><button id="fortrydknap" hidden onclick="fortrydSidste()">↩️<span class="ftxt"> Fortryd</span></button><button id="indstilknap" onclick="visIndstillinger()" title="Indstillinger">⚙️</button><span class="ver" id="ver">version 24</span></header>
 <nav id="nav">
   <button data-p="forside"><span class="ic">🏠</span>Hjem</button>
   <button data-p="opskrifter"><span class="ic">📖</span>Opskrifter</button>
@@ -270,7 +270,7 @@ button.b,label.b{box-shadow:0 6px 16px rgba(232,85,62,.3)}
 <dialog id="dlg"><div class="in" id="dlgin"></div></dialog>
 
 <script>
-const KEY='madapp-v1';const APP_VERSION=23, EJER='Søren';
+const KEY='madapp-v1';const APP_VERSION=24, EJER='Søren';
 let D;try{D=JSON.parse(localStorage.getItem(KEY)||'null')}catch(e){D=null;try{localStorage.setItem(KEY+'-skadet-'+Date.now(),localStorage.getItem(KEY))}catch(x){}}
 if(!D||typeof D!=='object')D={};
 ['opskrifter','indkob','lager','stdSlettet','gemteLister'].forEach(k=>{if(!Array.isArray(D[k]))D[k]=[]});
@@ -974,11 +974,11 @@ function muligeRegler(ing,liste){return liste.filter(r=>r.kod?ing.some(i=>/hakke
 function prisNivKort(o,niv,vr){
   const ned=muligeRegler(o.ing,BILLIGERE).length,op=muligeRegler(o.ing,FINERE).length;if(!ned&&!op)return '';
   const pf=prisOverslag(vr.ing),p0=prisOverslag(o.ing.map(i=>skal(i,o,visPort||o.portioner)));
-  return `<div class="nivboks"><div class="row" style="flex-wrap:nowrap;justify-content:space-between"><button class="l" ${niv<=-Math.min(10,ned)?'disabled style="opacity:.4"':''} onclick="setNiv('${o.id}',${niv-1})">💸 Billigere</button><b style="text-align:center">${niv===0?'Original':niv<0?'Billigere · trin '+(-niv):'Finere · trin '+niv}</b><button class="l" ${niv>=Math.min(10,op)?'disabled style="opacity:.4"':''} onclick="setNiv('${o.id}',${niv+1})">✨ Finere</button></div>
-  ${vr.aendr.length?`<ul style="margin:8px 0 0;padding-left:20px;font-size:14px">${vr.aendr.map(x=>`<li>${esc(x)}</li>`).join('')}</ul><button class="l" style="margin-top:8px;font-size:14px" onclick="setNiv('${o.id}',0)">↺ Tilbage til original</button>`:`<div class="muted" style="font-size:13px;margin-top:6px">Op til ${Math.min(10,ned)} trin billigere og ${Math.min(10,op)} trin finere for denne ret.</div>`}
+  return `<div class="nivboks"><div class="row" style="flex-wrap:nowrap;justify-content:space-between"><button class="l" ${niv<=-Math.min(5,ned)?'disabled style="opacity:.4"':''} onclick="setNiv('${o.id}',${niv-1})">💸 Billigere</button><b style="text-align:center">${niv===0?'Original':niv<0?'Billigere · trin '+(-niv):'Finere · trin '+niv}</b><button class="l" ${niv>=Math.min(5,op)?'disabled style="opacity:.4"':''} onclick="setNiv('${o.id}',${niv+1})">✨ Finere</button></div>
+  ${vr.aendr.length?`<ul style="margin:8px 0 0;padding-left:20px;font-size:14px">${vr.aendr.map(x=>`<li>${esc(x)}</li>`).join('')}</ul><button class="l" style="margin-top:8px;font-size:14px" onclick="setNiv('${o.id}',0)">↺ Tilbage til original</button>`:`<div class="muted" style="font-size:13px;margin-top:6px">Op til ${Math.min(5,ned)} trin billigere og ${Math.min(5,op)} trin finere for denne ret.</div>`}
   ${niv&&pf.sum&&p0.sum?`<div style="font-size:14px;margin-top:6px">💰 Ca. ${kr(pf.sum)} mod ${kr(p0.sum)} før (ud fra dine egne priser)</div>`:''}</div>`;
 }
-function setNiv(oid,n){window._niv=window._niv||{};const o=D.opskrifter.find(x=>x.id===oid),ned=o?Math.min(10,muligeRegler(o.ing,BILLIGERE).length):0,op=o?Math.min(10,muligeRegler(o.ing,FINERE).length):0;window._niv[oid]=Math.max(-ned,Math.min(op,n));visOpskrift(oid,visPort)}
+function setNiv(oid,n){window._niv=window._niv||{};const o=D.opskrifter.find(x=>x.id===oid),ned=o?Math.min(5,muligeRegler(o.ing,BILLIGERE).length):0,op=o?Math.min(5,muligeRegler(o.ing,FINERE).length):0;window._niv[oid]=Math.max(-ned,Math.min(op,n));visOpskrift(oid,visPort)}
 
 // ---------- Gemte indkøbslister (version 14) ----------
 function sletHeleListen(){const n=D.indkob.filter(x=>!x.kobt).length;if(!n)return;const s=snap();D.indkob=D.indkob.filter(x=>x.kobt);save();vis();toast(n+' varer slettet 🗑️',fortrydTil(s))}
