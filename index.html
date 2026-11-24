@@ -270,7 +270,7 @@ button.b,label.b{box-shadow:0 6px 16px rgba(232,85,62,.3)}
 <style>@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}</style>
 </head>
 <body>
-<header><h1><img src="ikoner/ikon-192.png" alt="" style="width:1.3em;height:1.3em;border-radius:.3em;vertical-align:-.3em;margin-right:.35em">Budget og Mad</h1><button id="instknap" onclick="visGuide()" style="display:none;border:1px solid #fff;background:none;color:#fff;border-radius:10px;padding:6px 10px;font:inherit;font-size:14px;cursor:pointer">📲<span class="itxt"> Installér</span></button><button id="fortrydknap" hidden onclick="fortrydSidste()">↩️<span class="ftxt"> Fortryd</span></button><button id="indstilknap" onclick="visIndstillinger()" title="Indstillinger">⚙️</button><span class="ver" id="ver">version 42</span></header>
+<header><h1><img src="ikoner/ikon-192.png" alt="" style="width:1.3em;height:1.3em;border-radius:.3em;vertical-align:-.3em;margin-right:.35em">Budget og Mad</h1><button id="instknap" onclick="visGuide()" style="display:none;border:1px solid #fff;background:none;color:#fff;border-radius:10px;padding:6px 10px;font:inherit;font-size:14px;cursor:pointer">📲<span class="itxt"> Installér</span></button><button id="fortrydknap" hidden onclick="fortrydSidste()">↩️<span class="ftxt"> Fortryd</span></button><button id="indstilknap" onclick="visIndstillinger()" title="Indstillinger">⚙️</button><span class="ver" id="ver">version 43</span></header>
 <nav id="nav">
   <button data-p="forside"><span class="ic">🏠</span>Hjem</button>
   <button data-p="opskrifter"><span class="ic">📖</span>Opskrifter</button>
@@ -284,7 +284,7 @@ button.b,label.b{box-shadow:0 6px 16px rgba(232,85,62,.3)}
 <dialog id="dlg"><div class="in" id="dlgin"></div></dialog>
 
 <script>
-const KEY='madapp-v1';const ENHED=(()=>{let e=localStorage.getItem('madapp-v1-enhed');if(!e){e=(crypto.randomUUID?crypto.randomUUID():Date.now().toString(36)+Math.random().toString(36).slice(2));localStorage.setItem('madapp-v1-enhed',e)}return e})();const APP_VERSION=42, EJER='Søren';
+const KEY='madapp-v1';const ENHED=(()=>{let e=localStorage.getItem('madapp-v1-enhed');if(!e){e=(crypto.randomUUID?crypto.randomUUID():Date.now().toString(36)+Math.random().toString(36).slice(2));localStorage.setItem('madapp-v1-enhed',e)}return e})();const APP_VERSION=43, EJER='Søren';
 let D;try{D=JSON.parse(localStorage.getItem(KEY)||'null')}catch(e){D=null;try{localStorage.setItem(KEY+'-skadet-'+Date.now(),localStorage.getItem(KEY))}catch(x){}}
 if(!D||typeof D!=='object')D={};
 ['opskrifter','indkob','lager','stdSlettet','gemteLister'].forEach(k=>{if(!Array.isArray(D[k]))D[k]=[]});
@@ -1086,6 +1086,12 @@ function overblikKort(md,erNu){
   <p class="muted" style="font-size:12px;margin:6px 0 0">Alt er regnet ud fra de tal, du selv har skrevet ind.</p></div>`;
 }
 
+// ---------- Tjek før afsendelse og ved modtagelse (version 43) ----------
+function kontrol(s){let h=2166136261;for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619)}return (h>>>0).toString(36)}
+function pak(obj){const j=JSON.stringify(obj);return encodeURIComponent(btoa(unescape(encodeURIComponent(JSON.stringify({v:1,k:kontrol(j),d:j})))))}
+function udpak(s){try{const o=JSON.parse(decodeURIComponent(escape(atob(decodeURIComponent(s)))));if(!o||o.v!==1||typeof o.d!=='string'||kontrol(o.d)!==o.k)return null;return JSON.parse(o.d)}catch(e){return null}}
+function tjekTekst(tx){if(typeof tx!=='string')return 'Beskeden mangler';tx=tx.trim();if(!tx)return 'Skriv en besked';if(tx.length>2000)return 'Beskeden er for lang (højst 2000 tegn)';if(/<\s*script|javascript:|on\w+\s*=/i.test(tx))return 'Beskeden indeholder kode og kan ikke sendes';return ''}
+
 // ---------- Hjælp begge veje (version 30) ----------
 // Kun beskeder og billeder. Ingen adgang til hinandens data.
 function hjaelpIndstil(){
@@ -1100,18 +1106,19 @@ function hjaelpIndstil(){
    <button class="b" style="width:100%;margin-top:8px" onclick="sendSvar()">📤 Send svar</button></details>`;
 }
 async function sendSvar(){
-  const tekst=document.getElementById('svartekst').value.trim();if(!tekst){alert('Skriv et svar');return}
-  const data={fra:EJER,tekst:tekst.slice(0,2000),dato:new Date().toISOString()};
-  const url=location.origin+location.pathname+'#hjaelp='+encodeURIComponent(btoa(unescape(encodeURIComponent(JSON.stringify(data)))));
+  const tekst=document.getElementById('svartekst').value.trim();const fejl=tjekTekst(tekst);if(fejl){alert('Svaret er ikke sendt: '+fejl);return}
+  const data={fra:EJER,tekst,dato:new Date().toISOString()};
+  const url=location.origin+location.pathname+'#hjaelp='+pak(data);
+  if(!udpak(url.split('#hjaelp=')[1])){alert('Svaret er ikke sendt: linket kunne ikke laves rigtigt. Prøv igen.');return}
   const msg='Svar fra '+EJER+' i Budget og Mad – tryk på linket:';
   if(navigator.share){try{await navigator.share({title:'Svar fra '+EJER,text:msg,url});return}catch(e){if(e.name==='AbortError')return}}
   try{await navigator.clipboard.writeText(msg+'\n'+url);toast('Linket er kopieret – send det til den unge')}catch(e){prompt('Kopiér linket og send det:',url)}
 }
 function modtagSvar(){
   if(!location.hash.startsWith('#hjaelp='))return;
-  let p;try{p=JSON.parse(decodeURIComponent(escape(atob(decodeURIComponent(location.hash.slice(8))))))}catch(e){return}
+  const p=udpak(location.hash.slice(8));
   history.replaceState(null,'',location.pathname);
-  if(!p||typeof p.tekst!=='string')return;
+  if(!p||tjekTekst(p.tekst)){setTimeout(()=>toast('Linket var ødelagt eller forkert – beskeden er ikke gemt. Bed om et nyt link.'),500);return}
   const b={tekst:String(p.tekst).slice(0,2000),dato:String(p.dato||new Date().toISOString())};
   D.beskeder=Array.isArray(D.beskeder)?D.beskeder:[];if(!D.beskeder.some(x=>x.dato===b.dato&&x.tekst===b.tekst)){D.beskeder.push(b);save()}
   dlgin.innerHTML=`<h2>📩 Besked fra ${esc(EJER)}</h2><div style="background:var(--felt);border-radius:14px;padding:12px;white-space:pre-wrap">${esc(b.tekst)}</div><p class="muted" style="font-size:13px">Beskeden er gemt under ⚙️ Indstillinger → 💬 Hjælp.</p><div class="row"><button class="b" style="flex:1" onclick="visHjaelp()">✍️ Svar</button><button class="l" onclick="dlg.close()">OK</button></div>`;
@@ -1392,7 +1399,7 @@ if('serviceWorker' in navigator&&(location.protocol==='https:'||location.hostnam
 }
 
 // ---------- Del med en ven (uden server) ----------
-function delLink(type,data){return location.origin+location.pathname+'#del='+encodeURIComponent(btoa(unescape(encodeURIComponent(JSON.stringify({type,data,fra:'Budget og Mad'})))))}
+function delLink(type,data){return location.origin+location.pathname+'#del='+pak({type,data,fra:'Budget og Mad'})}
 async function del(type){
   let data,titel;
   if(type==='indkob'){data=D.indkob.filter(x=>!x.kobt).map(x=>({navn:x.navn,maengde:x.maengde,enhed:x.enhed}));titel='min indkøbsliste';if(!data.length){toast('Listen er tom');return}}
@@ -1404,8 +1411,9 @@ async function del(type){
 }
 function modtagDel(){
   if(!location.hash.startsWith('#del='))return;
-  let p;try{p=JSON.parse(decodeURIComponent(escape(atob(decodeURIComponent(location.hash.slice(5))))))}catch(e){return}
+  const p=udpak(location.hash.slice(5));
   history.replaceState(null,'',location.pathname);
+  if(!p||!['indkob','madplan','opskrift'].includes(p.type)||!p.data){setTimeout(()=>toast('Linket var ødelagt eller forkert – intet er lagt ind.'),500);return}
   const navn={indkob:'en indkøbsliste',madplan:'en madplan',opskrift:'en opskrift'}[p.type];if(!navn)return;
   dlgin.innerHTML=`<h2>📥 Du har fået ${navn}</h2><p class="muted">Kun det, din ven har valgt at dele, er med. Intet andet fra din ven kommer ind i din app.</p>
   ${p.type==='indkob'?`<ul class="ingl">${p.data.map(x=>`<li>${esc(ingTekst(x))}</li>`).join('')}</ul>`:p.type==='madplan'?`<ul class="ingl">${Object.entries(p.data).map(([k,v])=>`<li>${new Date(k).toLocaleDateString('da-DK',{weekday:'long'})}: ${esc(v.navn||v.tekst)}</li>`).join('')}</ul>`:`<p><b>${esc(p.data.navn)}</b></p>`}
@@ -1424,6 +1432,8 @@ modtagSvar();
 let hjaelpFiler=[];
 async function sendHjaelp(){
   const tekst=document.getElementById('hjtekst').value.trim();if(!tekst&&!hjaelpFiler.length){alert('Skriv hvad du har brug for hjælp til');return}
+  if(tekst){const fejl=tjekTekst(tekst);if(fejl){alert('Ikke sendt: '+fejl);return}}
+  hjaelpFiler=hjaelpFiler.filter(f=>/^image\//.test(f.type)&&f.size<15e6);
   const msg='Hej '+EJER+'! Jeg har brug for hjælp med Budget og Mad (version '+APP_VERSION+'):\n\n'+tekst;
   if(navigator.share){const d={title:'Hjælp til Budget og Mad',text:msg};if(hjaelpFiler.length&&navigator.canShare&&navigator.canShare({files:hjaelpFiler}))d.files=hjaelpFiler;try{await navigator.share(d);dlg.close();return}catch(e){if(e.name==='AbortError')return}}
   location.href='mailto:?subject='+encodeURIComponent('Hjælp til Budget og Mad')+'&body='+encodeURIComponent(msg+(hjaelpFiler.length?'\n\n(Husk at vedhæfte dine billeder)':''));

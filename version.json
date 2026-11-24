@@ -1,4 +1,4 @@
 {
- "version": 42,
- "nyt": "Smartere indkøb og fejlrapport under hjælp."
+ "version": 43,
+ "nyt": "Beskeder, links og opdateringer bliver tjekket for fejl, før de sendes og når de modtages."
 }

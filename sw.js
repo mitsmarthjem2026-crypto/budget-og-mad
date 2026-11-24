@@ -1,7 +1,7 @@
 // Budget og Mad – gemmer appen på telefonen, så den virker uden internet.
 // Sikre opdateringer: en ny version bliver først brugt, når brugeren selv trykker »Opdater«.
 // Har den nye version fejl, bliver den ikke taget i brug, og appen kører videre på den gamle.
-const VERSION = 42;
+const VERSION = 43;
 const CACHE = 'bom-v' + VERSION;
 const META = 'bom-meta';
 const FILER = ['./', './index.html', './opskrifter.js', './manifest.json', './version.json',
@@ -31,6 +31,13 @@ self.addEventListener('install', e => {
       const side = await (await c.match('./index.html')).text();
       if (!side.includes('BOM-APP-OK') || !side.includes('</html>')) throw new Error('index.html er ikke hel');
       JSON.parse(await (await c.match('./manifest.json')).text());
+      const ops = await (await c.match('./opskrifter.js')).text();
+      if (!ops.includes('STD_OPSKRIFTER') || !ops.trim().endsWith(';')) throw new Error('opskrifter.js er ikke hel');
+      new Function(ops); // stopper, hvis der er stavefejl i koden
+      const scripts = [...side.matchAll(/<script>([\s\S]*?)<\/script>/g)].map(x => x[1]);
+      scripts.forEach(s => new Function(s));
+      const v = JSON.parse(await (await c.match('./version.json')).text());
+      if (!(v.version >= VERSION)) throw new Error('version.json passer ikke');
     } catch (fejl) {
       await caches.delete(CACHE);
       throw fejl; // installationen stoppes – den gamle version bliver
