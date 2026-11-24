@@ -44,8 +44,8 @@ function juraVilkaar() {
 <h3>12. Alder</h3>
 <p>Er du under 18, så vis gerne reglerne til en forælder.</p>
 <h3>13. Appen tilhører Søren</h3>
-<p>Appen, teksterne og opskrifterne må ikke kopieres, sælges eller lægges ud et andet sted uden Sørens lov. Fotos er fra Unsplash og bruges efter deres regler. Dine egne ting i appen er dine.</p>
-<p><b>Hvis reglerne bliver brudt:</b> Giver du din kode videre, kopierer eller sælger appen eller prøver at bryde ind, kan Søren slukke din kode med det samme og uden varsel. Søren kan også kræve at få dækket et tab, han kan vise, og ved kopiering af appen kræve betaling og erstatning efter ophavsretsloven.</p>
+<p>Appen, teksterne, opskrifterne og appens udseende må ikke kopieres, efterlignes, sælges eller lægges ud et andet sted uden Sørens lov. Du må heller ikke tage skærmbilleder, fotos eller film af appen og sende dem til andre. Undtagelser: Du må sende skærmbilleder til Søren, når du skal have hjælp, og du må bruge appens egne »Del«-knapper. Fotos er fra Unsplash og bruges efter deres regler. Dine egne ting i appen er dine.</p>
+<p><b>Hvis reglerne bliver brudt:</b> Giver du din kode videre, sender billeder af appen til andre, kopierer eller sælger appen eller prøver at bryde ind, kan Søren slukke din kode med det samme og uden varsel. Søren kan også kræve at få dækket et tab, han kan vise, og ved kopiering af appen kræve betaling og erstatning efter ophavsretsloven.</p>
 <h3>14. Lov</h3>
 <p>Dansk lov gælder. Har du et problem, så skriv til Søren først – så finder vi som regel en løsning.</p>`;
 }
