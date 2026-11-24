@@ -269,7 +269,7 @@ button.b,label.b{box-shadow:0 6px 16px rgba(232,85,62,.3)}
 <style>@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}</style>
 </head>
 <body>
-<header><h1><img src="ikoner/ikon-192.png" alt="" style="width:1.3em;height:1.3em;border-radius:.3em;vertical-align:-.3em;margin-right:.35em">Budget og Mad</h1><button id="instknap" onclick="visGuide()" style="display:none;border:1px solid #fff;background:none;color:#fff;border-radius:10px;padding:6px 10px;font:inherit;font-size:14px;cursor:pointer">📲<span class="itxt"> Installér</span></button><button id="fortrydknap" hidden onclick="fortrydSidste()">↩️<span class="ftxt"> Fortryd</span></button><button id="indstilknap" onclick="visIndstillinger()" title="Indstillinger">⚙️</button><span class="ver" id="ver">version 38</span></header>
+<header><h1><img src="ikoner/ikon-192.png" alt="" style="width:1.3em;height:1.3em;border-radius:.3em;vertical-align:-.3em;margin-right:.35em">Budget og Mad</h1><button id="instknap" onclick="visGuide()" style="display:none;border:1px solid #fff;background:none;color:#fff;border-radius:10px;padding:6px 10px;font:inherit;font-size:14px;cursor:pointer">📲<span class="itxt"> Installér</span></button><button id="fortrydknap" hidden onclick="fortrydSidste()">↩️<span class="ftxt"> Fortryd</span></button><button id="indstilknap" onclick="visIndstillinger()" title="Indstillinger">⚙️</button><span class="ver" id="ver">version 39</span></header>
 <nav id="nav">
   <button data-p="forside"><span class="ic">🏠</span>Hjem</button>
   <button data-p="opskrifter"><span class="ic">📖</span>Opskrifter</button>
@@ -283,7 +283,7 @@ button.b,label.b{box-shadow:0 6px 16px rgba(232,85,62,.3)}
 <dialog id="dlg"><div class="in" id="dlgin"></div></dialog>
 
 <script>
-const KEY='madapp-v1';const APP_VERSION=38, EJER='Søren';
+const KEY='madapp-v1';const ENHED=(()=>{let e=localStorage.getItem('madapp-v1-enhed');if(!e){e=(crypto.randomUUID?crypto.randomUUID():Date.now().toString(36)+Math.random().toString(36).slice(2));localStorage.setItem('madapp-v1-enhed',e)}return e})();const APP_VERSION=39, EJER='Søren';
 let D;try{D=JSON.parse(localStorage.getItem(KEY)||'null')}catch(e){D=null;try{localStorage.setItem(KEY+'-skadet-'+Date.now(),localStorage.getItem(KEY))}catch(x){}}
 if(!D||typeof D!=='object')D={};
 ['opskrifter','indkob','lager','stdSlettet','gemteLister'].forEach(k=>{if(!Array.isArray(D[k]))D[k]=[]});
@@ -693,11 +693,14 @@ async function kvittering(inp){
   }catch(e){hStatus=e.message==='net'?'Kræver internet første gang. Prøv igen, når du er online.':'Billedet kunne ikke læses. Prøv et skarpere billede.';vis()}
 }
 function sletUdgift(uid){const p=D.budget.udgifter.find(y=>y.id===uid);if(!sikker(p&&p.tekst))return;const s=snap();D.budget.udgifter=D.budget.udgifter.filter(x=>x.id!==uid);save();vis();toast('Købet er slettet',fortrydTil(s))}
-async function eksport(){const navn='budget-og-mad-kopi-'+iso(new Date())+'.json',blob=new Blob([tilGem()],{type:'application/json'});
+async function eksport(){const navn='budget-og-mad-kopi-'+iso(new Date())+'.json',blob=new Blob([JSON.stringify({type:'budget-og-mad-kopi',enhed:ENHED,dato:new Date().toISOString(),data:JSON.parse(tilGem())})],{type:'application/json'});
   const fil=new File([blob],navn,{type:'application/json'});
   if(navigator.canShare&&navigator.canShare({files:[fil]})){try{await navigator.share({files:[fil],title:'Kopi af Budget og Mad'});localStorage.setItem(KEY+'-sidstkopi',Date.now());toast('Kopien er gemt 💾');vis();return}catch(e){if(e.name==='AbortError')return}}
   const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=navn;a.click();localStorage.setItem(KEY+'-sidstkopi',Date.now());toast('Kopien er gemt i Overførsler 💾')}
-function importer(inp){const f=inp.files[0];if(!f)return;f.text().then(t=>{try{const n=JSON.parse(t);if(!n.opskrifter)throw 0;if(!confirm('Erstat alle data med kopien?'))return;const s=snap();D=n;flet();save();vis();toast('Kopien er hentet',fortrydTil(s))}catch(e){alert('Filen kan ikke læses')}})}
+function importer(inp){const f=inp.files[0];if(!f)return;f.text().then(tx=>{let n;try{n=JSON.parse(tx)}catch(e){alert('Filen kan ikke læses');return}
+  if(!n||n.type!=='budget-og-mad-kopi'||!n.data||!n.data.opskrifter){alert('Det er ikke en kopi fra Budget og Mad.');return}
+  if(n.enhed!==ENHED){alert('Denne kopi er lavet på en anden telefon og kan kun hentes ind der, hvor den blev lavet.');return}
+  if(!confirm('Erstat alle data med kopien fra '+new Date(n.dato).toLocaleDateString('da-DK')+'?'))return;const s=snap();D=n.data;flet();save();vis();toast('Kopien er hentet',fortrydTil(s))})}
 
 
 // Forside med fotoknapper (version 8)
@@ -778,7 +781,7 @@ if(navigator.storage&&navigator.storage.persist)navigator.storage.persisted().th
 (function autoKopi(){try{const k=KEY+'-auto-'+iso(new Date());if(!localStorage.getItem(k)){localStorage.setItem(k,tilGem());Object.keys(localStorage).filter(x=>x.startsWith(KEY+'-auto-')).sort().reverse().slice(3).forEach(x=>localStorage.removeItem(x))}}catch(e){}})();
 function dataKort(){
   const s=+localStorage.getItem(KEY+'-sidstkopi')||0,dage=s?Math.floor((Date.now()-s)/864e5):null;
-  return `<div class="card" style="margin-top:14px"><div class="row"><span style="font-size:26px">💾</span><div style="flex:1"><b>Dine data er gemt på telefonen</b><div class="muted" style="font-size:14px">${s?'Sidste kopi: '+(dage===0?'i dag':dage===1?'i går':dage+' dage siden'):'Du har ikke gemt en kopi endnu'}</div></div></div>
+  return `<div class="card" style="margin-top:14px"><div class="row"><span style="font-size:26px">💾</span><div style="flex:1"><b>Dine data er gemt på telefonen</b><div class="muted" style="font-size:14px">${s?'Sidste kopi: '+(dage===0?'i dag':dage===1?'i går':dage+' dage siden'):'Du har ikke gemt en kopi endnu'}</div><div class="muted" style="font-size:12px">Kopien indeholder kun dine egne tal – ikke selve appen – og kan kun hentes ind på denne telefon.</div></div></div>
   <div class="datarow"><button class="b" onclick="eksport()">💾 Gem kopi</button><label class="l" style="margin:0;cursor:pointer;color:inherit;background:var(--felt);border-radius:14px;padding:10px 14px;font-weight:600">📂 Hent kopi<input type="file" accept=".json,application/json" onchange="importer(this)" hidden></label><button class="l" onclick="visAutoKopier()">🕒 Tidligere</button></div></div>`;
 }
 function visAutoKopier(){
