@@ -1772,7 +1772,7 @@ async function sendHjaelp(){
 }
 function visHjaelp(){
   hjaelpFiler=[];
-  dlgin.innerHTML=`<h2>💬 Brug for hjælp?</h2><p class="muted" style="margin-top:-6px">Skriv til ${esc(EJER)}. Du kan sætte billeder på, som du selv har taget, fx skærmbilleder.</p>
+  dlgin.innerHTML=`<h2>💬 Brug for hjælp?</h2><div style="display:inline-block;background:var(--acc2);border-radius:20px;padding:4px 12px;font-weight:800;margin:-4px 0 8px">Din app er version ${APP_VERSION}</div><p class="muted" style="margin-top:0">Skriv til ${esc(EJER)}. Versionsnummeret bliver sendt med i beskeden. Du kan sætte billeder på, som du selv har taget, fx skærmbilleder.</p>
   <textarea id="hjtekst" placeholder="Hvad driller?" style="min-height:90px"></textarea>
   <label class="l" style="display:block;text-align:center;margin:10px 0 0;cursor:pointer;color:inherit;background:var(--felt);border-radius:14px;padding:12px;font-weight:700">🖼️ Vælg billeder<input type="file" accept="image/*" multiple hidden onchange="hjaelpFiler=[...this.files];document.getElementById('hjfil').innerHTML=hjaelpFiler.map(f=>'✔ '+esc(f.name)).join('<br>')"></label>
   <div id="hjfil" class="muted" style="margin-top:6px"></div>
