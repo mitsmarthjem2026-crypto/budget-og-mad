@@ -284,7 +284,7 @@ button.b,label.b{box-shadow:0 6px 16px rgba(232,85,62,.3)}
 <dialog id="dlg"><div class="in" id="dlgin"></div></dialog>
 
 <script>
-const KEY='madapp-v1';const ENHED=(()=>{let e=localStorage.getItem('madapp-v1-enhed');if(!e){e=(crypto.randomUUID?crypto.randomUUID():Date.now().toString(36)+Math.random().toString(36).slice(2));localStorage.setItem('madapp-v1-enhed',e)}return e})();const APP_VERSION=43, EJER='Søren';
+const KEY='madapp-v1';const ENHED=(()=>{let e=localStorage.getItem('madapp-v1-enhed');if(!e){e=(crypto.randomUUID?crypto.randomUUID():Date.now().toString(36)+Math.random().toString(36).slice(2));localStorage.setItem('madapp-v1-enhed',e)}return e})();const APP_VERSION=44, EJER='Søren';
 let D;try{D=JSON.parse(localStorage.getItem(KEY)||'null')}catch(e){D=null;try{localStorage.setItem(KEY+'-skadet-'+Date.now(),localStorage.getItem(KEY))}catch(x){}}
 if(!D||typeof D!=='object')D={};
 ['opskrifter','indkob','lager','stdSlettet','gemteLister'].forEach(k=>{if(!Array.isArray(D[k]))D[k]=[]});
@@ -1368,9 +1368,65 @@ function visGuide(){
   <div class="row"><button class="b" style="flex:1" onclick="localStorage.setItem(KEY+'-guide','set');dlg.close()">OK</button><button class="l" onclick="localStorage.setItem(KEY+'-guide','senere');dlg.close()">Senere</button></div>`;
   if(!dlg.open)dlg.showModal();
 }
+// ---------- Login med kode (version 44) ----------
+// Kun koden bliver sendt til serveren. Alle dine tal bliver på din egen telefon.
+const LOGIN={url:'https://cmlxlzzsfvbwgjwwzugx.supabase.co',noegle:'sb_publishable_Mk586TumBSe3NJsJ5JqpRQ_dlvRNqiI'};
+const LOGIN_TIL=!!(LOGIN.url&&LOGIN.noegle);
+let LAAST=false,dlgVenter=false,guideEfter=false;
+const _visDlg=dlg.showModal.bind(dlg);
+dlg.showModal=function(){if(LAAST){dlgVenter=true;return}_visDlg()};
+function loginGemt(){try{return JSON.parse(localStorage.getItem(KEY+'-login')||'null')}catch(e){return null}}
+async function tjekKode(k){
+  const h={'Content-Type':'application/json',apikey:LOGIN.noegle};if(LOGIN.noegle.startsWith('eyJ'))h.Authorization='Bearer '+LOGIN.noegle;
+  const r=await fetch(LOGIN.url.replace(/\/+$/,'')+'/rest/v1/rpc/tjek_kode',{method:'POST',headers:h,body:JSON.stringify({k}),cache:'no-store'});
+  if(!r.ok)throw new Error('server '+r.status);
+  return (await r.json())===true;
+}
+function visLogin(besked){
+  LAAST=true;
+  let d=document.getElementById('logind');
+  if(!d){d=document.createElement('dialog');d.id='logind';d.addEventListener('cancel',e=>e.preventDefault());document.body.appendChild(d)}
+  d.innerHTML=`<div class="in" style="text-align:center">
+   <img src="ikoner/ikon-192.png" alt="" style="width:84px;height:84px;border-radius:22px;margin-top:6px">
+   <h2 style="margin:10px 0 4px">Budget og Mad</h2>
+   <p class="muted" style="margin:0 0 14px">Skriv din kode for at åbne appen.</p>
+   <input id="logkode" type="text" autocomplete="off" autocapitalize="characters" autocorrect="off" spellcheck="false" maxlength="30" placeholder="Din kode" style="font-size:24px;text-align:center;letter-spacing:3px;text-transform:uppercase;width:100%">
+   <button class="b" id="logknap" style="width:100%;font-size:19px;padding:14px;margin-top:12px">Åbn appen</button>
+   <p id="logbesked" role="alert" style="min-height:22px;margin:10px 0 0;font-weight:700;color:#c0392b">${esc(besked||'')}</p>
+   <p class="muted" style="font-size:15px">Har du ingen kode? Spørg den, der sendte dig linket.</p>
+   <p class="muted" style="font-size:13px">🔒 Koden bruges kun til at åbne appen. Dine tal bliver kun gemt på din egen telefon.</p></div>`;
+  const inp=d.querySelector('#logkode');
+  d.querySelector('#logknap').onclick=logInd;
+  inp.onkeydown=e=>{if(e.key==='Enter')logInd()};
+  if(!d.open)d.showModal();
+  setTimeout(()=>inp.focus(),50);
+}
+async function logInd(){
+  const d=document.getElementById('logind'),b=d.querySelector('#logbesked'),knap=d.querySelector('#logknap');
+  const k=(d.querySelector('#logkode').value||'').replace(/\s+/g,'').toUpperCase();
+  if(!k){b.textContent='Skriv din kode først';return}
+  if(!/^[A-Z0-9ÆØÅ-]{4,30}$/.test(k)){b.textContent='Koden må kun have bogstaver og tal';return}
+  knap.disabled=true;knap.textContent='Tjekker…';b.textContent='';
+  try{
+    if(await tjekKode(k)){
+      localStorage.setItem(KEY+'-login',JSON.stringify({kode:k,tid:Date.now()}));
+      LAAST=false;d.close();toast('Velkommen 👋');
+      if(dlgVenter){dlgVenter=false;_visDlg()}else if(guideEfter){guideEfter=false;setTimeout(visGuide,600)}
+      return;
+    }
+    b.textContent='Koden virker ikke. Tjek at den er skrevet rigtigt.';
+  }catch(e){b.textContent=navigator.onLine===false?'Du har ikke internet. Prøv igen, når du har net.':'Kan ikke tjekke koden lige nu. Prøv igen om lidt.'}
+  knap.disabled=false;knap.textContent='Åbn appen';
+}
+if(LOGIN_TIL){
+  const g=loginGemt();
+  if(!g||!g.kode)visLogin();
+  else if(navigator.onLine!==false)tjekKode(g.kode).then(ok=>{if(!ok){localStorage.removeItem(KEY+'-login');if(dlg.open)dlg.close();visLogin('Din kode virker ikke længere. Spørg efter en ny kode.')}}).catch(()=>{});
+}
+
 if(erMobil&&!erInstalleret){
   document.getElementById('instknap').style.display='';
-  if(!localStorage.getItem(KEY+'-guide'))setTimeout(visGuide,800);
+  if(!localStorage.getItem(KEY+'-guide'))setTimeout(()=>{if(LAAST)guideEfter=true;else visGuide()},800);
 }
 
 // ---------- Sikre opdateringer (version 8) ----------
