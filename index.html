@@ -878,7 +878,7 @@ function madPeriodeInfo(){
 }
 function madPeriodeForm(){
   const g=madPer()||{type:'maaned',belob:'',dage:7},ty=window._madType||g.type,p={type:ty,belob:g.type===ty?g.belob:'',dage:g.dage||7};
-  return `<div class="chips" style="margin:6px 0"><button class="chip ${p.type==='dag'?'on':''}" onclick="madType('dag')">Pr. dag</button><button class="chip ${p.type==='dage'?'on':''}" onclick="madType('dage')">For et antal dage</button><button class="chip ${p.type==='maaned'?'on':''}" onclick="madType('maaned')">Pr. måned</button></div>
+  return `<div class="chips" style="margin:6px 0;flex-wrap:wrap;overflow:visible"><button class="chip ${p.type==='dag'?'on':''}" onclick="madType('dag')">Pr. dag</button><button class="chip ${p.type==='dage'?'on':''}" onclick="madType('dage')">For et antal dage</button><button class="chip ${p.type==='maaned'?'on':''}" onclick="madType('maaned')">Pr. måned</button></div>
   <div class="row"><input id="mpbelob" class="grow" type="text" inputmode="decimal" placeholder="${p.type==='dag'?'Fx 70 kr':p.type==='dage'?'Fx 500 kr':'Fx 2.000 kr'}" value="${p.belob?String(p.belob).replace('.',','):''}">${p.type==='dage'?`<input id="mpdage" type="number" min="1" max="60" style="width:90px" value="${p.dage||7}" title="Antal dage"><span class="muted">dage</span>`:''}<button class="b" onclick="gemMadPeriode()">Gem</button></div>`;
 }
 function madType(ty){window._madType=ty;const el=document.getElementById('madform');if(el)el.innerHTML=madPeriodeForm()}
