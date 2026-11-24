@@ -99,6 +99,12 @@ function styrDato(d) { return d ? new Date(d).toLocaleDateString('da-DK', { day:
 
 function styringEjerHTML() {
   var b = styrEjer.brug, s = styrEjer.indstil || {}, h = '';
+  // Vejledning til nye brugere
+  h += '<details style="background:var(--felt);border-radius:14px;padding:12px;margin:10px 0"><summary style="font-weight:800;font-size:17px;cursor:pointer">📲 Vejledning til nye brugere</summary>' +
+    '<p style="margin:8px 0">6 billeder, der viser, hvordan man lægger appen på telefonen. Send dem sammen med link og kode.</p>' +
+    '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px">' + [1, 2, 3, 4, 5, 6].map(function (i) { return '<img src="vejledning/' + i + '.jpg" alt="Trin ' + i + '" style="width:100%;border-radius:8px">' }).join('') + '</div>' +
+    '<button class="b" style="width:100%;margin-top:10px" onclick="styringSendVejledning()">📤 Send vejledningen</button>' +
+    '<p class="muted" style="font-size:13px;margin-bottom:0">På din PC ligger billederne også på skrivebordet i mappen »Vejledning til Budget og Mad«.</p></details>';
   // Brug
   h += '<details open style="background:var(--felt);border-radius:14px;padding:12px;margin:10px 0"><summary style="font-weight:800;font-size:17px;cursor:pointer">📊 Hvad bruger folk appen til?</summary>';
   if (!b) h += '<p class="muted">Kan ikke hente tallene lige nu.</p>';
@@ -183,3 +189,12 @@ function styringBeskyt() {
 }
 styringBeskyt();
 setInterval(styringBeskyt, 10000);
+
+async function styringSendVejledning() {
+  var tekst = 'Sådan lægger du Budget og Mad på din telefon 📲 Følg billederne 1 til 6. (6 er til Android.)';
+  try {
+    var filer = await Promise.all([1, 2, 3, 4, 5, 6].map(function (i) { return fetch('vejledning/' + i + '.jpg').then(function (r) { return r.blob() }).then(function (b) { return new File([b], 'vejledning-' + i + '.jpg', { type: 'image/jpeg' }) }) }));
+    if (navigator.canShare && navigator.canShare({ files: filer })) { await navigator.share({ title: 'Vejledning til Budget og Mad', text: tekst, files: filer }); return }
+  } catch (e) { if (e && e.name === 'AbortError') return }
+  alert('Din browser kan ikke sende billeder herfra. Brug billederne i mappen »Vejledning til Budget og Mad« på skrivebordet, eller send dem fra din telefon.');
+}
