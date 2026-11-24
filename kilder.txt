@@ -303,3 +303,5 @@ fotos/retter/ny/rugbrodaeg.jpg: Joseph Gonzalez – https://unsplash.com/photos/
 fotos/retter/ny/aeggekagebroccoli.jpg: Sandie Clarke – https://unsplash.com/photos/zPjFI7oxJRw
 fotos/retter/ny/kikaertspinat.jpg: martin becker – https://unsplash.com/photos/IA0iyiBPfDM
 fotos/retter/ny/spinatpasta.jpg: shibani Mishra – https://unsplash.com/photos/docP-fBTnjw
+
+Ca. priser (version 56): Sørens egen prisoversigt »117_retter_med_ingredienser_og_priser.pdf« (vejledende discountpriser, specialvarer anslået, for 2 personer) og hans madplan for 2 personer (11 retter). Vises i appen som »ca. pris«, ikke som rigtige butikspriser.
