@@ -121,3 +121,27 @@ fotos/retter/pasta/aertemynte.jpg: Bakd&Raw by Karolin Baitinger – https://uns
 fotos/retter/pasta/roedbede.jpg: Rachel Schoenberger – https://unsplash.com/photos/QCtHztkM4Ec
 fotos/retter/pasta/ragu.jpg: Louis Hansel – https://unsplash.com/photos/qfxAEVCDWiU
 fotos/retter/pasta/orzofeta.jpg: Lisha Riabinina – https://unsplash.com/photos/BySJbuQniyg
+
+Version 22 – flere billeder at vælge imellem (Unsplash, gratis efter Unsplash-licensen, hentet 24-11-2026):
+fotos/galleri/forside1.jpg: Land O'Lakes, Inc. – https://unsplash.com/photos/pazs-Hi5mf8
+fotos/galleri/forside2.jpg: Land O'Lakes, Inc. – https://unsplash.com/photos/m9cBmbOQCmQ
+fotos/galleri/forside3.jpg: National Cancer Institute – https://unsplash.com/photos/cfGG0niafjc
+fotos/galleri/forside5.jpg: Becca Tapert – https://unsplash.com/photos/kYh-O1Jk7EE
+fotos/galleri/forside6.jpg: Jason Briscoe – https://unsplash.com/photos/KTrov7eujms
+fotos/galleri/budget1.jpg: Andre Taissin – https://unsplash.com/photos/5OUMf1Mr5pU
+fotos/galleri/budget2.jpg: Braňo – https://unsplash.com/photos/heYdDdq0cbE
+fotos/galleri/budget3.jpg: Towfiqu barbhuiya – https://unsplash.com/photos/0ITvgXAU5Oo
+fotos/galleri/budget4.jpg: Allef Vinicius – https://unsplash.com/photos/fJTqyZMOh18
+fotos/galleri/opskrifter1.jpg: S O C I A L . C U T – https://unsplash.com/photos/hwy3W3qFjgM
+fotos/galleri/opskrifter2.jpg: Katie Smith – https://unsplash.com/photos/uQs1802D0CQ
+fotos/galleri/opskrifter3.jpg: Clay Banks – https://unsplash.com/photos/gpcx-mOXC8Y
+fotos/galleri/opskrifter4.jpg: Alexander Schimmeck – https://unsplash.com/photos/ks5flsI1mNo
+fotos/galleri/madplan2.jpg: Anh Nguyen – https://unsplash.com/photos/kcA-c3f_3FE
+fotos/galleri/madplan3.jpg: Leanna Myers – https://unsplash.com/photos/YB9VU4necQo
+fotos/galleri/indkob1.jpg: Kyle Nieber – https://unsplash.com/photos/eE-ffApg7oI
+fotos/galleri/indkob2.jpg: Anne Preble – https://unsplash.com/photos/SAPvKo12dQE
+fotos/galleri/indkob3.jpg: Maria Lin Kim – https://unsplash.com/photos/8RaUEd8zD-U
+fotos/galleri/indkob4.jpg: Vitaly Gariev – https://unsplash.com/photos/6aBRyZGtdeY
+fotos/galleri/lager1.jpg: Darrien Staton – https://unsplash.com/photos/ZUhM8LE_HGc
+fotos/galleri/lager2.jpg: Megan Nixon – https://unsplash.com/photos/gSptirCdrUs
+fotos/galleri/lager3.jpg: Heather McKean – https://unsplash.com/photos/1I9bMlIAIBM

@@ -195,6 +195,7 @@ dialog .dfoto{height:210px;background-size:cover;background-position:center;marg
 
 .skiftfoto{position:absolute;top:12px;right:12px;z-index:2;border:0;border-radius:20px;padding:8px 12px;background:rgba(255,255,255,.88);color:#1d130e;font:inherit;font-size:14px;font-weight:700;cursor:pointer;backdrop-filter:blur(6px)}
 .galleri{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.galleri.g3{grid-template-columns:1fr 1fr 1fr}.galleri.g3 .gfoto{height:80px}.galleri.g3 .gfoto span{font-size:11px}
 .gfoto{position:relative;height:110px;border:3px solid transparent;border-radius:16px;background-size:cover;background-position:center;cursor:pointer;overflow:hidden;padding:0}
 .gfoto.on{border-color:var(--acc);box-shadow:0 0 0 3px var(--acc2)}
 .gfoto span{position:absolute;left:0;right:0;bottom:0;padding:6px 8px;background:linear-gradient(transparent,rgba(0,0,0,.7));color:#fff;font:inherit;font-size:13px;font-weight:700;text-align:left}
@@ -249,7 +250,7 @@ button.b,label.b{box-shadow:0 6px 16px rgba(232,85,62,.3)}
 <style>@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}</style>
 </head>
 <body>
-<header><h1><img src="ikoner/ikon-192.png" alt="" style="width:1.3em;height:1.3em;border-radius:.3em;vertical-align:-.3em;margin-right:.35em">Budget og Mad</h1><button id="instknap" onclick="visGuide()" style="display:none;border:1px solid #fff;background:none;color:#fff;border-radius:10px;padding:6px 10px;font:inherit;font-size:14px;cursor:pointer">📲<span class="itxt"> Installér</span></button><button id="fortrydknap" hidden onclick="fortrydSidste()">↩️<span class="ftxt"> Fortryd</span></button><button id="indstilknap" onclick="visIndstillinger()" title="Indstillinger">⚙️</button><span class="ver" id="ver">version 21</span></header>
+<header><h1><img src="ikoner/ikon-192.png" alt="" style="width:1.3em;height:1.3em;border-radius:.3em;vertical-align:-.3em;margin-right:.35em">Budget og Mad</h1><button id="instknap" onclick="visGuide()" style="display:none;border:1px solid #fff;background:none;color:#fff;border-radius:10px;padding:6px 10px;font:inherit;font-size:14px;cursor:pointer">📲<span class="itxt"> Installér</span></button><button id="fortrydknap" hidden onclick="fortrydSidste()">↩️<span class="ftxt"> Fortryd</span></button><button id="indstilknap" onclick="visIndstillinger()" title="Indstillinger">⚙️</button><span class="ver" id="ver">version 22</span></header>
 <nav id="nav">
   <button data-p="forside"><span class="ic">🏠</span>Hjem</button>
   <button data-p="opskrifter"><span class="ic">📖</span>Opskrifter</button>
@@ -263,7 +264,7 @@ button.b,label.b{box-shadow:0 6px 16px rgba(232,85,62,.3)}
 <dialog id="dlg"><div class="in" id="dlgin"></div></dialog>
 
 <script>
-const KEY='madapp-v1';const APP_VERSION=21, EJER='Søren';
+const KEY='madapp-v1';const APP_VERSION=22, EJER='Søren';
 let D;try{D=JSON.parse(localStorage.getItem(KEY)||'null')}catch(e){D=null;try{localStorage.setItem(KEY+'-skadet-'+Date.now(),localStorage.getItem(KEY))}catch(x){}}
 if(!D||typeof D!=='object')D={};
 ['opskrifter','indkob','lager','stdSlettet','gemteLister'].forEach(k=>{if(!Array.isArray(D[k]))D[k]=[]});
@@ -679,7 +680,7 @@ function importer(inp){const f=inp.files[0];if(!f)return;f.text().then(t=>{try{c
 // Forside med fotoknapper (version 8)
 const FOTO={budget:['fotos/budget.jpg','💰','Budget'],opskrifter:['fotos/opskrifter.jpg','📖','Opskrifter'],madplan:['fotos/madplan.jpg','📅','Madplan'],indkob:['fotos/indkob.jpg','🛒','Indkøb'],lager:['fotos/lager.jpg','🥫','Lager']};
 function gaaTil(p){side=p;localStorage.setItem(KEY+'-side',p);vis();scrollTo(0,0)}
-function banner(p){const f=FOTO[p];return f?`<div class="banner" style="background-image:url(${f[0]})"><span>${f[1]} ${f[2]}</span></div>`:''}
+function banner(p){const f=FOTO[p];return f?`<div class="banner" style="background-image:url(${knapFoto(p)})"><span>${f[1]} ${f[2]}</span></div>`:''}
 SIDER.forside=function(){
   const nu=new Date(),md=iso(nu).slice(0,7),idag=new Date(nu);idag.setHours(0,0,0,0);
   const plan=D.madplan[iso(nu)]||{},ret=plan.opskrift?(D.opskrifter.find(o=>o.id===plan.opskrift)||{}).navn:plan.tekst;
@@ -688,7 +689,7 @@ SIDER.forside=function(){
   const info={budget:b.ind?'Tilbage: '+kr(b.tilbage):'Skriv din løn ind',opskrifter:D.opskrifter.length?D.opskrifter.length+' opskrifter':'Gem din første ret',madplan:ret?'I dag: '+ret:'Hvad skal du spise i dag?',indkob:paaListe?paaListe+' ting på listen':'Listen er tom',lager:D.lager.length?D.lager.length+' varer'+(snart?' · '+snart+' udløber snart':''):'Hvad har du derhjemme?'};
   const h=nu.getHours(),hilsen=h<10?'Godmorgen':h<17?'Hej':'Godaften';
   return `<div class="fhero" style="background-image:url('${valgtFoto()}')"><button class="skiftfoto" onclick="vaelgFoto()">🖼️ Skift billede</button><div><div class="fh1">${hilsen} 👋</div><div class="fh2">Hvad skal vi i dag?</div></div></div>
-  <div class="tiles">${Object.entries(FOTO).map(([k,f])=>`<button class="tile t-${k}" onclick="gaaTil('${k}')" style="background-image:url(${f[0]})"><span class="te">${f[1]}</span><span class="tn">${f[2]}</span><span class="ti">${esc(info[k])}</span></button>`).join('')}</div>
+  <div class="tiles">${Object.entries(FOTO).map(([k,f])=>`<button class="tile t-${k}" onclick="gaaTil('${k}')" style="background-image:url(${knapFoto(k)})"><span class="te">${f[1]}</span><span class="tn">${f[2]}</span><span class="ti">${esc(info[k])}</span></button>`).join('')}</div>
   ${forsideTips()}
   ${hjaelpKort()}`;
 };
@@ -980,13 +981,26 @@ function hentListe(gid){const g=(D.gemteLister||[]).find(x=>x.id===gid);if(!g)re
 function sletListe(gid){const s=snap();D.gemteLister=D.gemteLister.filter(x=>x.id!==gid);save();vis();toast('Den gemte liste er slettet 🗑️',fortrydTil(s))}
 
 // ---------- Billedgalleri (version 9) ----------
-const GALLERI=[['madlavning','Madlavning derhjemme'],['koekken','Venner i køkkenet'],['picnic','Picnic med venner'],['udenfor','Madlavning udenfor'],['bord','Fyldt bord'],['salat','Slik og hygge'],['frugt','Frugt og bær']];
+const GALLERI=[['madlavning','Madlavning derhjemme'],['koekken','Venner i køkkenet'],['picnic','Picnic med venner'],['udenfor','Madlavning udenfor'],['bord','Fyldt bord'],['salat','Slik og hygge'],['frugt','Frugt og bær'],
+ ['forside1','Hygge ved bordet'],['forside2','Fælles aftensmad'],['forside3','Familie i køkkenet'],['forside5','Lav mad sammen'],['forside6','Køkken med grønt']];
+// Ekstra billeder pr. knap på forsiden (første er standard)
+const KNAPFOTOS={budget:[['fotos/budget.jpg','Med mobilen'],['fotos/galleri/budget1.jpg','Sparegris'],['fotos/galleri/budget2.jpg','Lyserød sparegris'],['fotos/galleri/budget3.jpg','Sparebøsse'],['fotos/galleri/budget4.jpg','Pung og kort']],
+ opskrifter:[['fotos/opskrifter.jpg','Pasta og tomater'],['fotos/galleri/opskrifter1.jpg','Kogebog'],['fotos/galleri/opskrifter2.jpg','Skærebræt'],['fotos/galleri/opskrifter3.jpg','Friske råvarer'],['fotos/galleri/opskrifter4.jpg','Grøntsager']],
+ madplan:[['fotos/madplan.jpg','Madbokse'],['fotos/galleri/madplan2.jpg','Skål med grønt'],['fotos/galleri/madplan3.jpg','Madpakker']],
+ indkob:[['fotos/indkob.jpg','Grøntafdeling'],['fotos/galleri/indkob1.jpg','Indkøbsvogn'],['fotos/galleri/indkob2.jpg','Torvehal'],['fotos/galleri/indkob3.jpg','Indkøbspose'],['fotos/galleri/indkob4.jpg','I butikken']],
+ lager:[['fotos/lager.jpg','Glas på hylde'],['fotos/galleri/lager1.jpg','Køleskab'],['fotos/galleri/lager2.jpg','Skab med glas'],['fotos/galleri/lager3.jpg','Krydderier']]};
+function knapFoto(k){const v=(D.indstil&&D.indstil.knapfoto||{})[k];return v&&(KNAPFOTOS[k]||[]).some(x=>x[0]===v)?v:FOTO[k][0]}
+function setKnapFoto(k,p){const s=snap();D.indstil.knapfoto=D.indstil.knapfoto||{};D.indstil.knapfoto[k]=p;save();vaelgFoto('knap');vis();toast('Nyt billede på '+FOTO[k][2]+' 🎉',fortrydTil(s))}
 const STANDARD_FOTO='fotos/galleri/madlavning.jpg';
 function valgtFoto(){D.indstil=D.indstil||{};if(D.indstil.foto==='eget'&&D.indstil.egetFoto)return D.indstil.egetFoto;return D.indstil.foto&&D.indstil.foto!=='eget'?D.indstil.foto:STANDARD_FOTO}
 function brugFoto(){document.documentElement.style.setProperty('--hfoto',`url('${valgtFoto()}')`)}
-function vaelgFoto(){
+function vaelgFoto(fane){
   const nu=valgtFoto();
-  dlgin.innerHTML=`<h2>🖼️ Vælg dit billede</h2><p class="muted" style="margin-top:-6px">Billedet bruges på forsiden og øverst i appen.</p>
+  const faner=`<div class="chips" style="margin-bottom:6px"><button class="chip ${fane!=='knap'?'on':''}" onclick="vaelgFoto()">🏠 Stort billede</button><button class="chip ${fane==='knap'?'on':''}" onclick="vaelgFoto('knap')">🔲 Knapperne</button></div>`;
+  if(fane==='knap'){dlgin.innerHTML=`<h2>🖼️ Vælg billeder</h2>${faner}<p class="muted" style="margin-top:0">Vælg et billede til hver knap på forsiden.</p>
+   ${Object.keys(KNAPFOTOS).map(k=>`<h3>${FOTO[k][1]} ${FOTO[k][2]}</h3><div class="galleri g3">${KNAPFOTOS[k].map(([p,n])=>`<button class="gfoto ${knapFoto(k)===p?'on':''}" style="background-image:url(${p})" onclick="setKnapFoto('${k}','${p}')"><span>${n}</span></button>`).join('')}</div>`).join('')}
+   <p class="muted" style="font-size:13px">Fotos fra Unsplash.</p><div class="row"><button class="l" style="flex:1" onclick="dlg.close()">Luk</button></div>`;if(!dlg.open)dlg.showModal();return}
+  dlgin.innerHTML=`<h2>🖼️ Vælg billeder</h2>${faner}<p class="muted" style="margin-top:0">Billedet bruges på forsiden og øverst i appen.</p>
   <div class="galleri">${GALLERI.map(([k,n])=>{const p='fotos/galleri/'+k+'.jpg';return `<button class="gfoto ${nu===p?'on':''}" style="background-image:url(${p})" onclick="setFoto('${p}')"><span>${n}</span></button>`}).join('')}
   ${D.indstil.egetFoto?`<button class="gfoto ${D.indstil.foto==='eget'?'on':''}" style="background-image:url('${D.indstil.egetFoto}')" onclick="setFoto('eget')"><span>Mit eget foto</span></button>`:''}</div>
   <label class="b" style="display:block;text-align:center;margin-top:12px;color:#fff;cursor:pointer;padding:12px;border-radius:14px">📷 Brug mit eget foto<input type="file" accept="image/*" hidden onchange="egetFoto(this)"></label>
