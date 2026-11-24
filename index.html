@@ -213,6 +213,8 @@ button.x{font-size:18px}
 .chips.kats .chip{font-size:14px;padding:7px 12px;box-shadow:none;background:var(--felt)}.chips.kats .chip.on{background:var(--grad)}
 .madidag{background:linear-gradient(135deg,#fff3e6,#ffe9ef)}@media (prefers-color-scheme:dark){.madidag{background:linear-gradient(135deg,#2b1d12,#2b1520)}}
 .hjdel{background:var(--felt);border-radius:14px;padding:10px 14px;margin:8px 0}.hjdel summary{cursor:pointer;list-style:none}.hjdel summary::after{content:' ▾';color:var(--muted)}.hjdel ul{margin:8px 0 2px;padding-left:20px}.hjdel li{margin:5px 0}
+header h1{min-width:0;overflow:hidden;text-overflow:ellipsis}@media (max-width:760px){.ftxt{display:none}#fortrydknap{padding:6px 10px}header .ver{display:none}}
+#indstilknap{border:0;background:rgba(255,255,255,.22);color:#fff;border-radius:50%;width:36px;height:36px;font-size:18px;cursor:pointer;flex:none}
 /* Version 8: fotofarver og forside */
 :root{--bg:#fff6ef;--acc:#e8553e;--acc2:#ffe7df;--grad:linear-gradient(135deg,#ff8a3d 0%,#e8364f 100%);--felt:#fff1e9;--line:#f1e2d8}
 @media (prefers-color-scheme:dark){:root{--bg:#140d0a;--card:#211612;--acc:#ff8a5c;--acc2:#3a1d14;--felt:#1a110d;--line:#3a2a22}}
@@ -246,7 +248,7 @@ button.b,label.b{box-shadow:0 6px 16px rgba(232,85,62,.3)}
 <style>@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}</style>
 </head>
 <body>
-<header><h1><img src="ikoner/ikon-192.png" alt="" style="width:1.3em;height:1.3em;border-radius:.3em;vertical-align:-.3em;margin-right:.35em">Budget og Mad</h1><button id="instknap" onclick="visGuide()" style="display:none;border:1px solid #fff;background:none;color:#fff;border-radius:10px;padding:6px 10px;font:inherit;font-size:14px;cursor:pointer">📲<span class="itxt"> Installér</span></button><button id="fortrydknap" hidden onclick="fortrydSidste()">↩️ Fortryd</button><span class="ver" id="ver">version 8</span></header>
+<header><h1><img src="ikoner/ikon-192.png" alt="" style="width:1.3em;height:1.3em;border-radius:.3em;vertical-align:-.3em;margin-right:.35em">Budget og Mad</h1><button id="instknap" onclick="visGuide()" style="display:none;border:1px solid #fff;background:none;color:#fff;border-radius:10px;padding:6px 10px;font:inherit;font-size:14px;cursor:pointer">📲<span class="itxt"> Installér</span></button><button id="fortrydknap" hidden onclick="fortrydSidste()">↩️<span class="ftxt"> Fortryd</span></button><button id="indstilknap" onclick="visIndstillinger()" title="Indstillinger">⚙️</button><span class="ver" id="ver">version 8</span></header>
 <nav id="nav">
   <button data-p="forside"><span class="ic">🏠</span>Hjem</button>
   <button data-p="opskrifter"><span class="ic">📖</span>Opskrifter</button>
@@ -260,7 +262,7 @@ button.b,label.b{box-shadow:0 6px 16px rgba(232,85,62,.3)}
 <dialog id="dlg"><div class="in" id="dlgin"></div></dialog>
 
 <script>
-const KEY='madapp-v1';const APP_VERSION=18, EJER='Søren';
+const KEY='madapp-v1';const APP_VERSION=19, EJER='Søren';
 let D=JSON.parse(localStorage.getItem(KEY)||'null')||{opskrifter:[],indkob:[],lager:[],madplan:{},budget:{maaned:0,udgifter:[]}};
 
 // Faste opskrifter (klassiske, billige retter). Fotos: se kilder.txt
@@ -280,8 +282,9 @@ flet();
 let budgetMd=new Date().getFullYear()+'-'+String(new Date().getMonth()+1).padStart(2,'0');
 let side='forside';if(['#forside','#opskrifter','#madplan','#indkob','#lager','#budget'].includes(location.hash))side=location.hash.slice(1);
 let ugeStart=mandag(new Date());
-const tilGem=()=>JSON.stringify({...D,opskrifter:D.opskrifter.filter(o=>!String(o.id).startsWith('std-')||o.rettet)});
-function flet(){D.opskrifter=(D.opskrifter||[]).filter(o=>!String(o.id).startsWith('std-')||o.rettet);D.stdSlettet=D.stdSlettet||[];
+let STD_IDS=null;function erStd(x){if(!STD_IDS)STD_IDS=new Set(STD_OPSKRIFTER.map(s=>s.id));return STD_IDS.has(x)}
+const tilGem=()=>JSON.stringify({...D,opskrifter:D.opskrifter.filter(o=>!erStd(o.id)||o.rettet)});
+function flet(){D.opskrifter=(D.opskrifter||[]).filter(o=>!erStd(o.id)||o.rettet);D.stdSlettet=D.stdSlettet||[];
   STD_OPSKRIFTER.forEach(s=>{if(!D.opskrifter.some(o=>o.id===s.id)&&!D.stdSlettet.includes(s.id))D.opskrifter.push({...s,ing:s.ing.map(parseIng),trin:[...s.trin],tags:[...s.tags]})})}
 let HIST=[],sidst=tilGem();
 const save=()=>{const ny=tilGem();if(ny===sidst)return;if(sidst){HIST.push(sidst);if(HIST.length>30)HIST.shift()}sidst=ny;try{localStorage.setItem(KEY,ny)}catch(e){alert('Telefonen har ikke mere plads til appens data. Gem en kopi, og slet evt. dit eget foto.')}visFortrydKnap()};
@@ -329,14 +332,14 @@ opskrifter(){
   const F={alle:'Alle',dansk:'🇩🇰 Dansk',vegetar:'🥕 Vegetar',hurtig:'⏱️ Hurtig',kan:'🥫 Kan laves nu',mine:'⭐ Mine'};
   let liste=D.opskrifter.filter(o=>!q||o.navn.toLowerCase().includes(q)||o.ing.some(i=>i.navn.toLowerCase().includes(q)));
   if(fl==='kan')liste=liste.filter(o=>match(o).pct>=.6).sort((a,b)=>match(b).pct-match(a).pct);
-  else if(fl==='mine')liste=liste.filter(o=>!String(o.id).startsWith('std-'));
+  else if(fl==='mine')liste=liste.filter(o=>!erStd(o.id));
   else if(fl==='hurtig')liste=liste.filter(o=>(o.tags||[]).includes('hurtig')||(o.tid&&o.tid<=30));
   else if(fl!=='alle')liste=liste.filter(o=>(o.tags||[]).includes(fl));
   if(kt)liste=liste.filter(o=>o.kat===kt);
   const antal=liste.length,vis_=window._visN||40;liste=liste.slice(0,vis_);
   return `<h2>Opskrifter</h2>
   <div class="row" style="margin-bottom:12px"><button class="b" style="flex:1;background:linear-gradient(135deg,#16a34a,#0d9488)!important" onclick="visPengeDialog()">💰 Hvad kan jeg få for pengene?</button><button class="l" onclick="visOpskriftHjaelp()">❓ Hjælp</button></div>
-  <div class="row" style="margin-bottom:12px"><input class="grow" id="soeg" placeholder="Søg i opskrifter eller ingredienser" value="${esc(window._q||'')}"><button class="b" onclick="redigerOpskrift()">+ Ny opskrift</button></div>
+  <div class="row" style="margin-bottom:12px"><input class="grow" id="soeg" placeholder="Søg i opskrifter eller ingredienser" value="${esc(window._q||'')}"><button class="b" onclick="redigerOpskrift()">+ Ny opskrift</button><label class="l" style="margin:0;cursor:pointer;color:inherit;background:var(--felt);border-radius:14px;padding:10px 14px;font-weight:600">📷 Foto af opskrift<input type="file" accept="image/*" capture="environment" hidden onchange="fotoOpskrift(this)"></label></div><div id="ostatus" class="muted"></div>
   <div class="chips">${Object.entries(F).map(([k,v])=>`<button class="chip ${fl===k?'on':''}" onclick="window._fl='${k}';window._visN=40;vis()">${v}</button>`).join('')}</div>
   <div class="chips kats"><button class="chip ${kt?'':'on'}" onclick="window._kat='';window._visN=40;vis()">Alle slags</button>${KATS.map(k=>`<button class="chip ${kt===k?'on':''}" onclick="window._kat='${k}';window._visN=40;vis()">${k}</button>`).join('')}</div>
   <p class="muted" style="margin:0 0 10px">${antal} opskrifter${q||fl!=='alle'||kt?' passer':''}</p>
@@ -435,7 +438,7 @@ function vis(){
 document.querySelectorAll('#nav button').forEach(b=>b.onclick=()=>{side=b.dataset.p;localStorage.setItem(KEY+'-side',side);vis();scrollTo(0,0)});
 
 // Opskrifter
-const dlg=document.getElementById('dlg'),dlgin=document.getElementById('dlgin');
+const dlg=document.getElementById('dlg'),dlgin=document.getElementById('dlgin');dlg.addEventListener('close',()=>{if(window.speechSynthesis)speechSynthesis.cancel()});
 let visPort=null;
 function skal(i,o,p){if(i.maengde==null||!o.portioner)return{...i};let v=i.maengde*p/o.portioner;v=['','stk','fed','dåse','dåser'].includes(i.enhed)?Math.max(.5,Math.round(v*2)/2):Math.round(v*10)/10;return{...i,maengde:v}}
 function visOpskrift(oid,p){
@@ -453,7 +456,7 @@ function visOpskrift(oid,p){
   ${o.trin&&o.trin.length?`<h3>Sådan gør du</h3><ol class="trin">${o.trin.map(x=>`<li>${esc(x)}</li>`).join('')}</ol>`:o.frem?`<h3>Sådan gør du</h3><div style="white-space:pre-wrap">${esc(o.frem)}</div>`:''}
   <div class="row" style="margin-top:16px"><button class="b" onclick="opskriftTilIndkob('${o.id}')">🛒 Læg det, jeg mangler, i indkøbslisten</button><button class="b" onclick="document.getElementById('vdag').hidden=false">📅 På madplan</button><button class="b" onclick="lavRet('${o.id}')">👩‍🍳 Jeg har lavet den</button></div>
   <div id="vdag" hidden><p class="muted" style="margin:10px 0 6px">Hvilken dag?</p><div class="chips">${dage.map(d=>`<button class="chip" onclick="setPlan('${iso(d)}','opskrift','${o.id}');dlg.close();toast('${esc(o.navn)} er sat på ${d.toLocaleDateString('da-DK',{weekday:'long'})}')">${d.toLocaleDateString('da-DK',{weekday:'short',day:'numeric'})}</button>`).join('')}</div></div>
-  <div class="row" style="margin-top:10px"><button class="l" onclick="del('opskrift:${o.id}')">📤 Del</button><button class="l" onclick="redigerOpskrift('${o.id}')">Ret</button><button class="l" onclick="sletOpskrift('${o.id}')">Slet</button><button class="l" onclick="dlg.close()">Luk</button></div>
+  <div class="row" style="margin-top:10px"><button class="l" id="laesknap" onclick="laesOp('${o.id}')">🔊 Læs op</button><button class="l" onclick="del('opskrift:${o.id}')">📤 Del</button><button class="l" onclick="sletOpskrift('${o.id}')">Slet</button><button class="l" onclick="dlg.close()">Luk</button></div>
   <p class="muted" style="font-size:13px">✅ = det har du på lager. Salt, peber og vand regner vi med, at du har.</p>`;
   if(!dlg.open)dlg.showModal();
 }
@@ -463,13 +466,13 @@ function lavRet(oid){
     if(l.maengde==null){D.lager=D.lager.filter(x=>x!==l);return}if(i.maengde==null)return;const a=base(l),b=base(i);if(a.k!==b.k)return;const rest=(a.v-b.v)/(ENH[l.enhed]?ENH[l.enhed][1]:1);if(rest<=0.0001)D.lager=D.lager.filter(x=>x!==l);else l.maengde=Math.round(rest*100)/100});
   save();dlg.close();vis();toast(n?'Velbekomme! '+n+' varer er trukket fra lageret 😋':'Velbekomme! 😋',n?fortrydTil(s):null);
 }
-function redigerOpskrift(oid){
-  const o=D.opskrifter.find(x=>x.id===oid)||{navn:'',portioner:'',ing:[],frem:''};
+function redigerOpskrift(oid,forslag){
+  const o=D.opskrifter.find(x=>x.id===oid)||forslag||{navn:'',portioner:'',ing:[],frem:''};
   dlgin.innerHTML=`<h2>${oid?'Ret opskrift':'Ny opskrift'}</h2>
   <label>Navn</label><input id="onavn" style="width:100%" value="${esc(o.navn)}">
-  <label>Portioner</label><input id="oport" type="number" min="1" style="width:100px" value="${o.portioner||''}">
+  <div class="row" style="flex-wrap:nowrap"><div><label>Portioner</label><input id="oport" type="number" min="1" style="width:100px" value="${o.portioner||''}"></div><div><label>Tid (min)</label><input id="otid" type="number" min="1" style="width:100px" value="${o.tid||''}"></div></div>
   <label>Ingredienser (én pr. linje, fx »200 g mel«)</label><textarea id="oing">${esc(o.ing.map(ingTekst).join('\n'))}</textarea>
-  <label>Sådan gør du${o.trin?' (ét trin pr. linje)':''}</label><textarea id="ofrem">${esc(o.trin?o.trin.join('\n'):o.frem)}</textarea>
+  <label>Sådan gør du (ét trin pr. linje)</label><textarea id="ofrem" style="min-height:140px">${esc(o.trin?o.trin.join('\n'):o.frem)}</textarea>
   <div class="row" style="margin-top:14px"><button class="b" onclick="gemOpskrift('${oid||''}')">Gem</button><button class="l" onclick="dlg.close()">Annullér</button></div>`;
   if(!dlg.open)dlg.showModal();
 }
@@ -477,13 +480,14 @@ function gemOpskrift(oid){
   const navn=document.getElementById('onavn').value.trim();if(!navn){alert('Skriv et navn');return}
   const gl=D.opskrifter.find(x=>x.id===oid)||{},frem=document.getElementById('ofrem').value.trim();
   const o={...gl,id:oid||id(),navn,portioner:parseInt(document.getElementById('oport').value)||null,
-    ing:document.getElementById('oing').value.split('\n').filter(l=>l.trim()).map(parseIng),frem:gl.trin?'':frem};
-  if(gl.trin)o.trin=frem.split('\n').map(s=>s.trim()).filter(Boolean);
-  if(String(o.id).startsWith('std-'))o.rettet=true;
+    ing:document.getElementById('oing').value.split('\n').filter(l=>l.trim()).map(parseIng),frem:'',tid:parseInt(document.getElementById('otid').value)||gl.tid||null};
+  o.trin=frem.split('\n').map(s=>s.replace(/^\s*\d+[.)]\s*/,'').trim()).filter(Boolean);
+  if(!oid){o.kat=o.kat||'Mine opskrifter';o.tags=o.tags||[]}
+  if(erStd(o.id))o.rettet=true;
   const i=D.opskrifter.findIndex(x=>x.id===oid);if(i>=0)D.opskrifter[i]=o;else D.opskrifter.push(o);
   save();dlg.close();vis();toast('Opskriften er gemt');
 }
-function sletOpskrift(oid){const s=snap();if(String(oid).startsWith('std-'))D.stdSlettet.push(oid);D.opskrifter=D.opskrifter.filter(x=>x.id!==oid);save();dlg.close();vis();toast('Opskriften er slettet',fortrydTil(s))}
+function sletOpskrift(oid){const s=snap();if(erStd(oid))D.stdSlettet.push(oid);D.opskrifter=D.opskrifter.filter(x=>x.id!==oid);save();dlg.close();vis();toast('Opskriften er slettet',fortrydTil(s))}
 function opskriftTilIndkob(oid){const s=snap();const o=D.opskrifter.find(x=>x.id===oid);const n=tilIndkob(o.ing.map(i=>skal(i,o,visPort||o.portioner)));save();dlg.close();vis();toast(n?n+' varer lagt på indkøbslisten':'Du har det hele på lageret',n?fortrydTil(s):null)}
 
 // Madplan
@@ -846,6 +850,61 @@ function visOpskriftHjaelp(){
   <div class="row" style="margin-top:14px"><button class="b" style="flex:1" onclick="visHjaelp()">💬 Skriv til ${esc(EJER)}</button><button class="l" onclick="dlg.close()">Luk</button></div>`;
   if(!dlg.open)dlg.showModal();
 }
+
+// ---------- Indstillinger, oplæsning og foto af opskrift (version 19) ----------
+const STR={lille:.9,normal:1,stor:1.15,kaempe:1.3},FONTE={rund:'',klassisk:'Georgia,"Times New Roman",serif',enkel:'system-ui,-apple-system,"Segoe UI",Roboto,sans-serif',laese:'Verdana,Tahoma,"Trebuchet MS",sans-serif'};
+function brugIndstil(){D.indstil=D.indstil||{};document.body.style.zoom=STR[D.indstil.str||'normal']||1;document.body.style.fontFamily=FONTE[D.indstil.font||'rund']||''}
+function stemmer(){return window.speechSynthesis?speechSynthesis.getVoices():[]}
+function visIndstillinger(){
+  D.indstil=D.indstil||{};const v=D.indstil,st=stemmer(),da=st.filter(x=>/^da/i.test(x.lang)),andre=st.filter(x=>!/^da/i.test(x.lang));
+  dlgin.innerHTML=`<h2>⚙️ Indstillinger</h2>
+  <h3>🔠 Tekststørrelse</h3><div class="chips">${[['lille','Lille'],['normal','Normal'],['stor','Stor'],['kaempe','Meget stor']].map(([k,n])=>`<button class="chip ${ (v.str||'normal')===k?'on':''}" onclick="setIndstil('str','${k}')">${n}</button>`).join('')}</div>
+  <h3>✍️ Skrifttype</h3><div class="chips">${[['rund','Rund'],['klassisk','Klassisk'],['enkel','Enkel'],['laese','Let at læse']].map(([k,n])=>`<button class="chip ${(v.font||'rund')===k?'on':''}" style="font-family:${FONTE[k]||'inherit'}" onclick="setIndstil('font','${k}')">${n}</button>`).join('')}</div>
+  <h3>📝 Ret opskrifter</h3><p class="muted" style="margin-top:-6px;font-size:14px">Opskrifter rettes kun her. Find den, du vil rette.</p><input id="iret" style="width:100%" placeholder="Søg efter opskrift…" oninput="visRetListe(this.value)"><ul class="ingl" id="iretliste"></ul>
+  <h3>🔊 Oplæsning</h3>
+  ${window.speechSynthesis?`<label>Stemme</label><select id="istemme" style="width:100%" onchange="setIndstil('stemme',this.value,true)"><option value="">Telefonens danske stemme</option>${da.map(x=>`<option value="${esc(x.name)}" ${v.stemme===x.name?'selected':''}>${esc(x.name)} (dansk)</option>`).join('')}${andre.length?`<optgroup label="Andre sprog">${andre.map(x=>`<option value="${esc(x.name)}" ${v.stemme===x.name?'selected':''}>${esc(x.name)} (${esc(x.lang)})</option>`).join('')}</optgroup>`:''}</select>
+   <label>Hastighed</label><input type="range" min="0.6" max="1.4" step="0.1" value="${v.hast||1}" style="width:100%" onchange="setIndstil('hast',parseFloat(this.value),true)">
+   <button class="l" style="margin-top:8px" onclick="sig('Hej! Sådan lyder jeg, når jeg læser dine opskrifter op.')">▶️ Prøv stemmen</button>
+   ${da.length?'':'<p class="muted" style="font-size:13px">Der er ingen dansk stemme på denne enhed. På iPhone: Indstillinger → Tilgængelighed → Oplæst indhold → Stemmer → Dansk.</p>'}`:'<p class="muted">Oplæsning virker ikke i denne browser.</p>'}
+  <details class="hjdel" style="margin-top:14px"><summary><b>❓ Hjælp til indstillinger</b></summary><ul>
+   <li>Tekststørrelse gør alt i appen større eller mindre.</li><li>Skrifttype ændrer, hvordan bogstaverne ser ud. »Let at læse« har ekstra tydelige bogstaver.</li>
+   <li>Oplæsning bruger telefonens egen stemme – det er gratis og virker uden internet. Tryk »🔊 Læs op« inde i en opskrift.</li>
+   <li>Billedet på forsiden skifter du med »🖼️ Skift billede« på forsiden.</li><li>Alt gemmes kun på din egen telefon.</li></ul></details>
+  <div class="row" style="margin-top:14px"><button class="b" style="flex:1" onclick="dlg.close()">Færdig</button></div>`;
+  if(!dlg.open)dlg.showModal();
+}
+if(window.speechSynthesis)speechSynthesis.onvoiceschanged=()=>{};
+function visRetListe(q){q=norm(q);const l=document.getElementById('iretliste');if(!l)return;if(!q){l.innerHTML='';return}l.innerHTML=D.opskrifter.filter(o=>norm(o.navn).includes(q)).slice(0,15).map(o=>`<li class="row" style="flex-wrap:nowrap"><span style="flex:1">${esc(o.navn)}</span><button class="l" onclick="redigerOpskrift('${o.id}')">✏️ Ret</button></li>`).join('')||'<li class="muted">Ingen opskrifter fundet</li>'}
+function setIndstil(k,val,stille){D.indstil=D.indstil||{};D.indstil[k]=val;save();brugIndstil();if(!stille)visIndstillinger()}
+function sig(tekst){if(!window.speechSynthesis){alert('Oplæsning virker ikke i denne browser');return}speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(tekst);u.lang='da-DK';const nv=(D.indstil||{}).stemme,st=stemmer();const vx=st.find(x=>x.name===nv)||st.find(x=>/^da/i.test(x.lang));if(vx){u.voice=vx;u.lang=vx.lang}u.rate=(D.indstil||{}).hast||1;speechSynthesis.speak(u);return u}
+function laesOp(oid){
+  const b=document.getElementById('laesknap');
+  if(window.speechSynthesis&&speechSynthesis.speaking){speechSynthesis.cancel();if(b)b.textContent='🔊 Læs op';return}
+  const o=D.opskrifter.find(x=>x.id===oid);if(!o)return;const p=visPort||o.portioner;
+  const tekst=o.navn+'. Til '+p+' personer. Du skal bruge: '+o.ing.map(i=>ingTekst(skal(i,o,p)).replace(/\bspsk\b/g,'spiseskefuld').replace(/\btsk\b/g,'teskefuld').replace(/\bknsp\b/g,'knivspids').replace(/\bdl\b/g,'deciliter').replace(/\bg\b/g,'gram')).join(', ')+'. Sådan gør du. '+(o.trin&&o.trin.length?o.trin.map((x,i)=>'Trin '+(i+1)+'. '+x).join(' '):o.frem||'');
+  const u=sig(tekst);if(u&&b){b.textContent='⏹️ Stop';u.onend=()=>{const k=document.getElementById('laesknap');if(k)k.textContent='🔊 Læs op'}}
+}
+async function fotoOpskrift(inp){
+  const fl=inp.files[0];if(!fl)return;const st=document.getElementById('ostatus');st.textContent='Læser opskriften… (første gang tager det lidt længere)';
+  try{
+    await hentTesseract();
+    const r=await Tesseract.recognize(fl,'dan',{logger:m=>{if(m.status==='recognizing text')st.textContent='Læser opskriften… '+Math.round(m.progress*100)+' %'}});
+    const linjer=r.data.text.split('\n').map(l=>l.replace(/[|_]/g,'').trim()).filter(l=>l.length>1);
+    if(!linjer.length){st.textContent='Jeg kunne ikke læse noget. Prøv et skarpere billede.';return}
+    const navn=linjer[0].replace(/^[^A-Za-zÆØÅæøå]+/,'');let ing=[],trin=[],portioner=null,tid=null;
+    for(const l of linjer.slice(1)){
+      const pm=l.match(/(\d+)\s*(pers|portion)/i);if(pm&&!portioner){portioner=+pm[1];continue}
+      const tm=l.match(/(\d+)\s*min/i);if(tm&&!tid&&l.length<30){tid=+tm[1];continue}
+      if(/^(ingredienser|fremgangsmåde|sådan gør du|tilberedning)/i.test(l))continue;
+      const p=parseIng(l);if(p.maengde!=null&&l.length<45)ing.push(p);else trin.push(l.replace(/^\d+[.)]\s*/,''));
+    }
+    // saml korte, afbrudte linjer til hele sætninger
+    const samlet=[];trin.forEach(x=>{if(samlet.length&&!/[.!?]$/.test(samlet[samlet.length-1]))samlet[samlet.length-1]+=' '+x;else samlet.push(x)});
+    st.textContent='Tjek og ret teksten, før du gemmer.';
+    redigerOpskrift('',{navn,portioner,tid,ing,trin:samlet,frem:''});
+  }catch(e){st.textContent=e.message==='net'?'Kræver internet første gang.':'Billedet kunne ikke læses. Prøv et skarpere billede.'}
+}
+brugIndstil();
 
 // ---------- Gemte indkøbslister (version 14) ----------
 function sletHeleListen(){const n=D.indkob.filter(x=>!x.kobt).length;if(!n)return;const s=snap();D.indkob=D.indkob.filter(x=>x.kobt);save();vis();toast(n+' varer slettet 🗑️',fortrydTil(s))}
