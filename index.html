@@ -265,7 +265,7 @@ button.b,label.b{box-shadow:0 6px 16px rgba(232,85,62,.3)}
 <style>@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}</style>
 </head>
 <body>
-<header onclick="if(event.target===this||event.target.tagName==='H1'||event.target.tagName==='IMG')vaelgFoto()" style="cursor:pointer"><h1><img src="ikoner/ikon-192.png" alt="" style="width:1.3em;height:1.3em;border-radius:.3em;vertical-align:-.3em;margin-right:.35em">Budget og Mad</h1><button id="instknap" onclick="visGuide()" style="display:none;border:1px solid #fff;background:none;color:#fff;border-radius:10px;padding:6px 10px;font:inherit;font-size:14px;cursor:pointer">📲<span class="itxt"> Installér</span></button><button id="fortrydknap" hidden onclick="fortrydSidste()">↩️<span class="ftxt"> Fortryd</span></button><button id="indstilknap" onclick="visIndstillinger()" title="Indstillinger">⚙️</button><span class="ver" id="ver">version 30</span></header>
+<header onclick="if(event.target===this||event.target.tagName==='H1'||event.target.tagName==='IMG')vaelgFoto()" style="cursor:pointer"><h1><img src="ikoner/ikon-192.png" alt="" style="width:1.3em;height:1.3em;border-radius:.3em;vertical-align:-.3em;margin-right:.35em">Budget og Mad</h1><button id="instknap" onclick="visGuide()" style="display:none;border:1px solid #fff;background:none;color:#fff;border-radius:10px;padding:6px 10px;font:inherit;font-size:14px;cursor:pointer">📲<span class="itxt"> Installér</span></button><button id="fortrydknap" hidden onclick="fortrydSidste()">↩️<span class="ftxt"> Fortryd</span></button><button id="indstilknap" onclick="visIndstillinger()" title="Indstillinger">⚙️</button><span class="ver" id="ver">version 31</span></header>
 <nav id="nav">
   <button data-p="forside"><span class="ic">🏠</span>Hjem</button>
   <button data-p="opskrifter"><span class="ic">📖</span>Opskrifter</button>
@@ -279,7 +279,7 @@ button.b,label.b{box-shadow:0 6px 16px rgba(232,85,62,.3)}
 <dialog id="dlg"><div class="in" id="dlgin"></div></dialog>
 
 <script>
-const KEY='madapp-v1';const APP_VERSION=30, EJER='Søren';
+const KEY='madapp-v1';const APP_VERSION=31, EJER='Søren';
 let D;try{D=JSON.parse(localStorage.getItem(KEY)||'null')}catch(e){D=null;try{localStorage.setItem(KEY+'-skadet-'+Date.now(),localStorage.getItem(KEY))}catch(x){}}
 if(!D||typeof D!=='object')D={};
 ['opskrifter','indkob','lager','stdSlettet','gemteLister'].forEach(k=>{if(!Array.isArray(D[k]))D[k]=[]});
@@ -544,7 +544,7 @@ function tilfojLager(){const e=document.getElementById('nylager');if(!e.value.tr
 function brugLager(lid){const s=snap();D.lager=D.lager.filter(x=>x.id!==lid);save();vis();toast('Fjernet fra lager',fortrydTil(s))}
 
 // Budget
-function setBudget(){D.budget.maaned=tal('mbudget')||0;save();vis();toast('Budget gemt')}
+function setBudget(){const v=tal('mbudget')||0;const s=snap();D.budget.maaned=v;D.budget.madPeriode=v?{type:'maaned',belob:v}:null;save();vis();toast('Budget gemt',fortrydTil(s))}
 function tilfojUdgift(){const b=tal('ubelob');if(!b){alert('Skriv et beløb');return}D.budget.udgifter.push({id:id(),dato:document.getElementById('udato').value||iso(new Date()),tekst:document.getElementById('utekst').value.trim()||'Køb',belob:b});save();vis()}
 function skiftMd(n){const d=new Date(budgetMd+'-01');d.setMonth(d.getMonth()+n);budgetMd=iso(d).slice(0,7);vis()}
 function datoIMd(){const i=iso(new Date());return i.slice(0,7)===budgetMd?i:budgetMd+'-01'}
@@ -793,22 +793,46 @@ visFortrydKnap();
 
 // ---------- Budget: mad i dag, ret poster, sikker sletning (version 16) ----------
 function sikker(navn){return confirm('Er du helt sikker på, at du vil slette »'+(navn||'dette')+'«?\n\nDu kan fortryde bagefter med ↩️ Fortryd.')}
-function madIDagKort(md,erNu,dageIgen){
-  const b=D.budget.maaned||0;
-  if(!erNu)return '';
-  if(!b)return `<div class="card madidag"><b>🍽️ Penge til mad hver dag</b><p class="muted" style="margin:4px 0 8px">Skriv, hvad du vil bruge på mad om måneden. Så viser appen, hvad du kan bruge i dag.</p><div class="row"><input id="mbudget2" class="grow" type="text" inputmode="decimal" placeholder="Fx 2.000 kr"><button class="b" onclick="setBudget2()">Gem</button></div></div>`;
-  const idag=iso(new Date()),man=mandag(new Date());
-  const u=D.budget.udgifter.filter(x=>x.dato.slice(0,7)===md);
-  const brugtIdag=u.filter(x=>x.dato===idag).reduce((s,x)=>s+x.belob,0),brugtFoer=u.filter(x=>x.dato<idag).reduce((s,x)=>s+x.belob,0);
-  const brugtUge=u.filter(x=>new Date(x.dato)>=man&&x.dato<=idag).reduce((s,x)=>s+x.belob,0);
-  const dage=new Date(+md.slice(0,4),+md.slice(5,7),0).getDate(),ugeBudget=b/dage*7;
-  const dagsBudget=Math.max(0,(b-brugtFoer)/dageIgen),rest=dagsBudget-brugtIdag,pct=dagsBudget?Math.min(100,brugtIdag/dagsBudget*100):100;
-  return `<div class="card madidag"><div class="row"><span style="font-size:34px">🍽️</span><div style="flex:1"><div class="muted">Penge til mad i dag</div><div class="big" style="color:${rest<0?'var(--warn)':'var(--acc)'}">${kr(Math.floor(rest))}</div></div></div>
-  <div class="bar"><i class="${rest<0?'over':''}" style="width:${pct}%"></i></div>
-  <div class="row" style="justify-content:space-between;font-size:14px"><span>Brugt i dag: <b>${kr(brugtIdag)}</b></span><span>Denne uge: <b>${kr(brugtUge)}</b> af ${kr(Math.round(ugeBudget))}</span></div>
-  <div class="muted" style="font-size:13px;margin-top:4px">${rest<0?'Du har brugt lidt mere end dagens beløb. Det fordeles ud på resten af måneden.':'Bruger du mindre i dag, får du mere de næste dage.'} Madbudget: ${kr(b)} om måneden.</div></div>`;
+// Madbudget med periode (version 31): pr. dag, for X dage eller pr. måned
+function madPer(){const p=D.budget.madPeriode;if(p&&p.belob>0&&['dag','dage','maaned'].includes(p.type))return p;if(D.budget.maaned>0)return{type:'maaned',belob:D.budget.maaned};return null}
+function madPeriodeInfo(){
+  const p=madPer();if(!p)return null;const idag=new Date();idag.setHours(0,0,0,0);const iIso=iso(idag);
+  if(p.type==='dage'){const start=new Date(p.start||iIso);start.setHours(0,0,0,0);const slut=new Date(start);slut.setDate(slut.getDate()+p.dage);
+    const igen=Math.max(1,Math.round((slut-idag)/864e5));const aktiv=idag>=start&&idag<slut;
+    const brugt=D.budget.udgifter.filter(x=>x.dato>=iso(start)&&x.dato<iso(slut));
+    return{p,aktiv,igen,start,slut,brugtFoer:brugt.filter(x=>x.dato<iIso).reduce((s,x)=>s+x.belob,0),brugtIdag:brugt.filter(x=>x.dato===iIso).reduce((s,x)=>s+x.belob,0),total:p.belob,tekst:`${kr(p.belob)} for ${p.dage} ${p.dage===1?'dag':'dage'} (${start.toLocaleDateString('da-DK',{day:'numeric',month:'short'})} – ${new Date(slut-864e5).toLocaleDateString('da-DK',{day:'numeric',month:'short'})})`}}
+  const md=iIso.slice(0,7),dIM=new Date(idag.getFullYear(),idag.getMonth()+1,0).getDate(),igen=dIM-idag.getDate()+1;
+  const mStart=md+'-01',dStart=p.type==='dag'&&p.start&&p.start>mStart?p.start:mStart,dageFra=dIM-(+dStart.slice(8,10))+1;
+  const total=p.type==='dag'?p.belob*dageFra:p.belob,u=D.budget.udgifter.filter(x=>x.dato.slice(0,7)===md&&x.dato>=dStart);
+  return{p,aktiv:true,igen,total,brugtFoer:u.filter(x=>x.dato<iIso).reduce((s,x)=>s+x.belob,0),brugtIdag:u.filter(x=>x.dato===iIso).reduce((s,x)=>s+x.belob,0),tekst:p.type==='dag'?`${kr(p.belob)} pr. dag`:`${kr(p.belob)} om måneden`};
 }
-function setBudget2(){const v=tal('mbudget2');if(!v){alert('Skriv et beløb');return}const s=snap();D.budget.maaned=v;save();vis();toast('Madbudget gemt 🍽️',fortrydTil(s))}
+function madPeriodeForm(){
+  const g=madPer()||{type:'maaned',belob:'',dage:7},ty=window._madType||g.type,p={type:ty,belob:g.type===ty?g.belob:'',dage:g.dage||7};
+  return `<div class="chips" style="margin:6px 0"><button class="chip ${p.type==='dag'?'on':''}" onclick="madType('dag')">Pr. dag</button><button class="chip ${p.type==='dage'?'on':''}" onclick="madType('dage')">For et antal dage</button><button class="chip ${p.type==='maaned'?'on':''}" onclick="madType('maaned')">Pr. måned</button></div>
+  <div class="row"><input id="mpbelob" class="grow" type="text" inputmode="decimal" placeholder="${p.type==='dag'?'Fx 70 kr':p.type==='dage'?'Fx 500 kr':'Fx 2.000 kr'}" value="${p.belob?String(p.belob).replace('.',','):''}">${p.type==='dage'?`<input id="mpdage" type="number" min="1" max="60" style="width:90px" value="${p.dage||7}" title="Antal dage"><span class="muted">dage</span>`:''}<button class="b" onclick="gemMadPeriode()">Gem</button></div>`;
+}
+function madType(ty){window._madType=ty;const el=document.getElementById('madform');if(el)el.innerHTML=madPeriodeForm()}
+function gemMadPeriode(){
+  const ty=window._madType||(madPer()||{type:'maaned'}).type,b=tal('mpbelob');if(!b){alert('Skriv et beløb');return}
+  const s=snap(),dg=ty==='dage'?Math.max(1,Math.min(60,parseInt(document.getElementById('mpdage').value)||7)):null;
+  D.budget.madPeriode={type:ty,belob:b,dage:dg,start:ty!=='maaned'?iso(new Date()):null};
+  const dIM=new Date(new Date().getFullYear(),new Date().getMonth()+1,0).getDate();
+  D.budget.maaned=ty==='maaned'?b:ty==='dag'?Math.round(b*dIM):Math.round(b/dg*dIM);
+  window._madType=null;save();vis();toast('Madbudget gemt 🍽️',fortrydTil(s));
+}
+function madIDagKort(md,erNu,dageIgen){
+  if(!erNu)return '';
+  const info=madPeriodeInfo();
+  if(!info)return `<div class="card madidag"><b>🍽️ Penge til mad</b><p class="muted" style="margin:4px 0 0">Hvor mange penge har du til mad? Vælg om det er pr. dag, for et antal dage eller for en måned.</p><div id="madform">${madPeriodeForm()}</div></div>`;
+  const rest0=Math.max(0,(info.total-info.brugtFoer)/info.igen),rest=rest0-info.brugtIdag,pct=rest0?Math.min(100,info.brugtIdag/rest0*100):100;
+  const tilbageI=info.total-info.brugtFoer-info.brugtIdag;
+  return `<div class="card madidag"><div class="row"><span style="font-size:34px">🍽️</span><div style="flex:1"><div class="muted">Penge til mad i dag</div><div class="big" style="color:${rest<0?'var(--warn)':'var(--acc)'}">${info.aktiv?kr(Math.floor(rest)):'–'}</div></div></div>
+  ${info.aktiv?`<div class="bar"><i class="${rest<0?'over':''}" style="width:${pct}%"></i></div>
+  <div class="row" style="justify-content:space-between;font-size:14px"><span>Brugt i dag: <b>${kr(info.brugtIdag)}</b></span><span>Tilbage: <b>${kr(tilbageI)}</b> · ${info.igen} ${info.igen===1?'dag':'dage'}</span></div>
+  <div class="muted" style="font-size:13px;margin-top:4px">${rest<0?'Du har brugt lidt mere end dagens beløb. Det fordeles ud på de næste dage.':'Bruger du mindre i dag, får du mere de næste dage.'}</div>`:`<p class="muted">Perioden er slut. Lav en ny herunder.</p>`}
+  <details class="hjdel" style="margin-top:8px"><summary><b>Madbudget: ${info.tekst}</b> <span class="muted">– skift</span></summary><div id="madform">${madPeriodeForm()}</div></details></div>`;
+}
+function setBudget2(){window._madType='maaned';const e=document.getElementById('mbudget2');if(e){document.body.insertAdjacentHTML('beforeend','<input id="mpbelob" hidden value="'+e.value+'">');gemMadPeriode();const x=document.getElementById('mpbelob');if(x&&x.hidden)x.remove()}}
 function retPost(type,pid){
   const liste=type==='ind'?D.budget.ind:type==='fast'?D.budget.faste:D.budget.udgifter,p=liste.find(x=>x.id===pid);if(!p)return;
   dlgin.innerHTML=`<h2>✏️ Ret ${type==='ind'?'penge ind':type==='fast'?'fast udgift':'køb'}</h2>
@@ -1030,13 +1054,13 @@ function naesteLoen(md){
 function overblikKort(md,erNu){
   const b=budgetTal(md);if(!b.ind&&!b.faste&&!b.kob)return `<div class="card overblik"><b>📊 Dit overblik</b><p class="muted" style="margin:6px 0 0">Skriv din løn eller SU under »Penge ind« og dine faste udgifter i »Bank-budget«. Så regner appen ud, hvad du har tilbage – i alt, til mad og pr. dag.</p></div>`;
   const nl=erNu?naesteLoen(md):null,dage=nl?nl.dage:new Date(+md.slice(0,4),+md.slice(5,7),0).getDate();
-  const mb=D.budget.maaned||0,madTilbage=mb?mb-b.kob:null;
+  const mi=madPeriodeInfo(),mb=mi?mi.total:0,madTilbage=mi?mi.total-mi.brugtFoer-mi.brugtIdag:null;
   const tot=Math.max(b.ind,b.faste+b.kob+b.sparet,1),pct=v=>Math.max(0,v/tot*100);
   const dele=[['Faste',b.faste,'#64748b'],['Køb',b.kob,'#f59e0b'],['Opsparing',b.sparet,'#a855f7'],['Tilbage',Math.max(0,b.tilbage),'var(--acc)']].filter(d=>d[1]>0);
   return `<div class="card overblik"><div class="row" style="justify-content:space-between"><b>📊 Dit overblik</b>${nl?`<span class="muted" style="font-size:14px">${nl.kendt?'Næste løn':'Måneden slutter'} ${nl.dato.toLocaleDateString('da-DK',{day:'numeric',month:'short'})} · <b>${nl.dage} ${nl.dage===1?'dag':'dage'}</b></span>`:''}</div>
   <div class="obgrid">
    <div class="ob"><small>💰 Tilbage i alt</small><b style="color:${b.tilbage<0?'var(--warn)':'inherit'}">${kr(b.tilbage)}</b>${erNu?`<span>${b.tilbage>0?kr(Math.floor(b.tilbage/dage))+' pr. dag':'Intet tilbage'}</span>`:''}</div>
-   <div class="ob"><small>🍽️ Tilbage til mad</small>${mb?`<b style="color:${madTilbage<0?'var(--warn)':'inherit'}">${kr(madTilbage)}</b>${erNu?`<span>${madTilbage>0?kr(Math.floor(madTilbage/dage))+' pr. dag':'Madbudgettet er brugt'}</span>`:''}`:`<b>–</b><span>Sæt et madbudget nedenfor</span>`}</div>
+   <div class="ob"><small>🍽️ Tilbage til mad</small>${mb?`<b style="color:${madTilbage<0?'var(--warn)':'inherit'}">${kr(madTilbage)}</b>${erNu?`<span>${madTilbage>0?kr(Math.floor(madTilbage/(mi&&mi.p.type==='dage'?mi.igen:dage)))+' pr. dag':'Madbudgettet er brugt'}</span>`:''}`:`<b>–</b><span>Sæt et madbudget nedenfor</span>`}</div>
   </div>
   <div class="obbar">${dele.map(d=>`<i style="width:${pct(d[1])}%;background:${d[2]}" title="${d[0]}"></i>`).join('')}</div>
   <div class="oblegend">${dele.map(d=>`<span><i style="background:${d[2]}"></i>${d[0]} ${kr(d[1])}</span>`).join('')}</div>
