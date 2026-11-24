@@ -1,7 +1,7 @@
 // Budget og Mad – gemmer appen på telefonen, så den virker uden internet.
 // Sikre opdateringer: en ny version bliver først brugt, når brugeren selv trykker »Opdater«.
 // Har den nye version fejl, bliver den ikke taget i brug, og appen kører videre på den gamle.
-const VERSION = 34;
+const VERSION = 35;
 const CACHE = 'bom-v' + VERSION;
 const META = 'bom-meta';
 const FILER = ['./', './index.html', './opskrifter.js', './manifest.json', './version.json',
@@ -68,7 +68,7 @@ self.addEventListener('fetch', e => {
       const c = await caches.open(await hentAktiv());
       return (await c.match(e.request, { ignoreSearch: true })) || fetch(e.request);
     })());
-  } else if (u.hostname === 'cdn.jsdelivr.net' || u.hostname.endsWith('tessdata.projectnaptha.com')) {
+  } else if (u.hostname === 'cdn.jsdelivr.net' || u.hostname.endsWith('tessdata.projectnaptha.com') || u.hostname === 'storage.googleapis.com' || u.hostname === 'tfhub.dev' || u.hostname === 'www.kaggle.com') {
     e.respondWith(caches.match(e.request).then(h => h || fetch(e.request).then(r => {
       const k = r.clone(); caches.open(CACHE).then(c => c.put(e.request, k)); return r;
     })));

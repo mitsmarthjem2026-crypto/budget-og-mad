@@ -268,7 +268,7 @@ button.b,label.b{box-shadow:0 6px 16px rgba(232,85,62,.3)}
 <style>@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}</style>
 </head>
 <body>
-<header onclick="if(event.target===this||event.target.tagName==='H1'||event.target.tagName==='IMG')vaelgFoto()" style="cursor:pointer"><h1><img src="ikoner/ikon-192.png" alt="" style="width:1.3em;height:1.3em;border-radius:.3em;vertical-align:-.3em;margin-right:.35em">Budget og Mad</h1><button id="instknap" onclick="visGuide()" style="display:none;border:1px solid #fff;background:none;color:#fff;border-radius:10px;padding:6px 10px;font:inherit;font-size:14px;cursor:pointer">📲<span class="itxt"> Installér</span></button><button id="fortrydknap" hidden onclick="fortrydSidste()">↩️<span class="ftxt"> Fortryd</span></button><button id="indstilknap" onclick="visIndstillinger()" title="Indstillinger">⚙️</button><span class="ver" id="ver">version 34</span></header>
+<header><h1><img src="ikoner/ikon-192.png" alt="" style="width:1.3em;height:1.3em;border-radius:.3em;vertical-align:-.3em;margin-right:.35em">Budget og Mad</h1><button id="instknap" onclick="visGuide()" style="display:none;border:1px solid #fff;background:none;color:#fff;border-radius:10px;padding:6px 10px;font:inherit;font-size:14px;cursor:pointer">📲<span class="itxt"> Installér</span></button><button id="fortrydknap" hidden onclick="fortrydSidste()">↩️<span class="ftxt"> Fortryd</span></button><button id="indstilknap" onclick="visIndstillinger()" title="Indstillinger">⚙️</button><span class="ver" id="ver">version 35</span></header>
 <nav id="nav">
   <button data-p="forside"><span class="ic">🏠</span>Hjem</button>
   <button data-p="opskrifter"><span class="ic">📖</span>Opskrifter</button>
@@ -282,7 +282,7 @@ button.b,label.b{box-shadow:0 6px 16px rgba(232,85,62,.3)}
 <dialog id="dlg"><div class="in" id="dlgin"></div></dialog>
 
 <script>
-const KEY='madapp-v1';const APP_VERSION=34, EJER='Søren';
+const KEY='madapp-v1';const APP_VERSION=35, EJER='Søren';
 let D;try{D=JSON.parse(localStorage.getItem(KEY)||'null')}catch(e){D=null;try{localStorage.setItem(KEY+'-skadet-'+Date.now(),localStorage.getItem(KEY))}catch(x){}}
 if(!D||typeof D!=='object')D={};
 ['opskrifter','indkob','lager','stdSlettet','gemteLister'].forEach(k=>{if(!Array.isArray(D[k]))D[k]=[]});
@@ -401,6 +401,7 @@ lager(){
   return `<h2>Lager</h2>
   <div class="card"><div class="row"><input class="grow" id="nylager" placeholder="Fx 500 g pasta"><label style="margin:0">Holdbar til</label><input type="date" id="nyudlob"><button class="b" onclick="tilfojLager()">Tilføj</button></div>
   <div class="row" style="margin-top:10px"><button class="b" style="flex:1" onclick="scanStregkode()">📷 Scan stregkode</button><label class="b" style="flex:1;text-align:center;cursor:pointer;margin:0;color:#fff;padding:10px 16px;border-radius:14px">🧾 Foto af kvittering<input type="file" accept="image/*" capture="environment" hidden onchange="kvitteringTilLager(this)"></label></div>
+  <label class="b" style="display:block;text-align:center;cursor:pointer;margin:10px 0 0;color:#fff;padding:12px 16px;border-radius:14px">🧊 Foto af køleskab eller skab<input type="file" accept="image/*" capture="environment" hidden onchange="koeleskabFoto(this)"></label>
   <div id="lstatus" class="muted" style="margin-top:6px"></div></div>
   <div class="card"><ul class="list">${s.length?s.map(x=>{const dage=x.udlob?Math.round((new Date(x.udlob)-idag)/864e5):null;const soon=dage!=null&&dage<=3;
     return `<li class="${soon?'soon':''}"><span class="n">${esc(ingTekst(x))}</span>
@@ -483,7 +484,7 @@ function visOpskrift(oid,p){
    ${mangler.length?`<h3>🛒 Du mangler (${mangler.length})</h3><ul class="ingl">${mangler.map(i=>`<li>▫️ ${esc(ingTekst(i))} <a class="tilbud" href="https://etilbudsavis.dk/soeg/${encodeURIComponent(i.navn)}" target="_blank" rel="noopener">tilbud ↗</a></li>`).join('')}</ul>`:''}
    ${har.length?`<h3>✅ Du har på lager (${har.length})</h3><ul class="ingl">${har.map(i=>`<li>✅ ${esc(ingTekst(i))}</li>`).join('')}</ul>`:''}`})()}
   ${o.trin&&o.trin.length?`<h3>Sådan gør du</h3><ol class="trin">${o.trin.map(x=>`<li>${esc(x)}</li>`).join('')}</ol>`:o.frem?`<h3>Sådan gør du</h3><div style="white-space:pre-wrap">${esc(o.frem)}</div>`:''}
-  <div class="row" style="margin-top:16px"><button class="b" onclick="opskriftTilIndkob('${o.id}')">🛒 Læg det, jeg mangler, i indkøbslisten</button><button class="b" onclick="document.getElementById('vdag').hidden=false">📅 På madplan</button><button class="b" onclick="lavRet('${o.id}')">👩‍🍳 Jeg har lavet den</button></div>
+  <div class="row" style="margin-top:16px"><button class="b" onclick="opskriftTilIndkob('${o.id}')">🛒 Læg det, jeg mangler, i indkøbslisten</button><button class="b" onclick="document.getElementById('vdag').hidden=false">📅 På madplan</button><button class="b" onclick="lavRet('${o.id}')">👩‍🍳 Jeg har lavet den (træk fra lager)</button></div>
   <div id="vdag" hidden><p class="muted" style="margin:10px 0 6px">Hvilken dag?</p><div class="chips">${dage.map(d=>`<button class="chip" onclick="setPlan('${iso(d)}','opskrift','${o.id}');dlg.close();toast('${esc(o.navn)} er sat på ${d.toLocaleDateString('da-DK',{weekday:'long'})}')">${d.toLocaleDateString('da-DK',{weekday:'short',day:'numeric'})}</button>`).join('')}</div></div>
   <div class="row" style="margin-top:10px"><button class="l" id="laesknap" onclick="laesOp('${o.id}')">🔊 Læs op</button><button class="l" onclick="del('opskrift:${o.id}')">📤 Del</button><button class="l" onclick="sletOpskrift('${o.id}')">Slet</button><button class="l" onclick="dlg.close()">Luk</button></div>
   <p class="muted" style="font-size:13px">✅ = det har du på lager. Salt, peber og vand regner vi med, at du har.</p>`;
@@ -708,7 +709,7 @@ SIDER.forside=function(){
   const b=budgetTal(md);
   const info={budget:b.ind?'Tilbage: '+kr(b.tilbage):'Skriv din løn ind',opskrifter:D.opskrifter.length?D.opskrifter.length+' opskrifter':'Gem din første ret',madplan:ret?'I dag: '+ret:'Hvad skal du spise i dag?',indkob:paaListe?paaListe+' ting på listen':'Listen er tom',lager:D.lager.length?D.lager.length+' varer'+(snart?' · '+snart+' udløber snart':''):'Hvad har du derhjemme?'};
   const h=nu.getHours(),hilsen=h<10?'Godmorgen':h<17?'Hej':'Godaften';
-  return `<div class="fhero" style="background-image:url('${valgtFoto()}');cursor:pointer" onclick="vaelgFoto()"><button class="skiftfoto" onclick="event.stopPropagation();vaelgFoto()">🖼️ Skift billede</button><label class="skiftfoto egetfoto" onclick="event.stopPropagation()">📷 Mit foto<input type="file" accept="image/*" hidden onchange="egetFoto(this)"></label><div><div class="fh1">${hilsen} 👋</div><div class="fh2">Hvad skal vi i dag?</div></div></div>
+  return `<div class="fhero" style="background-image:url('${valgtFoto()}')"><div><div class="fh1">${hilsen} 👋</div><div class="fh2">Hvad skal vi i dag?</div></div></div>
   <div class="tiles">${Object.entries(FOTO).map(([k,f])=>`<button class="tile t-${k}" onclick="gaaTil('${k}')" style="background-image:url(${knapFoto(k)})"><span class="te">${f[1]}</span><span class="tskift" role="button" title="Skift billede" onclick="event.stopPropagation();vaelgKnapFoto('${k}')">🖼️</span><span class="tn">${f[2]}</span><span class="ti">${esc(info[k])}</span></button>`).join('')}</div>
   ${forsideTips()}
   ${hjaelpKort()}`;
@@ -921,6 +922,8 @@ function visIndstillinger(){
   dlgin.innerHTML=`<h2>⚙️ Indstillinger</h2>
   <h3>🔠 Tekststørrelse</h3><div class="chips">${[['lille','Lille'],['normal','Normal'],['stor','Stor'],['kaempe','Meget stor']].map(([k,n])=>`<button class="chip ${ (v.str||'normal')===k?'on':''}" onclick="setIndstil('str','${k}')">${n}</button>`).join('')}</div>
   <h3>✍️ Skrifttype</h3><div class="chips">${[['rund','Rund'],['klassisk','Klassisk'],['enkel','Enkel'],['laese','Let at læse']].map(([k,n])=>`<button class="chip ${(v.font||'rund')===k?'on':''}" style="font-family:${FONTE[k]||'inherit'}" onclick="setIndstil('font','${k}')">${n}</button>`).join('')}</div>
+  <h3>🖼️ Billedet øverst</h3><div class="row" style="flex-wrap:nowrap;align-items:center"><div style="width:110px;height:70px;border-radius:14px;background:url('${valgtFoto()}') center/cover;flex:none"></div><button class="b" style="flex:1" onclick="vaelgFoto()">Skift billedet øverst</button></div>
+  <p class="muted" style="font-size:13px">Vælg mellem 20 billeder eller dit eget foto. Billederne på knapperne skifter du med 🖼️ på hver knap.</p>
   <h3>💬 Hjælp</h3>${hjaelpIndstil()}
   <h3>🎨 Farver</h3><div class="temaer"><button class="tema ${!D.indstil.tema?'on':''}" style="background:linear-gradient(135deg,#ff8a3d,#e8364f)" onclick="setIndstil('tema','')"><span>Standard</span></button>${Object.entries(TEMAER).filter(([k])=>k!=='solnedgang').map(([k,v])=>`<button class="tema ${D.indstil.tema===k?'on':''}" style="background:linear-gradient(135deg,${v[1]},${v[2]})" onclick="setIndstil('tema','${k}')"><span>${v[0]}</span></button>`).join('')}</div>
   <h3>🖼️ Baggrund</h3><div class="galleri g3">${BAGGRUNDE.map(([p,n])=>`<button class="gfoto ${(D.indstil.baggrund||'ingen')===p?'on':''}" style="${p==='ingen'?'background:var(--felt)':'background-image:url('+p+')'}" onclick="setIndstil('baggrund','${p}')"><span>${n}</span></button>`).join('')}</div>
@@ -1156,6 +1159,39 @@ async function bonFoto(inp){
   }catch(e){st.textContent=e.message==='net'?'Kræver internet første gang.':'Billedet kunne ikke læses. Prøv et skarpere billede.'}
 }
 
+// ---------- Foto af køleskab -> lager (version 35) ----------
+// Gratis: TensorFlow COCO-SSD kører i browseren + tekst på pakker (Tesseract). Ingen nøgle, intet sendes væk.
+const COCO_DA={banana:'Bananer',apple:'Æbler',orange:'Appelsiner',broccoli:'Broccoli',carrot:'Gulerødder','hot dog':'Pølser',pizza:'Pizza',donut:'Donuts',cake:'Kage',sandwich:'Sandwich',bottle:'Flaske (fx mælk/juice)',cup:'Kop/bæger (fx yoghurt)',bowl:'Skål med rester'};
+function hentScript(src){return new Promise((ok,fejl)=>{if(document.querySelector('script[src="'+src+'"]'))return ok();const s=document.createElement('script');s.src=src;s.onload=ok;s.onerror=()=>fejl(new Error('net'));document.head.appendChild(s)})}
+let cocoModel=null;
+async function hentCoco(){if(cocoModel)return cocoModel;await hentScript('https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.22.0/dist/tf.min.js');await hentScript('https://cdn.jsdelivr.net/npm/@tensorflow-models/coco-ssd@2.2.3/dist/coco-ssd.min.js');cocoModel=await cocoSsd.load({base:'mobilenet_v2'});return cocoModel}
+function kendteVareord(){const s=new Set();D.opskrifter.forEach(o=>o.ing.forEach(i=>tok(i.navn).forEach(w=>{if(w.length>=4&&!/^(spsk|dåse|dåser|pakke|bundt|frisk|stk)$/.test(w))s.add(w)})));['mælk','skyr','yoghurt','smør','ost','æg','juice','fløde','pålæg','skinke','leverpostej','rugbrød','toast','pasta','ris','havregryn','kyllingebryst','hakket','bacon','pølser','agurk','tomat','tomater','peberfrugt','salat','løg','kartofler','creme','fraiche','remoulade','ketchup','sennep','mayonnaise'].forEach(w=>s.add(w));return s}
+async function koeleskabFoto(inp){
+  const fl=inp.files[0];if(!fl)return;const st=document.getElementById('lstatus');st.textContent='Ser på billedet… (første gang skal appen hente genkendelsen – det kan tage lidt tid)';
+  const img=new Image();img.src=URL.createObjectURL(fl);await new Promise(r=>img.onload=r);
+  const fund=new Map();let fejl='';
+  try{const mdl=await hentCoco();const res=await mdl.detect(img,30,.35);res.forEach(p=>{const da=COCO_DA[p.class];if(da)fund.set(da,(fund.get(da)||0)+1)})}catch(e){fejl='billede'}
+  try{st.textContent='Læser tekst på pakkerne…';await hentTesseract();const r=await Tesseract.recognize(fl,'dan');const ord=kendteVareord();
+    const set=new Set();r.data.text.toLowerCase().replace(/[^a-zæøå\s]/g,' ').split(/\s+/).forEach(w=>{if(w.length>=3&&ord.has(w))set.add(w)});
+    set.forEach(w=>{const navn=w.charAt(0).toUpperCase()+w.slice(1);if(![...fund.keys()].some(k=>norm(k).includes(w)))fund.set(navn,1)})}catch(e){if(!fejl)fejl='tekst'}
+  URL.revokeObjectURL(img.src);st.textContent='';
+  const liste=[...fund.entries()];
+  dlgin.innerHTML=`<h2>🧊 Det kunne jeg se</h2><p class="muted" style="margin-top:-6px">${liste.length?'Tjek listen. Fjern fluebenet ved det forkerte, og skriv det, jeg ikke fandt.':'Jeg kunne ikke genkende noget på billedet.'}</p>
+  <ul class="ingl" id="kslist">${liste.map(([n,a],i)=>`<li class="row" style="flex-wrap:nowrap"><input type="checkbox" checked id="ks${i}" style="width:22px;height:22px"><input id="kn${i}" value="${esc(a>1?a+' '+n:n)}" style="flex:1"></li>`).join('')}</ul>
+  <label>Mangler der noget? (komma mellem varerne)</label><textarea id="ksekstra" style="min-height:60px" placeholder="Fx mælk, æg, smør"></textarea>
+  <p class="muted" style="font-size:13px">Appen kan kun genkende nogle få ting på billeder (fx frugt, gulerødder, broccoli, flasker) og læse tekst på pakker. Resten skriver du selv. Billedet sendes ikke nogen steder hen.</p>
+  <div class="row" style="margin-top:10px"><button class="b" style="flex:1" onclick="gemKoeleskab(${liste.length})">🥫 Læg på lager</button><button class="l" onclick="dlg.close()">Annullér</button></div>`;
+  dlg.showModal();
+  if(fejl==='billede'&&!liste.length)toast('Billedgenkendelsen kræver internet første gang');
+}
+function gemKoeleskab(n){
+  const s=snap();let k=0;const navne=[];
+  for(let i=0;i<n;i++){if(!document.getElementById('ks'+i).checked)continue;const v=document.getElementById('kn'+i).value.trim();if(v)navne.push(v)}
+  document.getElementById('ksekstra').value.split(/[,\n]+/).map(x=>x.trim()).filter(Boolean).forEach(v=>navne.push(v));
+  navne.forEach(v=>{const p=parseIng(v);if(iLager(p.navn))return;D.lager.push({id:id(),...p,udlob:''});k++});
+  save();dlg.close();vis();toast(k?k+' varer lagt på lager 🥫':'Det hele var allerede på lager',k?fortrydTil(s):null);
+}
+
 // ---------- Gemte indkøbslister (version 14) ----------
 function sletHeleListen(){const n=D.indkob.filter(x=>!x.kobt).length;if(!n)return;const s=snap();D.indkob=D.indkob.filter(x=>x.kobt);save();vis();toast(n+' varer slettet 🗑️',fortrydTil(s))}
 function gemteListerKort(ikke){
@@ -1202,7 +1238,7 @@ function vaelgFoto(fane){
   <div class="row"><button class="l" style="flex:1" onclick="dlg.close()">Luk</button></div>`;
   if(!dlg.open)dlg.showModal();
 }
-function setFoto(p){const s=snap();D.indstil.foto=p;save();brugFoto();dlg.close();vis();toast('Nyt billede valgt 🎉',fortrydTil(s))}
+function setFoto(p){const s=snap();D.indstil.foto=p;save();brugFoto();dlg.close();vis();visIndstillinger();toast('Nyt billede valgt 🎉',fortrydTil(s))}
 function egetFoto(inp){const fl=inp.files[0];if(!fl)return;const img=new Image();img.onload=()=>{const mx=1200,sk=Math.min(1,mx/Math.max(img.width,img.height)),c=document.createElement('canvas');c.width=Math.round(img.width*sk);c.height=Math.round(img.height*sk);c.getContext('2d').drawImage(img,0,0,c.width,c.height);
   const s=snap();D.indstil.egetFoto=c.toDataURL('image/jpeg',.8);D.indstil.foto='eget';try{save()}catch(e){D=JSON.parse(s);alert('Billedet er for stort. Prøv et andet.');return}URL.revokeObjectURL(img.src);brugFoto();dlg.close();vis();toast('Dit eget foto er sat ind 🎉',fortrydTil(s))};img.src=URL.createObjectURL(fl)}
 brugFoto();

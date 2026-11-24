@@ -233,3 +233,6 @@ fotos/galleri/lager-22.jpg: NordWood Themes – https://unsplash.com/photos/Ukax
 fotos/galleri/lager-23.jpg: Muhammed A. Mustapha – https://unsplash.com/photos/l8pJWy8N2jA
 fotos/galleri/lager-24.jpg: Antonio Araujo – https://unsplash.com/photos/LXcwwdZcPwQ
 fotos/galleri/lager-25.jpg: Julia Fiander – https://unsplash.com/photos/U2edNLT_jI8
+
+Version 35 – genkendelse af varer på foto: TensorFlow.js + COCO-SSD (gratis, åben kildekode, kører på telefonen) – https://github.com/tensorflow/tfjs-models
+
