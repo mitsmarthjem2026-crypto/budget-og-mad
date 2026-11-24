@@ -338,7 +338,7 @@ body{padding-top:env(safe-area-inset-top)}
 <dialog id="dlg"><div class="in" id="dlgin"></div></dialog>
 
 <script>
-const KEY='madapp-v1';const ENHED=(()=>{let e=localStorage.getItem('madapp-v1-enhed');if(!e){e=(crypto.randomUUID?crypto.randomUUID():Date.now().toString(36)+Math.random().toString(36).slice(2));localStorage.setItem('madapp-v1-enhed',e)}return e})();const APP_VERSION=53, EJER='Søren';
+const KEY='madapp-v1';const ENHED=(()=>{let e=localStorage.getItem('madapp-v1-enhed');if(!e){e=(crypto.randomUUID?crypto.randomUUID():Date.now().toString(36)+Math.random().toString(36).slice(2));localStorage.setItem('madapp-v1-enhed',e)}return e})();const APP_VERSION=55, EJER='Søren';
 let D;try{D=JSON.parse(localStorage.getItem(KEY)||'null')}catch(e){D=null;try{localStorage.setItem(KEY+'-skadet-'+Date.now(),localStorage.getItem(KEY))}catch(x){}}
 if(!D||typeof D!=='object')D={};
 ['opskrifter','indkob','lager','stdSlettet','gemteLister'].forEach(k=>{if(!Array.isArray(D[k]))D[k]=[]});
@@ -502,6 +502,7 @@ budget(){
   <div class="row" style="margin-top:8px"><input class="grow" id="ftekst" placeholder="Fx Husleje"><input type="text" inputmode="decimal" id="fbelob" placeholder="kr" style="width:110px"><input type="number" min="1" max="31" id="fdag" placeholder="dag" title="Hvilken dag i måneden betales den?" style="width:80px"><button class="b" onclick="tilfojFast()">Tilføj</button></div>
   <ul class="list">${[...D.budget.faste].sort((a,b)=>(a.dag||99)-(b.dag||99)).map(x=>`<li><span class="muted" style="width:52px">${x.dag?'d. '+x.dag:''}</span><span class="n">${esc(x.tekst)}</span><b>${kr(x.belob)}</b><button class="x" title="Ret" onclick="retPost('fast','${x.id}')">✏️</button><button class="x" title="Slet" onclick="sletFast('${x.id}')">🗑️</button></li>`).join('')}</ul>
   ${D.budget.faste.length?`<div class="row" style="justify-content:space-between;margin-top:8px;font-weight:700"><span>I alt pr. måned: ${kr(sumFaste)}</span><span class="muted">pr. år: ${kr(sumFaste*12)}</span></div>`:''}</div>
+  ${huskeKort()}
   ${opsparingKort()}
   <h2 style="margin-top:22px">🛒 Køb</h2>
   <div class="card"><div class="row"><label style="margin:0">Budget til mad pr. måned</label><input type="text" inputmode="decimal" id="mbudget" value="${b||''}" placeholder="kr" style="width:140px"><button class="l" onclick="setBudget()">Gem</button></div>
@@ -607,6 +608,29 @@ function kobtTilLager(){
 function tilfojLager(){const e=document.getElementById('nylager');if(!e.value.trim())return;D.lager.push({id:id(),...parseIng(e.value),udlob:document.getElementById('nyudlob').value});save();vis();document.getElementById('nylager').focus()}
 function brugLager(lid){const s=snap();D.lager=D.lager.filter(x=>x.id!==lid);save();vis();toast('Fjernet fra lager',fortrydTil(s))}
 
+// ---------- Huskeliste til budgettet (version 54) ----------
+// Kilde: Forbrugerrådet Tænk, »Husk disse budgetposter, når du lægger budget« (6. juni 2025)
+const HUSKE=[
+ ['Penge ind',[['lon','💼','Løn',/løn/i],['su','🎓','SU',/\bsu\b/i],['boligst','🏠','Boligstøtte (søg på borger.dk)',/boligst|boligsik/i],['feriep','🌴','Feriepenge',/feriep/i]],'ind'],
+ ['Bolig',[['husleje','🏠','Husleje',/husleje|leje/i],['el','💡','El',/\bel\b|strøm/i],['vand','🚿','Vand og varme',/vand|varme|aconto/i],['vask','🧺','Vaskeri',/vask/i],['vedl','🔧','Vedligehold (fx pærer, maling)',/vedlige|reparation/i]],'fast'],
+ ['Forsikring og a-kasse',[['indbo','🛋️','Indboforsikring (dækker tyveri, brand og skader du laver på andre)',/indbo|familieforsik|ansvar/i],['ulykke','🩹','Ulykkesforsikring',/ulykke/i],['rejse','🧳','Rejseforsikring',/rejseforsik/i],['akasse','🛟','A-kasse og fagforening',/a-kasse|akasse|fagforening/i]],'fast'],
+ ['Mobil og internet',[['mobil','📱','Mobil',/mobil|telefon/i],['net','🌐','Internet',/internet|bredbånd|wifi/i],['stream','📺','Streaming (fx Netflix, Spotify)',/stream|netflix|spotify|hbo|viaplay|disney|tv\s?2/i]],'fast'],
+ ['Transport',[['bus','🚌','Bus, tog eller rejsekort',/bus|tog|rejsekort|pendler|ungdomskort/i],['cykel','🚲','Cykel eller bil (reparation, benzin)',/cykel|\bbil\b|benzin/i]],'fast'],
+ ['Lån og opsparing',[['laan','💳','Lån og afdrag',/lån|afdrag|kredit/i],['spar','🐷','Opsparing hver måned',/opspar|spar/i]],'fast'],
+ ['Fritid',[['fitness','🏋️','Sport og fitness',/fitness|sport|klub|forening/i]],'fast'],
+ ['Hverdag (det, der svinger)',[['mad','🛒','Mad og dagligvarer',null],['takeaway','🍕','Take-away og café',null],['toj','👕','Tøj og sko',null],['pleje','🧴','Frisør og personlig pleje',null],['sund','💊','Medicin og tandlæge',null],['hjem','🪑','Ting til hjemmet',null]],'kob'],
+ ['Husk at spare op til',[['gaver','🎁','Gaver og fødselsdage',null],['jul','🎄','Julegaver',null],['ferie','✈️','Ferie og rejser',null],['buffer','🧯','Uventede ting (fx ny telefon)',null]],'kob']
+];
+function huskeHar(k,rx,hvor){const h=(D.budget.huske||{});if(h[k])return true;if(!rx)return false;const l=hvor==='ind'?D.budget.ind:hvor==='fast'?D.budget.faste:[];return l.some(x=>rx.test(x.tekst||''))}
+function huskeKort(){
+  let i=0,a=0;const grp=HUSKE.map(([navn,pk,hvor])=>`<div style="margin-top:10px"><b style="font-size:14px">${navn}</b>${pk.map(([k,ik,tx,rx])=>{const ok=huskeHar(k,rx,hvor);a++;if(ok)i++;return `<label class="row" style="margin:6px 0;gap:8px;cursor:pointer;font-weight:400"><input type="checkbox" ${ok?'checked':''} onchange="huskeSkift('${k}',this.checked)" style="width:22px;height:22px;flex:none"><span style="flex:1;${ok?'text-decoration:line-through;opacity:.6':''}">${ik} ${tx}</span>${!ok&&hvor!=='kob'?`<button class="l" style="padding:4px 10px" title="Skriv den ind" onclick="event.preventDefault();huskeLaegInd('${hvor}','${tx.replace(/ \(.*\)/,'').replace(/'/g,'')}')">＋</button>`:''}</label>`}).join('')}</div>`).join('');
+  return `<div class="card"><details${(D.budget.huskeAaben?' open':'')} ontoggle="D.budget.huskeAaben=this.open;save()"><summary style="cursor:pointer;font-weight:700">📝 Huskeliste – det skal med i dit budget <span class="muted" style="font-weight:400">(${i} af ${a})</span></summary>
+  <p class="muted" style="margin:6px 0 0">Sæt flueben, når du har det med. Tryk ＋ for at skrive den ind. Det, der svinger, skriver du under Køb.</p>${grp}
+  <p class="muted" style="font-size:12px;margin-top:10px">Kilde: Forbrugerrådet Tænk – »Husk disse budgetposter, når du lægger budget«.</p></details></div>`
+}
+function huskeSkift(k,v){D.budget.huske=D.budget.huske||{};if(v)D.budget.huske[k]=1;else delete D.budget.huske[k];save();vis()}
+function huskeLaegInd(hvor,tx){const id=hvor==='ind'?'itekst':'ftekst',b=hvor==='ind'?'ibelob':'fbelob';const e=document.getElementById(id);if(!e)return;e.value=tx;const be=document.getElementById(b);be.scrollIntoView({behavior:'smooth',block:'center'});setTimeout(()=>be.focus(),300);toast('Skriv beløbet og tryk Tilføj')}
+
 // Budget
 function setBudget(){const v=tal('mbudget')||0;const s=snap();D.budget.maaned=v;D.budget.madPeriode=v?{type:'maaned',belob:v}:null;save();vis();toast('Budget gemt',fortrydTil(s))}
 function tilfojUdgift(){const b=tal('ubelob');if(!b){alert('Skriv et beløb');return}D.budget.udgifter.push({id:id(),dato:document.getElementById('udato').value||iso(new Date()),tekst:document.getElementById('utekst').value.trim()||'Køb',belob:b});save();vis()}
@@ -634,7 +658,7 @@ function budgetTal(md){const ind=D.budget.ind.filter(x=>x.dato.slice(0,7)===md).
 function maalEmoji(n){n=norm(n);const l=[['ferie|rejse|tur','✈️'],['telefon|iphone|mobil','📱'],['computer|pc|mac','💻'],['bil|kørekort','🚗'],['cykel','🚲'],['koncert|festival|billet','🎟️'],['gave|jul','🎁'],['buffer|nød|uforudset','🛟'],['tøj|sko','👟'],['spil|playstation|xbox','🎮'],['flytte|lejlighed|depositum','🏠']];for(const[k,e]of l)if(new RegExp(k).test(n))return e;return '🎯'}
 function opsparingKort(){
   return `<div class="card"><b>🐷 Opsparing</b> <span class="muted">– spar op til noget, du drømmer om</span>
-  ${D.budget.maal.map(g=>{const s=g.ind.reduce((a,x)=>a+x.belob,0),p=Math.min(100,g.maal?s/g.maal*100:0);return `<div class="maal"><div class="row"><span style="font-size:28px">${g.emoji}</span><b style="flex:1">${esc(g.navn)}</b><span><b>${kr(s)}</b> / ${kr(g.maal)}</span><button class="x" title="Slet" onclick="sletMaal('${g.id}')">🗑️</button></div>
+  ${D.budget.maal.map(g=>{const s=g.ind.reduce((a,x)=>a+x.belob,0),p=Math.min(100,g.maal?s/g.maal*100:0);return `<div class="maal"><div class="row"><span style="font-size:28px">${g.emoji}</span><b style="flex:1">${esc(g.navn)}</b><span><b>${kr(s)}</b> / ${kr(g.maal)}</span><button class="x" title="Ret" onclick="retMaal('${g.id}')">✏️</button><button class="x" title="Slet" onclick="sletMaal('${g.id}')">🗑️</button></div>
    <div class="bar"><i style="width:${p}%"></i></div>${p>=100?'<div style="font-weight:800">🎉 Mål nået! Sejt gået!</div>':`<div class="muted" style="font-size:14px">${kr(g.maal-s)} tilbage · ${Math.round(p)} %</div>`}
    <div class="row" style="margin-top:8px"><input type="text" inputmode="decimal" id="ms-${g.id}" placeholder="kr" style="flex:1 1 90px"><button class="b" onclick="spar('${g.id}',1)">+ Læg til</button><button class="l" onclick="spar('${g.id}',-1)">− Tag ud</button></div></div>`}).join('')}
   <div class="row" style="margin-top:12px"><input id="mnavn" class="grow" placeholder="Fx Ny telefon, Ferie, Buffer"><input id="mbelob" type="text" inputmode="decimal" placeholder="Mål i kr" style="width:120px"><button class="b" onclick="nytMaal()">+ Nyt mål</button></div>
@@ -643,6 +667,10 @@ function opsparingKort(){
 function nytMaal(){const n=document.getElementById('mnavn').value.trim(),b=tal('mbelob');if(!n||!b){alert('Skriv hvad du sparer op til og hvor meget');return}D.budget.maal.push({id:id(),navn:n,emoji:maalEmoji(n),maal:b,ind:[]});save();vis();toast('Nyt sparemål: '+n+' 🐷')}
 function spar(gid,fortegn){const g=D.budget.maal.find(x=>x.id===gid),b=tal('ms-'+gid);if(!b){alert('Skriv et beløb');return}const s=snap(),har=g.ind.reduce((a,x)=>a+x.belob,0);if(fortegn<0&&b>har){alert('Der er kun '+kr(har)+' på opsparingen');return}
   g.ind.push({dato:datoIMd(),belob:fortegn*b});save();vis();const ny=har+fortegn*b;toast(fortegn>0?(ny>=g.maal?'🎉 Du har nået dit mål!':'+'+kr(b)+' til '+g.navn+' 🐷'):kr(b)+' taget ud',fortrydTil(s))}
+function retMaal(gid){const g=D.budget.maal.find(x=>x.id===gid);if(!g)return;
+  dlgin.innerHTML=`<h2>✏️ Ret sparemål</h2><label>Hvad sparer du op til?</label><input id="rmnavn" style="width:100%" value="${esc(g.navn)}"><label>Mål (kr)</label><input id="rmbelob" type="text" inputmode="decimal" style="width:100%" value="${String(g.maal).replace('.',',')}">
+  <div class="row" style="margin-top:14px"><button class="b" style="flex:1" onclick="gemMaal('${gid}')">✓ Gem</button><button class="l" onclick="dlg.close()">Annullér</button></div>`;dlg.showModal()}
+function gemMaal(gid){const g=D.budget.maal.find(x=>x.id===gid);if(!g)return;const n=document.getElementById('rmnavn').value.trim(),b=tal('rmbelob');if(!n||!b){alert('Skriv navn og beløb');return}const s=snap();g.navn=n;g.maal=b;g.emoji=maalEmoji(n);save();dlg.close();vis();toast('Sparemålet er gemt',fortrydTil(s))}
 function sletMaal(gid){const p=D.budget.maal.find(y=>y.id===gid);if(!sikker(p&&p.navn))return;const s=snap();D.budget.maal=D.budget.maal.filter(x=>x.id!==gid);save();vis();toast('Sparemålet er slettet',fortrydTil(s))}
 // Lager -> opskrifter
 function kanLave(){
