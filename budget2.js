@@ -441,3 +441,124 @@ function kontoKort(md) {
   <div class="chips" style="flex-wrap:wrap;overflow:visible">${brugte.map(([k, ik, navn]) => `<button class="chip ${v[k] ? 'on' : ''}" onclick="kontoSkift('${k}')">${v[k] ? '✓ ' : ''}${ik} ${navn}</button>`).join('')}</div>
   ${iMd ? `<div class="muted" style="margin-top:8px">Denne måned betalt fra kontoen: <b>${kr(Math.round(iMd))}</b> (tæller ikke med i »Tilbage«)</div>` : ''}</div>`;
 }
+
+// ---------- Version 79: 📤 Send budget til banken ----------
+// Laver en pæn oversigt (PDF via »Udskriv/Gem som PDF«) eller en CSV-fil, som du selv deler med banken
+// (fx i bankens sikre post eller på mail). Intet sendes af appen selv – det sker først, når du deler det.
+let sendAar = null;
+function sendKort() {
+  const aar = sendAar || new Date().getFullYear();
+  return `<div class="card"><b>📤 Send budget til banken</b>
+  <p class="muted" style="margin:6px 0 8px">Lav en pæn oversigt over dit budget for et helt år: penge ind, faste udgifter, køb, opsparing og hvad der er tilbage pr. måned. Du sender den selv – fx i bankens sikre post (mobilbank/netbank) eller på mail. Appen sender ikke noget.</p>
+  <div class="row" style="margin-bottom:8px"><button class="l" onclick="sendAar=${aar - 1};vis()">‹ ${aar - 1}</button><b style="flex:1;text-align:center">${aar}</b><button class="l" onclick="sendAar=${aar + 1};vis()">${aar + 1} ›</button></div>
+  <div class="row"><button class="b" style="flex:1" onclick="sendPdf(${aar})">📄 Lav PDF</button><button class="b" style="flex:1" onclick="sendCsv(${aar})">📊 Del som regneark (CSV)</button></div>
+  <p class="muted" style="font-size:13px;margin:8px 0 0">PDF: Når udskriv-vinduet kommer på iPhone, så tryk »Del« øverst og gem eller send PDF'en. På PC: vælg »Gem som PDF«.</p></div>`;
+}
+function sendData(aar) {
+  const md = Array.from({length: 12}, (_, i) => { const m = aar + '-' + String(i + 1).padStart(2, '0'), b = budgetTal(m); return {m, b, har: b.ind > 0 || b.kob > 0 || b.sparet !== 0} });
+  const med = md.filter(x => x.har), sum = k => med.reduce((s, x) => s + x.b[k], 0);
+  return {md, med, ind: sum('ind'), faste: sum('faste'), kob: sum('kob'), sparet: sum('sparet'), tilbage: sum('tilbage')};
+}
+function sendPdf(aar) {
+  const d = sendData(aar), k = n => kr(Math.round(n)), mn = m => new Date(m + '-01').toLocaleDateString('da-DK', {month: 'long'});
+  const n = d.med.length || 1, konto = (typeof kontoValg === 'function') ? Object.keys(kontoValg()) : [];
+  const html = `<!doctype html><html lang="da"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Budget ${aar}</title>
+<style>body{font:14px/1.45 system-ui,-apple-system,Segoe UI,sans-serif;color:#111;margin:24px;max-width:820px}h1{font-size:24px;margin:0 0 4px}h2{font-size:17px;margin:22px 0 6px;border-bottom:2px solid #333;padding-bottom:3px}table{width:100%;border-collapse:collapse}td,th{padding:5px 6px;border-bottom:1px solid #ddd;text-align:right}td:first-child,th:first-child{text-align:left}th{background:#f3f3f3}.m{color:#b91c1c}.p{color:#15803d}.lille{color:#555;font-size:12px}tr.sum td{font-weight:700;border-top:2px solid #333}@media print{body{margin:10mm}button{display:none}}</style></head><body>
+<button onclick="print()" style="float:right;padding:10px 16px;font-size:15px">🖨️ Udskriv / Gem som PDF</button>
+<h1>Budget ${aar}</h1><div class="lille">Lavet ${new Date().toLocaleDateString('da-DK', {day: 'numeric', month: 'long', year: 'numeric'})} med appen Budget og Mad. Beløb i kr.</div>
+<h2>Kort fortalt (gennemsnit pr. måned, ${d.med.length} måneder med tal)</h2>
+<table><tr><td>Penge ind</td><td>${k(d.ind / n)}</td></tr><tr><td>Faste udgifter</td><td>${k(d.faste / n)}</td></tr><tr><td>Køb og andre udgifter</td><td>${k(d.kob / n)}</td></tr><tr><td>Opsparing</td><td>${k(d.sparet / n)}</td></tr><tr class="sum"><td>Tilbage</td><td class="${d.tilbage < 0 ? 'm' : 'p'}">${k(d.tilbage / n)}</td></tr></table>
+<h2>Måned for måned</h2>
+<table><tr><th>Måned</th><th>Ind</th><th>Faste</th><th>Køb</th><th>Opsparing</th><th>Tilbage</th></tr>
+${d.md.map(x => x.har ? `<tr><td>${mn(x.m)}</td><td>${k(x.b.ind)}</td><td>${k(x.b.faste)}</td><td>${k(x.b.kob)}</td><td>${k(x.b.sparet)}</td><td class="${x.b.tilbage < 0 ? 'm' : 'p'}">${k(x.b.tilbage)}</td></tr>` : `<tr><td>${mn(x.m)}</td><td colspan="5" class="lille">ingen tal</td></tr>`).join('')}
+<tr class="sum"><td>I alt</td><td>${k(d.ind)}</td><td>${k(d.faste)}</td><td>${k(d.kob)}</td><td>${k(d.sparet)}</td><td class="${d.tilbage < 0 ? 'm' : 'p'}">${k(d.tilbage)}</td></tr></table>
+${D.budget.faste.length ? `<h2>Faste udgifter hver måned</h2><table>${[...D.budget.faste].sort((a, b) => b.belob - a.belob).map(x => `<tr><td>${esc(x.tekst)}${x.dag ? ` <span class="lille">(d. ${x.dag})</span>` : ''}</td><td>${k(x.belob)}</td></tr>`).join('')}</table>` : ''}
+${D.budget.maal.length ? `<h2>Opsparing</h2><table><tr><th>Mål</th><th>Sparet</th><th>Mål i kr</th></tr>${D.budget.maal.map(g => `<tr><td>${esc(g.navn)}</td><td>${k(g.ind.reduce((a, x) => a + x.belob, 0))}</td><td>${k(g.maal)}</td></tr>`).join('')}</table>` : ''}
+${konto.length ? `<p class="lille">Betales fra budgetkonto/feriekonto og tæller derfor ikke med i »Tilbage«: ${konto.map(x => ({ferie: 'ferie og rejser', forsikr: 'forsikringer', el: 'el, vand og varme', laan: 'lån'})[x] || x).join(', ')}.</p>` : ''}
+</body></html>`;
+  // Udskriv inde i appen (virker også i iPhone-appen): kun oversigten kommer med på papiret/PDF'en
+  let u = document.getElementById('udskrift');
+  if (!u) { u = document.createElement('div'); u.id = 'udskrift'; document.body.appendChild(u); const st = document.createElement('style'); st.textContent = '#udskrift{display:none}@media print{body.udskriv>*:not(#udskrift){display:none!important}body.udskriv #udskrift{display:block!important}body.udskriv{background:#fff!important;zoom:1!important}}'; document.head.appendChild(st); }
+  const krop = html.slice(html.indexOf('<style>'), html.indexOf('</style>') + 8).replace(/body\{/g, '#udskrift{').replace(/@media print\{#udskrift\{margin:10mm\}/, '@media print{#udskrift{margin:0}') + html.slice(html.indexOf('<h1>'), html.lastIndexOf('</body>'));
+  u.innerHTML = krop;
+  document.body.classList.add('udskriv');
+  const slut = () => { document.body.classList.remove('udskriv'); window.removeEventListener('afterprint', slut) };
+  window.addEventListener('afterprint', slut); setTimeout(() => { window.print(); setTimeout(slut, 1500) }, 100);
+}
+function sendCsv(aar) {
+  const d = sendData(aar), f2 = n => String(Math.round(n * 100) / 100).replace('.', ',');
+  const r = [['Måned', 'Ind', 'Faste udgifter', 'Køb', 'Opsparing', 'Tilbage']];
+  d.md.forEach(x => r.push([x.m, f2(x.b.ind), f2(x.har ? x.b.faste : 0), f2(x.b.kob), f2(x.b.sparet), x.har ? f2(x.b.tilbage) : '']));
+  r.push(['I alt', f2(d.ind), f2(d.faste), f2(d.kob), f2(d.sparet), f2(d.tilbage)], [], ['Faste udgifter', 'Beløb pr. måned']);
+  D.budget.faste.forEach(x => r.push(['"' + String(x.tekst).replace(/"/g, '""') + '"', f2(x.belob)]));
+  const tekst = '﻿' + r.map(x => x.join(';')).join('\r\n'), navn = 'Budget-' + aar + '.csv';
+  const f = new File([tekst], navn, {type: 'text/csv'});
+  if (navigator.canShare && navigator.canShare({files: [f]})) navigator.share({files: [f], title: 'Budget ' + aar}).catch(() => {});
+  else { const a = document.createElement('a'); a.href = URL.createObjectURL(f); a.download = navn; a.click(); toast('Filen »' + navn + '« er gemt') }
+}
+
+// ---------- Version 80: 💡 Forslag til et budget ----------
+// Kilde: 50/30/20-reglen (Elizabeth Warren, »All Your Worth«, 2005 – se Britannica »What is the 50/30/20 rule?«)
+// og Forbrugerrådet Tænk om rådighedsbeløb (ca. 7.250 kr for enlige, ca. 12.250 kr for samlevende pr. måned).
+function forslagKort() {
+  const nu = iso(new Date()).slice(0, 7), b = budgetTal(nu);
+  const egen = D.budget.forslagInd;
+  const ind = egen > 0 ? egen : b.ind;
+  const del = p => Math.round(ind * p / 100);
+  const linje = (ik, navn, pct, tekst) => `<li style="display:block;padding:8px 0"><div class="row" style="justify-content:space-between"><b>${ik} ${navn}</b><b>${ind ? kr(del(pct)) : pct + ' %'}</b></div><div class="muted" style="font-size:13px">${pct} % · ${tekst}</div></li>`;
+  return `<div class="card"><b>💡 Forslag til et budget</b>
+  <div style="background:var(--acc2);border-radius:12px;padding:10px 12px;margin-top:8px"><b>FORSLAG – ikke dit eget budget.</b> En kendt og enkel tommelfingerregel for et sundt budget: del pengene, du får ind efter skat, i tre dele.</div>
+  <div class="row" style="margin-top:10px;justify-content:space-between"><span>💵 Penge ind efter skat pr. måned</span><input type="text" inputmode="decimal" id="forslagind" value="${ind ? String(Math.round(ind)).replace(/\B(?=(\d{3})+(?!\d))/g, '.') : ''}" placeholder="kr" style="width:130px" onchange="const v=tal('forslagind');D.budget.forslagInd=v>0?v:null;save();vis()"></div>
+  ${!egen && b.ind ? '<div class="muted" style="font-size:12px">Taget fra »Penge ind« i denne måned. Du kan skrive et andet tal.</div>' : ''}
+  <ul class="list" style="margin-top:6px">
+   ${linje('🏠', 'Det nødvendige', 50, 'husleje, el og varme, mad, transport, forsikringer, mobil og lån')}
+   ${linje('🎉', 'Det, du har lyst til', 30, 'café, tøj, fritid, ferie, streaming og gaver')}
+   ${linje('🐷', 'Opsparing og afdrag', 20, 'buffer til uventede ting, opsparing og ekstra afdrag på gæld')}
+  </ul>
+  ${ind && b.ind ? `<div style="margin-top:8px;padding:10px;border:2px solid var(--acc);border-radius:12px">I denne måned har du <b>${kr(Math.round(b.tilbage))}</b> tilbage. Forslaget er at lægge ca. <b>${kr(del(20))}</b> til side.</div>` : ''}
+  <p class="muted" style="font-size:13px;margin:8px 0 0">Er det nødvendige mere end halvdelen, så passer reglen ikke helt – det er helt normalt. Så kan du starte med en mindre opsparing. Banker regner med, at én voksen mindst skal have ca. 7.250 kr og to voksne ca. 12.250 kr om måneden at leve for, når de faste regninger er betalt.</p>
+  <p class="muted" style="font-size:12px;margin:6px 0 0">Kilder: 50/30/20-reglen (Elizabeth Warren) og Forbrugerrådet Tænk.</p></div>`;
+}
+
+// ---------- Version 78: Budget – det vigtigste først, resten kan foldes ud ----------
+// Øverst: måned, »Tilbage« med ind/faste/køb og »⚡ Hurtigt«. Alt andet ligger i bokse, man trykker på for at åbne.
+// Intet er fjernet – det er kun foldet sammen. Appen husker, hvad du har åbnet.
+function budgetFold(html) {
+  try {
+    const tpl = document.createElement('template'); tpl.innerHTML = html;
+    const ud = document.createElement('div'), noder = [...tpl.content.childNodes].filter(n => n.nodeType === 1);
+    const aabne = (D.budget.aabne = D.budget.aabne && typeof D.budget.aabne === 'object' ? D.budget.aabne : {});
+    const forsteKort = noder.find(n => n.classList.contains('card'));
+    const vigtig = n => n.classList.contains('row') || n === forsteKort || /Hurtigt:/.test((n.querySelector('b') || {}).textContent || '');
+    const titel = n => { const b = n.querySelector('b,h2,h3'); return ((b && b.textContent) || n.textContent || '').trim().replace(/\s+/g, ' ').slice(0, 60) };
+    const pak = (navn, emne, indhold) => {
+      const k = navn.replace(/[^a-zæøå0-9]/gi, '').slice(0, 30).toLowerCase() || 'boks';
+      const d = document.createElement('details'); d.className = 'card bfold'; if (aabne[k]) d.open = true;
+      d.setAttribute('ontoggle', `D.budget.aabne=D.budget.aabne||{};if(this.open)D.budget.aabne['${k}']=1;else delete D.budget.aabne['${k}'];save()`);
+      const s = document.createElement('summary'); s.innerHTML = `<b>${esc(navn)}</b>${emne ? ` <span class="muted" style="font-weight:400">${esc(emne)}</span>` : ''}`; d.append(s);
+      indhold.forEach(x => { if (x.classList && x.classList.contains('card')) x.classList.add('bfold-ind'); d.append(x) });
+      return d;
+    };
+    const top = document.createElement('div');
+    let i = 0;
+    while (i < noder.length) {
+      const n = noder[i];
+      if (vigtig(n)) { top.append(n); i++; continue }
+      if (n.tagName === 'H2') { // »🛒 Køb« og alt herunder samles i én boks
+        const rest = noder.slice(i + 1); ud.append(pak(n.textContent.trim(), '– det du har købt', rest)); break;
+      }
+      if (n.tagName === 'DETAILS') { ud.append(n); i++; continue } // kan allerede foldes
+      if (n.classList.contains('card') && n.firstElementChild && n.firstElementChild.tagName === 'DETAILS' && n.children.length === 1) { ud.append(n); i++; continue } // kan allerede foldes
+      if (n.classList.contains('card')) { ud.append(pak(titel(n), '', [n])); i++; continue }
+      ud.append(n); i++;
+    }
+    return top.innerHTML + ud.innerHTML; // det vigtigste (måned, Tilbage, Hurtigt) står øverst
+  } catch (e) { return html }
+}
+(function () {
+  const st = document.createElement('style');
+  st.textContent = '.bfold-ind>b:first-child{display:none}details.card.bfold{padding:0!important;margin-bottom:10px}.bfold>summary{cursor:pointer;padding:12px 16px;list-style:none;font-size:17px}.bfold>summary::-webkit-details-marker{display:none}.bfold>summary::after{content:"▾";float:right;opacity:.5}.bfold[open]>summary::after{content:"▴"}.bfold-ind{box-shadow:none!important;margin:0!important;border-radius:0 0 18px 18px!important;border:0!important}.bfold>:not(summary){margin-left:0;margin-right:0}';
+  document.head.appendChild(st);
+  const virk = () => { try { if (typeof SIDER === 'object' && SIDER.budget && !SIDER.budget._fold) { const o = SIDER.budget; SIDER.budget = function () { let h = o.apply(this, arguments); const ekstra = (typeof forslagKort === 'function' ? forslagKort() : '') + (typeof sendKort === 'function' ? sendKort() : ''); const mk = h.match(/<h2[^>]*>\s*🛒 Køb\s*<\/h2>/), k = mk ? mk.index : -1; h = k >= 0 ? h.slice(0, k) + ekstra + h.slice(k) : h + ekstra; return budgetFold(h) }; SIDER.budget._fold = 1; if (typeof huskeLaegInd === 'function' && !huskeLaegInd._f) { const oh = huskeLaegInd; window.huskeLaegInd = function (h, tx) { const e = document.getElementById(h === 'ind' ? 'ibelob' : 'fbelob'), dd = e && e.closest('details.bfold'); if (dd) dd.open = true; return oh(h, tx) }; window.huskeLaegInd._f = 1 } return true } } catch (e) {} return false };
+  if (!virk()) { document.addEventListener('DOMContentLoaded', virk); setTimeout(virk, 0) }
+})();
