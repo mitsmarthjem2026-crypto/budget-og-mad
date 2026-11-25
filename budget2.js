@@ -578,7 +578,7 @@ function budgetFold(html) {
 
 // ---------- Version 85: 💡 Gode råd – side for sig selv ----------
 function raadIndhold() {
-  return `<h2>💡 Gode råd og forslag</h2><p class="muted" style="margin:-6px 0 10px">Råd og et forslag til et sundt budget – samlet ét sted.</p>${typeof hjaelperKort === 'function' ? hjaelperKort() : ''}<div class="card"><b>🍳 Mad derhjemme er billigst</b><p style="margin:6px 0 0">Fastfood og færdigretter er nemme, men hver dag bliver det hurtigt dyrt – ofte flere tusinde kroner om måneden. En hjemmelavet aftensmad fra appen koster ca. 45 kr for to. Et godt råd er at lave mad derhjemme de fleste dage og gemme take-away til en hyggeaften. Laver man dobbelt portion, er der mad til næste dag eller til fryseren.</p></div>${window._raadHtml || '<p class="muted">Ingen råd lige nu.</p>'}
+  return `<h2>💡 Gode råd og forslag</h2><p class="muted" style="margin:-6px 0 10px">Råd og et forslag til et sundt budget – samlet ét sted.</p>${typeof hjaelperKort === 'function' ? hjaelperKort() : ''}${typeof spareKort === 'function' ? spareKort() : ''}<div class="card"><b>🍳 Mad derhjemme er billigst</b><p style="margin:6px 0 0">Fastfood og færdigretter er nemme, men hver dag bliver det hurtigt dyrt – ofte flere tusinde kroner om måneden. En hjemmelavet aftensmad fra appen koster ca. 45 kr for to. Et godt råd er at lave mad derhjemme de fleste dage og gemme take-away til en hyggeaften. Laver man dobbelt portion, er der mad til næste dag eller til fryseren.</p></div>${window._raadHtml || '<p class="muted">Ingen råd lige nu.</p>'}
   <button class="l" style="width:100%;margin-top:12px" onclick="raadLuk()">Luk</button>`;
 }
 function raadSide() { dlgin.innerHTML = raadIndhold(); dlg.dataset.raad = '1'; dlg.addEventListener('close', raadLuk, {once: true}); if (!dlg.open) dlg.showModal(); }
@@ -671,4 +671,26 @@ function cirkelKort(md) {
    <svg viewBox="0 0 200 200" width="170" height="170" style="flex:none;margin:0 auto" role="img" aria-label="Cirkeldiagram over udgifter"><defs>${data.map(x => `<linearGradient id="cg-${x.k}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".55"/><stop offset=".18" stop-color="${x.farve}"/><stop offset="1" stop-color="${x.farve}" stop-opacity=".9"/></linearGradient>`).join('')}<radialGradient id="cglans" cx=".35" cy=".25" r=".8"><stop offset="0" stop-color="#fff" stop-opacity=".45"/><stop offset=".5" stop-color="#fff" stop-opacity=".06"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient><filter id="cskygge" x="-20%" y="-20%" width="140%" height="140%"><feDropShadow dx="0" dy="3" stdDeviation="4" flood-opacity=".25"/></filter></defs><g filter="url(#cskygge)">${buer}</g><circle r="89" cx="100" cy="100" fill="url(#cglans)" pointer-events="none"/><circle r="51" cx="100" cy="100" fill="#fff"/><text x="100" y="96" text-anchor="middle" font-size="13" fill="currentColor" opacity=".7">I alt</text><text x="100" y="116" text-anchor="middle" font-size="17" font-weight="800" fill="#dc2626">${kr(Math.round(total))}</text></svg>
    <ul style="list-style:none;margin:0;padding:0;flex:1;min-width:170px">${data.map(x => `<li style="display:flex;align-items:center;gap:8px;margin:5px 0"><span style="width:16px;height:16px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#fff 0,${x.farve} 45%);box-shadow:0 1px 3px #0003;flex:none"></span><span style="flex:1">${x.ik} ${esc(x.navn)}</span><span style="text-align:right;white-space:nowrap"><b>${Math.round(x.v / total * 100)} %</b><br><span class="muted" style="font-size:13px">${kr(Math.round(x.v))}</span></span></li>`).join('')}</ul>
   </div><p class="muted" style="font-size:12px;margin:6px 0 0">Faste udgifter, køb og opsparing i måneden. Appen gætter gruppen ud fra navnet.</p></div>`;
+}
+
+// ---------- 💰 Sådan kan I spare (råd-siden) ----------
+// Tallene er regnet ud fra jeres egne tal (gennemsnit for de sidste måneder med tal). »Fx 10 %« er kun et regneeksempel.
+function spareKort() {
+  const nu = new Date(), md = i => { const d = new Date(nu.getFullYear(), nu.getMonth() - i, 1); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') };
+  const mdr = [0, 1, 2].map(md), snit = {};
+  mdr.forEach(m => cirkelData(m).forEach(x => { snit[x.k] = (snit[x.k] || 0) + x.v / mdr.length }));
+  const k = n => kr(Math.round(n / 10) * 10), r = [];
+  const abo = D.budget.faste.filter(x => /netflix|hbo|max|viaplay|disney|spotify|tv ?2|youtube|apple|prime|abonnement|mofibo|podimo|storytel|fitness/i.test(x.tekst || ''));
+  if (abo.length) { const dyr = [...abo].sort((a, b) => b.belob - a.belob)[0]; r.push(['📺', 'Abonnementer', `Sættes <b>${esc(dyr.tekst)}</b> på pause i 3 måneder, spares der <b>${k(dyr.belob * 3)}</b>. Mange streamingtjenester kan slås til og fra en måned ad gangen.`]); }
+  if (snit.mad) r.push(['🛒', 'Indkøb', `I bruger ca. <b>${k(snit.mad)}</b> om måneden på mad og dagligvarer. Handler I efter en madplan og en indkøbsliste, og bruger fx 10 % mindre, er det ca. <b>${k(snit.mad * 0.1)}</b> om måneden – <b>${k(snit.mad * 1.2)}</b> om året.`]);
+  if (snit.ude) r.push(['🍕', 'Mad ude', `Mad ude og take-away koster ca. <b>${k(snit.ude)}</b> om måneden. Halveres det, spares der ca. <b>${k(snit.ude / 2)}</b> om måneden.`]);
+  if (snit.transport) r.push(['🚗', 'Transport', `Transport og bil koster ca. <b>${k(snit.transport)}</b> om måneden. Cykles der eller samkøres nogle dage, og bruges fx 10 % mindre, er det ca. <b>${k(snit.transport * 0.1)}</b> om måneden.`]);
+  const erEl = x => /el|el,|strøm|energi|varme|vand|forsyning/i.test(x.tekst || '');
+  const s = D.budget.faste.filter(erEl).reduce((a, x) => a + x.belob, 0) + D.budget.udgifter.filter(x => mdr.includes(x.dato.slice(0, 7)) && erEl(x)).reduce((a, x) => a + x.belob, 0) / mdr.length;
+  if (s > 0) { r.push(['💡', 'El, vand og varme', `I bruger ca. <b>${k(s)}</b> om måneden. Sluk standby, tag kortere bade og skru 1 grad ned – sparer I fx 10 %, er det ca. <b>${k(s * 0.1)}</b> om måneden.`]); }
+  if (snit.fritid) r.push(['🎉', 'Fritid, tøj og gaver', `Det koster ca. <b>${k(snit.fritid)}</b> om måneden. Køb brugt, lån af hinanden og vent en uge med ting, I gerne vil have – så er det tit ikke så vigtigt alligevel.`]);
+  r.push(['🏷️', 'Tilbud', 'Kig på tilbud, før I handler. Under »🛒 Indkøb« er der et »🔎 tilbud«-link ved hver vare.']);
+  return `<div class="card"><b>💰 Sådan kan I spare</b> <span class="muted">– ud fra jeres egne tal</span>
+  <ul class="list" style="margin-top:6px">${r.map(([ik, t, x]) => `<li style="display:block;padding:9px 0"><b>${ik} ${t}</b><div style="margin-top:3px">${x}</div></li>`).join('')}</ul>
+  <p class="muted" style="font-size:12px;margin:6px 0 0">Beløbene er ca. og regnet ud fra jeres tal de sidste 3 måneder. »Fx 10 %« er kun et regneeksempel.</p></div>`;
 }
