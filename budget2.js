@@ -578,7 +578,7 @@ function budgetFold(html) {
 
 // ---------- Version 85: 💡 Gode råd – side for sig selv ----------
 function raadIndhold() {
-  return `<h2>💡 Gode råd og forslag</h2><p class="muted" style="margin:-6px 0 10px">Råd og et forslag til et sundt budget – samlet ét sted.</p>${typeof hjaelperKort === 'function' ? hjaelperKort() : ''}${window._raadHtml || '<p class="muted">Ingen råd lige nu.</p>'}
+  return `<h2>💡 Gode råd og forslag</h2><p class="muted" style="margin:-6px 0 10px">Råd og et forslag til et sundt budget – samlet ét sted.</p>${typeof hjaelperKort === 'function' ? hjaelperKort() : ''}<div class="card"><b>🍳 Mad derhjemme er billigst</b><p style="margin:6px 0 0">Fastfood og færdigretter er nemme, men hver dag bliver det hurtigt dyrt – ofte flere tusinde kroner om måneden. En hjemmelavet aftensmad fra appen koster ca. 45 kr for to. Et godt råd er at lave mad derhjemme de fleste dage og gemme take-away til en hyggeaften. Laver man dobbelt portion, er der mad til næste dag eller til fryseren.</p></div>${window._raadHtml || '<p class="muted">Ingen råd lige nu.</p>'}
   <button class="l" style="width:100%;margin-top:12px" onclick="raadLuk()">Luk</button>`;
 }
 function raadSide() { dlgin.innerHTML = raadIndhold(); dlg.dataset.raad = '1'; dlg.addEventListener('close', raadLuk, {once: true}); if (!dlg.open) dlg.showModal(); }
@@ -618,6 +618,13 @@ function hjaelperRaad() {
   const ude = Object.values(grp).filter(x => /take|pizza|burger|café|cafe|kiosk|7-eleven|mcdonald|sushi|restaurant|slik|wolt|just eat|mad ude/i.test(x.navn));
   const udeSum = ude.reduce((s, x) => s + x.sum, 0);
   if (udeSum > 0) r.push(`Mad ude og take-away de sidste 3 måneder: <b>${k(udeSum)}</b>. Laver du mad fra appen, koster en aftensmad ca. 45 kr for to.`);
+  // 3b) Fastfood og færdigretter den sidste måned – venligt og neutralt
+  const fra30 = iso(new Date(Date.now() - 30 * 864e5));
+  const ff = D.budget.udgifter.filter(x => x.dato >= fra30 && /take|pizza|burger|mcdonald|max|sunset|kebab|shawarma|sushi|wolt|just eat|grill|pølse|færdigret|færdig ret|mikroovn|frostpizza|frossen|7-eleven|kiosk/i.test(x.tekst || ''));
+  if (ff.length >= 4) {
+    const s = ff.reduce((a, x) => a + x.belob, 0), pr = s / ff.length, hjemme = 45, spar = Math.max(0, Math.round((pr - hjemme) * Math.ceil(ff.length / 2)));
+    r.push(`Den sidste måned er der købt fastfood eller færdigretter <b>${ff.length} gange</b> for i alt <b>${k(s)}</b> – ca. ${k(pr)} pr. gang. En hjemmelavet ret fra appen koster ca. ${hjemme} kr for to. Laves halvdelen af gangene derhjemme, kan der spares ca. <b>${k(spar)}</b> om måneden.`);
+  }
   // 4) Abonnementer i faste udgifter
   const abo = D.budget.faste.filter(x => /netflix|hbo|max|viaplay|disney|spotify|tv ?2|youtube|apple|prime|fitness|abonnement|mofibo|podimo|storytel/i.test(x.tekst || ''));
   if (abo.length >= 2) r.push(`Du har <b>${abo.length} abonnementer</b> for i alt <b>${k(abo.reduce((s, x) => s + x.belob, 0))}</b> om måneden (${abo.map(x => esc(x.tekst)).join(', ')}). Kan nogle sættes på pause?`);
