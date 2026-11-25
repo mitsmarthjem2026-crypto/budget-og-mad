@@ -1,4 +1,4 @@
 {
- "version": 67,
- "nyt": "Budget: regninger, der betales fra budgetkonto eller feriekonto, tæller ikke dobbelt i »Tilbage«."
+ "version": 68,
+ "nyt": "Budget: lån (Totalkredit, bil) tæller nu også som betalt fra budgetkontoen."
 }

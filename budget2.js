@@ -403,7 +403,7 @@ const KONTO_GRP = [
 function kontoValg() {
   if (D.budget.fraKonto && typeof D.budget.fraKonto === 'object') return D.budget.fraKonto;
   let ejer = false; try { ejer = erEjer() } catch (e) {}
-  return ejer ? {ferie: 1, forsikr: 1, el: 1} : {};
+  return ejer ? {ferie: 1, forsikr: 1, el: 1, laan: 1} : {}; // v68: lån betales også fra budgetkontoen
 }
 function kontoGruppe(x) {
   const t = String((x && x.tekst) || '');
