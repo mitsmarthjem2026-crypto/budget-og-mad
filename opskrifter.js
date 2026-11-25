@@ -166,7 +166,7 @@ STD_OPSKRIFTER.push(...[
  trin:['Steg kylling i tern i olie i en stor gryde. Tag den op.','Steg champignon og løg i gryden.','Kom pasta, vand og bouillon i, og kog under låg i ca. 12 minutter. Rør tit.','Rør fløde og kylling i, og varm igennem.','Smag til med salt.']},
 {id:'p-rejer-hvidloeg',kat:'Pasta & nudler',navn:'Pasta med rejer og hvidløg',foto:'fotos/retter/pasta/rejepasta.jpg',tid:20,portioner:4,tags:['hurtig'],
  ing:['400 g spaghetti','400 g rejer','4 fed hvidløg','3 spsk olie','1 knsp chiliflager','1 stk citron','1 bundt persille','1 tsk salt'],
- trin:['Kog spaghettien efter pakken.','Steg hvidløg og chili i olie et minut.','Kom rejerne på, og steg dem 2–3 minutter (frosne rejer skal tøs op først).','Vend spaghetti, citronsaft og hakket persille i.','Smag til med salt.']},
+ trin:['Kog spaghettien efter pakken.','Steg hvidløg og chili i olie et minut.','Kom rejerne på, og steg dem 2–3 minutter (frosne rejer skal tøes op først).','Vend spaghetti, citronsaft og hakket persille i.','Smag til med salt.']},
 {id:'p-spaghetti-kodboller',kat:'Pasta & nudler',navn:'Spaghetti med kødboller',foto:'fotos/retter/pasta/kodboller.jpg',tid:40,portioner:4,tags:[],
  ing:['500 g hakket oksekød','1 æg','3 spsk rasp','1 løg','2 fed hvidløg','2 spsk olie','2 dåser hakkede tomater','1 tsk oregano','400 g spaghetti','1 tsk salt'],
  trin:['Rør kød, æg, rasp, salt og halvdelen af det hakkede løg sammen. Form små boller.','Brun kødbollerne i olie, og tag dem op.','Svits resten af løget og hvidløg, kom tomater og oregano i, og kog 5 minutter.','Kom kødbollerne i sovsen, og lad dem simre 15 minutter.','Kog spaghettien, og server med kødboller og sovs.']},

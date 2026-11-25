@@ -340,7 +340,7 @@ body{padding-top:env(safe-area-inset-top)}
 <dialog id="dlg"><div class="in" id="dlgin"></div></dialog>
 
 <script>
-const KEY='madapp-v1';const ENHED=(()=>{let e=localStorage.getItem('madapp-v1-enhed');if(!e){e=(crypto.randomUUID?crypto.randomUUID():Date.now().toString(36)+Math.random().toString(36).slice(2));localStorage.setItem('madapp-v1-enhed',e)}return e})();const APP_VERSION=93, EJER='Søren';
+const KEY='madapp-v1';const ENHED=(()=>{let e=localStorage.getItem('madapp-v1-enhed');if(!e){e=(crypto.randomUUID?crypto.randomUUID():Date.now().toString(36)+Math.random().toString(36).slice(2));localStorage.setItem('madapp-v1-enhed',e)}return e})();const APP_VERSION=94, EJER='Søren';
 let D;try{D=JSON.parse(localStorage.getItem(KEY)||'null')}catch(e){D=null;try{localStorage.setItem(KEY+'-skadet-'+Date.now(),localStorage.getItem(KEY))}catch(x){}}
 if(!D||typeof D!=='object')D={};
 ['opskrifter','indkob','lager','stdSlettet','gemteLister'].forEach(k=>{if(!Array.isArray(D[k]))D[k]=[]});
@@ -810,7 +810,7 @@ SIDER.forside=function(){
   return `<div class="fhero" style="background-image:url('${valgtFoto()}')"><div><div class="fh1">${hilsen} 👋</div><div class="fh2">Hvad skal vi i dag?</div></div></div>
   ${typeof styringForside==='function'?styringForside():''}
   <div class="tiles">${Object.entries(FOTO).filter(([k])=>typeof styringMaa!=='function'||styringMaa(k)).map(([k,f])=>`<button class="tile t-${k}" onclick="gaaTil('${k}')" style="background-image:url(${knapFoto(k)})"><span class="te">${f[1]}</span><span class="tskift" role="button" title="Skift billede" onclick="event.stopPropagation();vaelgKnapFoto('${k}')">🖼️</span><span class="tn">${f[2]}</span><span class="ti">${esc(info[k])}</span></button>`).join('')}</div>
-  ${erEjer()?'<button class="b" style="width:100%;font-size:19px;padding:16px;margin:14px 0 4px" onclick="visAndreBrugere()">👥 Til andre app brugere</button>':''}
+  ${erEjer()?'<button class="b" style="width:100%;font-size:19px;padding:16px;margin:14px 0 4px" onclick="visAndreBrugere()">👥 Til andre app-brugere</button>':''}
   ${forsideTips()}
   ${hjaelpKort()}`;
 };
@@ -1011,10 +1011,10 @@ function visOpskriftHjaelp(){
 }
 
 // ---------- Indstillinger, oplæsning og foto af opskrift (version 19) ----------
-const STR={lille:.9,normal:1,stor:1.15,kaempe:1.3},FONTE={rund:'',klassisk:'Georgia,"Times New Roman",serif',enkel:'system-ui,-apple-system,"Segoe UI",Roboto,sans-serif',laese:'Verdana,Tahoma,"Trebuchet MS",sans-serif'};
+const STR={lille:.9,normal:1,stor:1.15,kaempe:1.3,ekstra:1.45},FONTE={rund:'',klassisk:'Georgia,"Times New Roman",serif',enkel:'system-ui,-apple-system,"Segoe UI",Roboto,sans-serif',laese:'Verdana,Tahoma,"Trebuchet MS",sans-serif'};
 const TEMAER={solnedgang:['Solnedgang','#ff8a3d','#e8364f','#e8553e','#ffe7df','#fff6ef'],mynte:['Mynte','#10b981','#06b6d4','#0fa968','#e4f7ee','#f2f7f4'],hav:['Hav','#3b82f6','#06b6d4','#2563eb','#e0edff','#f2f7ff'],lilla:['Lilla','#a855f7','#ec4899','#9333ea','#f3e8ff','#faf5ff'],skov:['Skov','#65a30d','#15803d','#4d7c0f','#ecfccb','#f7fbef'],kaffe:['Kaffe','#a16207','#78350f','#92400e','#fef3c7','#fbf7f0'],nat:['Nat','#475569','#0f172a','#334155','#e2e8f0','#f1f5f9'],slik:['Slik','#f472b6','#fb923c','#db2777','#fce7f3','#fff5fa'],gul:['Gul','#eab308','#d97706','#a16207','#fef9c3','#fffdf0'],moerkegroen:['Mørkegrøn','#166534','#14532d','#15803d','#dcfce7','#f3faf5']};
 const BAGGRUNDE=[['ingen','Ingen'],['fotos/galleri/frugt.jpg','Frugt og bær'],['fotos/galleri/bord.jpg','Fyldt bord'],['fotos/galleri/opskrifter4.jpg','Grøntsager'],['fotos/galleri/opskrifter2.jpg','Skærebræt'],['fotos/galleri/picnic.jpg','Picnic'],['fotos/galleri/indkob2.jpg','Torvehal'],['fotos/galleri/lager3.jpg','Krydderier'],['fotos/galleri/opskrifter-12.jpg','Urter'],['fotos/galleri/opskrifter-14.jpg','Krydderiskåle'],['fotos/galleri/opskrifter-16.jpg','Råvarer'],['fotos/galleri/opskrifter-20.jpg','Køkkenbord'],['fotos/galleri/madplan-12.jpg','Salat'],['fotos/galleri/madplan-20.jpg','Bowls'],['fotos/galleri/indkob-17.jpg','Marked'],['fotos/galleri/indkob-21.jpg','Frugtdisk'],['fotos/galleri/lager-16.jpg','Spisekammer'],['fotos/galleri/lager-22.jpg','Glas'],['fotos/galleri/budget-12.jpg','Mønter'],['fotos/galleri/forside-16.jpg','Middag']];
-function brugIndstil(){D.indstil=D.indstil||{};document.body.style.zoom=STR[D.indstil.str||'normal']||1;document.body.style.fontFamily=FONTE[D.indstil.font||'rund']||'';
+function brugIndstil(){D.indstil=D.indstil||{};document.body.style.zoom=STR[D.indstil.str||'normal']||1;{const z=STR[D.indstil.str||'normal']||1,nv=document.getElementById('nav');if(nv)nv.style.zoom=Math.min(z,1.1)/z;document.body.dataset.str=D.indstil.str||'normal'}document.body.style.fontFamily=FONTE[D.indstil.font||'rund']||'';
   const tm=TEMAER[D.indstil.tema],r=document.documentElement.style;
   if(tm){r.setProperty('--grad',`linear-gradient(135deg,${tm[1]} 0%,${tm[2]} 100%)`);r.setProperty('--acc',tm[3]);if(!matchMedia('(prefers-color-scheme: dark)').matches){r.setProperty('--acc2',tm[4]);r.setProperty('--bg',tm[5]);r.setProperty('--felt',tm[4])}}
   else ['--grad','--acc','--acc2','--bg','--felt'].forEach(v=>r.removeProperty(v));
@@ -1025,7 +1025,7 @@ function visIndstillinger(){
   D.indstil=D.indstil||{};const v=D.indstil,st=stemmer(),da=st.filter(x=>/^da/i.test(x.lang)),andre=st.filter(x=>!/^da/i.test(x.lang));
   dlgin.innerHTML=`<h2>⚙️ Indstillinger</h2><p class="muted" style="margin:-6px 0 8px;font-size:14px">Version ${APP_VERSION}</p>
   <button class="b" style="width:100%" onclick="soegOpdatering(this)">🔄 Søg efter opdatering</button><div id="opdstatus" class="muted" style="font-size:14px;margin:4px 0 6px"></div>
-  <h3>🔠 Tekststørrelse</h3><div class="chips">${[['lille','Lille'],['normal','Normal'],['stor','Stor'],['kaempe','Meget stor']].map(([k,n])=>`<button class="chip ${ (v.str||'normal')===k?'on':''}" onclick="setIndstil('str','${k}')">${n}</button>`).join('')}</div>
+  <h3>🔠 Tekststørrelse</h3><div class="chips">${[['lille','Lille'],['normal','Normal'],['stor','Stor'],['kaempe','Meget stor'],['ekstra','Ekstra stor']].map(([k,n])=>`<button class="chip ${ (v.str||'normal')===k?'on':''}" onclick="setIndstil('str','${k}')">${n}</button>`).join('')}</div><p class="muted" style="margin:6px 0 0">Gør al tekst i appen større eller mindre. Det gemmes med det samme på denne telefon.</p>
   <h3>✍️ Skrifttype</h3><div class="chips">${[['rund','Rund'],['klassisk','Klassisk'],['enkel','Enkel'],['laese','Let at læse']].map(([k,n])=>`<button class="chip ${(v.font||'rund')===k?'on':''}" style="font-family:${FONTE[k]||'inherit'}" onclick="setIndstil('font','${k}')">${n}</button>`).join('')}</div>
   <h3>🖼️ Billedet øverst</h3><div class="row" style="flex-wrap:nowrap;align-items:center"><div style="width:110px;height:70px;border-radius:14px;background:url('${valgtFoto()}') center/cover;flex:none"></div><button class="b" style="flex:1" onclick="vaelgFoto()">Skift billedet øverst</button></div>
   <p class="muted" style="font-size:13px">Vælg mellem 20 billeder eller dit eget foto. Billederne på knapperne skifter du under »Skift billedet øverst« → fanen »Knapperne«.</p>
@@ -1663,13 +1663,13 @@ if(LOGIN_TIL){
 
 if(erEjer()&&side==='forside')vis();
 
-// ---------- Til andre app brugere (version 45) – kun for ejeren ----------
+// ---------- Til andre app-brugere (version 45) – kun for ejeren ----------
 const APP_LINK='https://mitsmarthjem2026-crypto.github.io/budget-og-mad/';
 let ejerListe=[],ejerNy=null;
 function ejerKode(){const g=loginGemt();return g&&g.kode}
 async function visAndreBrugere(){
   if(!erEjer())return;
-  dlgin.innerHTML=`<h2>👥 Til andre app brugere</h2><p class="muted" style="margin-top:-6px">Kun du kan se denne side.</p><p class="muted">Henter listen…</p>`;
+  dlgin.innerHTML=`<h2>👥 Til andre app-brugere</h2><p class="muted" style="margin-top:-6px">Kun du kan se denne side.</p><p class="muted">Henter listen…</p>`;
   if(!dlg.open)dlg.showModal();
   try{ejerListe=await rpc('ejer_koder',{k:ejerKode()})||[]}catch(e){ejerListe=null}
   if(typeof styringHent==='function')await styringHent();
@@ -1686,7 +1686,7 @@ function tegnAndreBrugere(){
      ${!x.ejer&&x.afvist?`<div style="font-size:14px;margin-top:4px;color:#c0392b;font-weight:700">⚠️ ${x.aktiv?'Prøvet':'Lukket, fordi koden blev prøvet'} på en anden enhed ${x.afvist} ${x.afvist===1?'gang':'gange'}${x.afvist_slags?' ('+esc(x.afvist_slags)+')':''}${x.afvist_sidst?', sidst '+dato(x.afvist_sidst):''}. Måske er koden givet videre.${x.aktiv?'':' Tryk ✅ Tænd og 🔓 Frigiv for at åbne den igen.'}</div>`:''}
      ${typeof styringKodeHTML==='function'?styringKodeHTML(x):''}
      <div class="row" style="margin-top:8px;flex-wrap:wrap">${x.ejer?'':`<button class="b" style="flex:1" onclick="sendKode('${esc(x.kode)}')">📤 Send</button>`}<button class="l" onclick="navnKode('${esc(x.kode)}')">✏️ Navn</button>${!x.ejer&&typeof styringAdgang==='function'?`<button class="l" onclick="styringAdgang('${esc(x.kode)}')">⚙️ Adgang</button>`:''}${!x.ejer&&x.enheder?`<button class="l" onclick="frigivKode('${esc(x.kode)}')">🔓 Frigiv</button>`:''}${x.ejer?'':`<button class="l" onclick="slaaKode('${esc(x.kode)}',${!x.aktiv})">${x.aktiv?'⛔ Sluk':'✅ Tænd'}</button>`}</div></div>`).join('');
-  dlgin.innerHTML=`<h2>👥 Til andre app brugere</h2><div style="display:inline-block;background:var(--acc2);border-radius:20px;padding:4px 12px;font-weight:800;margin:-4px 0 8px">Appen er version ${APP_VERSION}</div><p class="muted" style="margin-top:0">Kun du kan se denne side. Her giver du andre en kode til appen. Du kan ikke se deres tal – de bliver på deres egen telefon.</p>
+  dlgin.innerHTML=`<h2>👥 Til andre app-brugere</h2><div style="display:inline-block;background:var(--acc2);border-radius:20px;padding:4px 12px;font-weight:800;margin:-4px 0 8px">Appen er version ${APP_VERSION}</div><p class="muted" style="margin-top:0">Kun du kan se denne side. Her giver du andre en kode til appen. Du kan ikke se deres tal – de bliver på deres egen telefon.</p>
   <div style="background:var(--acc2);border-radius:14px;padding:12px;margin:10px 0"><b>➕ Giv en ny person adgang</b>
    <input id="nynavn" placeholder="Personens navn" maxlength="60" style="width:100%;margin-top:8px">
    <button class="b" style="width:100%;margin-top:8px;font-size:17px;padding:12px" onclick="nyKode()">Lav kode</button>
@@ -1860,6 +1860,19 @@ try{if(typeof juraVisFoersteGang==='function')juraVisFoersteGang()}catch(e){}
 localStorage.removeItem(KEY+'-test'); // appen startede fint
 </script>
 <script src="styring.js"></script>
+<style>/* Version 94: småtekst lidt større, så den er nem at læse på telefonen */
+[style*="font-size:9.5px"],[style*="font-size:10px"],[style*="font-size:10.5px"],[style*="font-size:11px"],[style*="font-size:12px"]{font-size:14px!important}
+[style*="font-size:13px"],[style*="font-size:14px"]{font-size:15px!important}
+.muted{font-size:16px}
+.minikort .muted,.rinfo .muted,.infobar small,.tag,a.tilbud,.gfoto span,.galleri.g3 .gfoto span{font-size:14px}
+.ob small,.oblegend,.kuge span{font-size:15px}
+.rinfo .tag,.harbadge,header .ver{font-size:13px}
+/* Store tekststørrelser: rækker må gå på to linjer, så intet skubbes ud over skærmen */
+.datarow>*{white-space:normal;min-width:0}.ktitel{white-space:normal;min-width:0}.knav{flex:none}
+@media (max-width:520px){body[data-str="kaempe"] .tiles,body[data-str="ekstra"] .tiles{grid-template-columns:1fr}}
+</style>
+<script>/* Version 94: dansk stavekontrol i alle tekstfelter (browserens egen, gratis). Felter med spellcheck="false" (fx koden) røres ikke. */
+document.addEventListener('focusin',function(e){var t=e.target;if(!t||t.hasAttribute('spellcheck'))return;var ty=(t.getAttribute('type')||'text').toLowerCase();if(t.tagName==='TEXTAREA'||(t.tagName==='INPUT'&&(ty==='text'||ty==='search'))){t.spellcheck=true;if(!t.lang)t.lang='da'}},true);</script>
 </body>
 </html>
 <!-- BOM-APP-OK -->
