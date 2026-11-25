@@ -319,3 +319,5 @@ Danske Bank, »Kontoudskrifter«: mobilbank → konto → 3 prikker → »Ekspor
 Jyske Bank, »Sådan danner du en kontoudskrift i Jyske net- og mobilbank«: konto → 3 prikker → »Print og eksporter« → periode og filtype → OK – https://www.jyskebank.dk/hjaelp/netbank-og-mobilbank/find-dine-kontoudskrifter
 Nykredit, »Hvordan henter jeg selv kontoudskrifter via netbanken?«: Konti og kort → Konti → »Gem posteringer som fil« → CSV – https://www.nykredit.dk/kundeservice/mitnykredit---netbanken/hvordan-henter-jeg-selv-kontoudskrifter-via-netbanken/
 Andre banker (fx Nordea, Lunar): ingen hjælpeside kunne læses – derfor kun et generelt råd i appen.
+
+Version 61: Brændende kærlighed bruger nu ejerens eget valgte billede (fotos/retter/braendende-egen.jpg, sendt af ejeren 25-11-2026). Det gamle Unsplash-foto (braendende.jpg) bruges ikke længere.

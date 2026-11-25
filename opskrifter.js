@@ -13,7 +13,7 @@ var STD_OPSKRIFTER=[
 {id:'std-aeggekage',kat:'Æg & hurtigt',navn:'Æggekage med bacon',foto:'',tid:25,portioner:4,tags:['dansk','hurtig'],
  ing:['8 æg','2 dl mælk','2 spsk hvedemel','200 g bacon','2 tomater','1 bundt purløg','1 tsk salt','1 knsp peber'],
  trin:['Steg baconen sprød på en pande. Læg den på køkkenrulle.','Pisk æg, mælk, mel, salt og peber sammen.','Hæld æggemassen på panden med lidt af fedtet. Læg låg på, og lad den stivne ved svag varme i 10–15 minutter.','Skub forsigtigt kanten ind en gang imellem, så den ikke brænder på.','Top med bacon, tomatbåde og klippet purløg. Server med rugbrød.']},
-{id:'std-braendende-kaerlighed',kat:'Kød & fars',navn:'Brændende kærlighed',foto:'fotos/retter/braendende.jpg',tid:35,portioner:4,tags:['dansk'],
+{id:'std-braendende-kaerlighed',kat:'Kød & fars',navn:'Brændende kærlighed',foto:'fotos/retter/braendende-egen.jpg',tid:35,portioner:4,tags:['dansk'],
  ing:['1 kg kartofler','2 dl mælk','50 g smør','250 g bacon','2 løg','1 tsk salt','1 knsp peber'],
  trin:['Skræl kartoflerne, og kog dem møre i ca. 20 minutter.','Skær bacon i tern og løg i skiver. Steg dem sprøde og gyldne.','Hæld vandet fra kartoflerne. Mos dem med varm mælk og smør. Smag til med salt og peber.','Læg mosen på tallerkenen, og top med bacon og løg.','Server gerne med rødbeder.']},
 {id:'std-millionboef',kat:'Kød & fars',navn:'Millionbøf med kartoffelmos',foto:'fotos/retter/millionbof.jpg',tid:35,portioner:4,tags:['dansk'],
