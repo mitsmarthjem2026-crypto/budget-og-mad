@@ -445,27 +445,31 @@ function kontoKort(md) {
 // ---------- Version 79: 📤 Send budget til banken ----------
 // Laver en pæn oversigt (PDF via »Udskriv/Gem som PDF«) eller en CSV-fil, som du selv deler med banken
 // (fx i bankens sikre post eller på mail). Intet sendes af appen selv – det sker først, når du deler det.
-let sendAar = null;
+let sendAar = null, sendMd = null; // sendMd: null = hele året, ellers liste af måneder (1–12)
+const MDK = ['jan', 'feb', 'mar', 'apr', 'maj', 'jun', 'jul', 'aug', 'sep', 'okt', 'nov', 'dec'];
+function sendSkift(m) { if (m === 0) { sendMd = null } else { const s = new Set(sendMd || []); if (s.has(m)) s.delete(m); else s.add(m); sendMd = s.size && s.size < 12 ? [...s].sort((a, b) => a - b) : null } vis() }
 function sendKort() {
   const aar = sendAar || new Date().getFullYear();
   return `<div class="card"><b>📤 Send budget til banken</b>
-  <p class="muted" style="margin:6px 0 8px">Lav en pæn oversigt over dit budget for et helt år: penge ind, faste udgifter, køb, opsparing og hvad der er tilbage pr. måned. Du sender den selv – fx i bankens sikre post (mobilbank/netbank) eller på mail. Appen sender ikke noget.</p>
+  <p class="muted" style="margin:6px 0 8px">Lav en pæn oversigt over dit budget for de måneder, du vælger, eller et helt år: penge ind, faste udgifter, køb, opsparing og hvad der er tilbage pr. måned. Du sender den selv – fx i bankens sikre post (mobilbank/netbank) eller på mail. Appen sender ikke noget.</p>
   <div class="row" style="margin-bottom:8px"><button class="l" onclick="sendAar=${aar - 1};vis()">‹ ${aar - 1}</button><b style="flex:1;text-align:center">${aar}</b><button class="l" onclick="sendAar=${aar + 1};vis()">${aar + 1} ›</button></div>
+  <div class="muted" style="font-size:13px;margin:4px 0">Vælg måneder – én, flere eller hele året:</div>
+  <div class="chips" style="flex-wrap:wrap;overflow:visible;margin-bottom:8px"><button class="chip ${sendMd ? '' : 'on'}" onclick="sendSkift(0)">📅 Hele året</button>${MDK.map((n, i) => `<button class="chip ${sendMd && sendMd.includes(i + 1) ? 'on' : ''}" onclick="sendSkift(${i + 1})">${n}</button>`).join('')}</div>
   <div class="row"><button class="b" style="flex:1" onclick="sendPdf(${aar})">📄 Lav PDF</button><button class="b" style="flex:1" onclick="sendCsv(${aar})">📊 Del som regneark (CSV)</button></div>
   <p class="muted" style="font-size:13px;margin:8px 0 0">PDF: Når udskriv-vinduet kommer på iPhone, så tryk »Del« øverst og gem eller send PDF'en. På PC: vælg »Gem som PDF«.</p></div>`;
 }
 function sendData(aar) {
-  const md = Array.from({length: 12}, (_, i) => { const m = aar + '-' + String(i + 1).padStart(2, '0'), b = budgetTal(m); return {m, b, har: b.ind > 0 || b.kob > 0 || b.sparet !== 0} });
+  const md = Array.from({length: 12}, (_, i) => i).filter(i => !sendMd || sendMd.includes(i + 1)).map(i => { const m = aar + '-' + String(i + 1).padStart(2, '0'), b = budgetTal(m); return {m, b, har: b.ind > 0 || b.kob > 0 || b.sparet !== 0} });
   const med = md.filter(x => x.har), sum = k => med.reduce((s, x) => s + x.b[k], 0);
   return {md, med, ind: sum('ind'), faste: sum('faste'), kob: sum('kob'), sparet: sum('sparet'), tilbage: sum('tilbage')};
 }
 function sendPdf(aar) {
   const d = sendData(aar), k = n => kr(Math.round(n)), mn = m => new Date(m + '-01').toLocaleDateString('da-DK', {month: 'long'});
   const n = d.med.length || 1, konto = (typeof kontoValg === 'function') ? Object.keys(kontoValg()) : [];
-  const html = `<!doctype html><html lang="da"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Budget ${aar}</title>
+  const html = `<!doctype html><html lang="da"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Budget ${aar}${sendMd ? ' – ' + sendMd.map(m => MDK[m - 1]).join(', ') : ''}</title>
 <style>body{font:14px/1.45 system-ui,-apple-system,Segoe UI,sans-serif;color:#111;margin:24px;max-width:820px}h1{font-size:24px;margin:0 0 4px}h2{font-size:17px;margin:22px 0 6px;border-bottom:2px solid #333;padding-bottom:3px}table{width:100%;border-collapse:collapse}td,th{padding:5px 6px;border-bottom:1px solid #ddd;text-align:right}td:first-child,th:first-child{text-align:left}th{background:#f3f3f3}.m{color:#b91c1c}.p{color:#15803d}.lille{color:#555;font-size:12px}tr.sum td{font-weight:700;border-top:2px solid #333}@media print{body{margin:10mm}button{display:none}}</style></head><body>
 <button onclick="print()" style="float:right;padding:10px 16px;font-size:15px">🖨️ Udskriv / Gem som PDF</button>
-<h1>Budget ${aar}</h1><div class="lille">Lavet ${new Date().toLocaleDateString('da-DK', {day: 'numeric', month: 'long', year: 'numeric'})} med appen Budget og Mad. Beløb i kr.</div>
+<h1>Budget ${aar}${sendMd ? ' – ' + sendMd.map(m => MDK[m - 1]).join(', ') : ' – hele året'}</h1><div class="lille">Lavet ${new Date().toLocaleDateString('da-DK', {day: 'numeric', month: 'long', year: 'numeric'})} med appen Budget og Mad. Beløb i kr.</div>
 <h2>Kort fortalt (gennemsnit pr. måned, ${d.med.length} måneder med tal)</h2>
 <table><tr><td>Penge ind</td><td>${k(d.ind / n)}</td></tr><tr><td>Faste udgifter</td><td>${k(d.faste / n)}</td></tr><tr><td>Køb og andre udgifter</td><td>${k(d.kob / n)}</td></tr><tr><td>Opsparing</td><td>${k(d.sparet / n)}</td></tr><tr class="sum"><td>Tilbage</td><td class="${d.tilbage < 0 ? 'm' : 'p'}">${k(d.tilbage / n)}</td></tr></table>
 <h2>Måned for måned</h2>
@@ -491,7 +495,7 @@ function sendCsv(aar) {
   d.md.forEach(x => r.push([x.m, f2(x.b.ind), f2(x.har ? x.b.faste : 0), f2(x.b.kob), f2(x.b.sparet), x.har ? f2(x.b.tilbage) : '']));
   r.push(['I alt', f2(d.ind), f2(d.faste), f2(d.kob), f2(d.sparet), f2(d.tilbage)], [], ['Faste udgifter', 'Beløb pr. måned']);
   D.budget.faste.forEach(x => r.push(['"' + String(x.tekst).replace(/"/g, '""') + '"', f2(x.belob)]));
-  const tekst = '﻿' + r.map(x => x.join(';')).join('\r\n'), navn = 'Budget-' + aar + '.csv';
+  const tekst = '﻿' + r.map(x => x.join(';')).join('\r\n'), navn = 'Budget-' + aar + (sendMd ? '-' + sendMd.map(m => MDK[m - 1]).join('-') : '') + '.csv';
   const f = new File([tekst], navn, {type: 'text/csv'});
   if (navigator.canShare && navigator.canShare({files: [f]})) navigator.share({files: [f], title: 'Budget ' + aar}).catch(() => {});
   else { const a = document.createElement('a'); a.href = URL.createObjectURL(f); a.download = navn; a.click(); toast('Filen »' + navn + '« er gemt') }
