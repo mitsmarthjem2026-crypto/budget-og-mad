@@ -643,10 +643,10 @@ function hjaelperRaad() {
 // Regnes kun ud fra dine egne tal på telefonen.
 const CIRKEL_GRP = [
   ['bolig', '🏠', 'Bolig og regninger', '#2f80ed', /husleje|leje|el\b|el,|vand|varme|forsyning|energi|internet|bredbånd|tv|forsikr|tryg|ejendomsskat|grundejer/i],
-  ['mad', '🛒', 'Mad og dagligvarer', '#22c55e', /netto|rema|lidl|føtex|bilka|coop|kvickly|superbrugsen|meny|spar\b|aldi|365|lovable|dagligvare|mad og|indkøb/i],
-  ['ude', '🍕', 'Mad ude og take-away', '#ef233c', /take|pizza|burger|café|cafe|kiosk|7-eleven|mcdonald|sushi|restaurant|wolt|just eat|mad ude|slik/i],
+  ['mad', '🛒', 'Mad og dagligvarer', '#14b8a6', /netto|rema|lidl|føtex|bilka|coop|kvickly|superbrugsen|meny|spar\b|aldi|365|lovable|dagligvare|mad og|indkøb/i],
+  ['ude', '🍕', 'Mad ude og take-away', '#fb923c', /take|pizza|burger|café|cafe|kiosk|7-eleven|mcdonald|sushi|restaurant|wolt|just eat|mad ude|slik/i],
   ['transport', '🚗', 'Transport og bil', '#8b5cf6', /bil|benzin|diesel|ok\b|ok og|clever|oplad|bus|tog|dsb|rejsekort|brobizz|parkering|værksted|lån \(totalkredit og bil\)|auto/i],
-  ['laan', '🏦', 'Lån og afdrag', '#14b8a6', /lån|afdrag|totalkredit|kredit/i],
+  ['laan', '🏦', 'Lån og afdrag', '#6366f1', /lån|afdrag|totalkredit|kredit/i],
   ['abo', '📱', 'Mobil og abonnementer', '#f472b6', /mobil|telefon|netflix|hbo|max|viaplay|disney|spotify|youtube|apple|prime|abonnement|fitness/i],
   ['fritid', '🎉', 'Fritid, tøj og gaver', '#fbbf24', /fritid|gave|tøj|sko|ferie|rejse|biograf|koncert|hobby|frisør|personlig/i],
   ['ops', '🐷', 'Opsparing', '#06b6d4', /^opsparing/i]
@@ -662,7 +662,12 @@ function cirkelData(md) {
 }
 function cirkelKort(md) {
   // version 89: 3D-cirkeldiagram med kraftige, blanke farver
-  const data = cirkelData(md), total = data.reduce((s, x) => s + x.v, 0);
+  // version 93: den største udgift er altid rød, og et overskud vises som et grønt stykke
+  const data = cirkelData(md).map(x => ({...x})); if (!data.length) return '';
+  data[0].farve = '#ef233c';
+  const udg = data.reduce((s, x) => s + x.v, 0), indM = budgetTal(md).ind, over = indM - udg;
+  if (over > 0) data.push({k: 'over', ik: '💚', navn: 'Overskud', farve: '#16a34a', v: over});
+  const total = data.reduce((s, x) => s + x.v, 0);
   if (!total) return '';
   const cx = 120, cy = 86, rx = 108, ry = 66, dyb = 26;
   const P = (a, dy) => [cx + rx * Math.cos(a), cy + ry * Math.sin(a) + (dy || 0)];
@@ -692,9 +697,9 @@ function cirkelKort(md) {
    <g filter="url(#c3sk)">${sider.map(s => `<path d="${s.d}" fill="url(#c3s-${s.k})"/>`).join('')}${top}</g>
    <ellipse cx="${cx}" cy="${cy}" rx="${rx}" ry="${ry}" fill="url(#c3glans)" pointer-events="none"/><ellipse cx="${cx}" cy="${cy}" rx="${rx - 1.5}" ry="${ry - 1.5}" fill="none" stroke="#fff" stroke-opacity=".7" stroke-width="3" pointer-events="none"/><path d="M${cx - rx},${cy} L${cx - rx},${cy + dyb} A${rx},${ry} 0 0 0 ${cx + rx},${cy + dyb} L${cx + rx},${cy}" fill="none" stroke="#000" stroke-opacity=".12" stroke-width="2" stroke-linejoin="round" pointer-events="none"/>
   </svg>
-  <div style="text-align:center;margin:2px 0 8px;font-size:17px">I alt <b style="color:#dc2626;font-size:24px">${kr(Math.round(total))}</b></div>
-  <ul style="list-style:none;margin:0;padding:0">${data.map(x => `<li style="display:flex;align-items:center;gap:10px;margin:8px 0;font-size:17px"><span style="width:20px;height:20px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#fff 0,${x.farve} 45%,${morkere(x.farve, .7)} 100%);box-shadow:0 2px 4px #0004;flex:none"></span><span style="flex:1">${x.ik} ${esc(x.navn)}</span><span style="text-align:right;white-space:nowrap"><b style="font-size:19px">${Math.round(x.v / total * 100)} %</b><br><b style="font-size:16px;color:#dc2626">${kr(Math.round(x.v))}</b></span></li>`).join('')}</ul>
-  <p class="muted" style="font-size:15px;margin:8px 0 0">Faste udgifter, køb og opsparing i måneden. Appen gætter gruppen ud fra navnet.</p></div>`;
+  <div style="text-align:center;margin:2px 0 8px;font-size:17px">Udgifter <b style="color:#dc2626;font-size:24px">${kr(Math.round(udg))}</b>${over > 0 ? ` · Overskud <b style="color:#16a34a;font-size:24px">${kr(Math.round(over))}</b>` : ""}</div>
+  <ul style="list-style:none;margin:0;padding:0">${data.map(x => `<li style="display:flex;align-items:center;gap:10px;margin:8px 0;font-size:17px"><span style="width:20px;height:20px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#fff 0,${x.farve} 45%,${morkere(x.farve, .7)} 100%);box-shadow:0 2px 4px #0004;flex:none"></span><span style="flex:1">${x.ik} ${esc(x.navn)}</span><span style="text-align:right;white-space:nowrap"><b style="font-size:19px">${Math.round(x.v / total * 100)} %</b><br><b style="font-size:16px;color:${x.k === 'over' ? '#16a34a' : '#dc2626'}">${kr(Math.round(x.v))}</b></span></li>`).join('')}</ul>
+  <p class="muted" style="font-size:15px;margin:8px 0 0">Faste udgifter, køb og opsparing i måneden. Den største udgift er rød. Er der penge tilovers, står de som grønt overskud. Appen gætter gruppen ud fra navnet.</p></div>`;
 }
 
 // ---------- 💰 Sådan kan I spare (råd-siden) ----------
