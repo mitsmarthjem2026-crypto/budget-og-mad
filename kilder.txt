@@ -321,3 +321,15 @@ Nykredit, »Hvordan henter jeg selv kontoudskrifter via netbanken?«: Konti og k
 Andre banker (fx Nordea, Lunar): ingen hjælpeside kunne læses – derfor kun et generelt råd i appen.
 
 Version 61: Brændende kærlighed bruger nu ejerens eget valgte billede (fotos/retter/braendende-egen.jpg, sendt af ejeren 25-11-2026). Det gamle Unsplash-foto (braendende.jpg) bruges ikke længere.
+
+Fil fra banken – vejledning for hver bank (version 74, læst 25-11-2026 på bankernes egne sider):
+Danske Bank – https://danskebank.dk/privat/find-hjaelp/konti/kontoudskrifter
+Nordea – »Sådan finder og administrerer du dine personoplysninger i Nordea Mobilbank og Nordea Netbank« (PDF): https://www.nordea.dk/Images/144-516962/2.0%20DK_GDPR%20specific%20Nordea%20Mobile%20and%20Nordea%20Netbank%20guidline.pdf
+Jyske Bank – https://www.jyskebank.dk/hjaelp/netbank-og-mobilbank/find-dine-kontoudskrifter
+Sydbank – »Udlæs posteringer fra NetBanken« (PDF, nov. 2023): https://www.sydbank.dk/wps/wcm/connect/sydbank/d6689013-aad9-48ff-ae5a-c19f1181dfd5/udl%C3%A6s+posteringer+fra+netbank.pdf
+Nykredit – https://www.nykredit.dk/kundeservice/mitnykredit---netbanken/hvordan-henter-jeg-selv-kontoudskrifter-via-netbanken/
+Coop Bank – https://coopbank.dk/kontakt/kontooplysninger-faq
+Lunar – https://support.lunar.app/da/articles/6466281
+Arbejdernes Landsbank, Spar Nord, Lån & Spar: ingen vejledning til private fundet på bankens egen side – appen viser kun et generelt råd.
+
+Forslag til et budget (version 74): 50/30/20-reglen (Elizabeth Warren, »All Your Worth«, 2005) – se Britannica »What is the 50/30/20 rule?« https://www.britannica.com/money/what-is-the-50-30-20-rule . Rådighedsbeløb: Forbrugerrådet Tænk (se version 57).
