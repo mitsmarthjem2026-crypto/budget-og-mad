@@ -642,14 +642,14 @@ function hjaelperRaad() {
 // ---------- 🥧 Hvad går pengene til? (cirkeldiagram øverst i Budget) ----------
 // Regnes kun ud fra dine egne tal på telefonen.
 const CIRKEL_GRP = [
-  ['bolig', '🏠', 'Bolig og regninger', '#3b82f6', /husleje|leje|el\b|el,|vand|varme|forsyning|energi|internet|bredbånd|tv|forsikr|tryg|ejendomsskat|grundejer/i],
-  ['mad', '🛒', 'Mad og dagligvarer', '#22c55e', /netto|rema|lidl|føtex|bilka|coop|kvickly|superbrugsen|meny|spar\b|aldi|365|lovable|dagligvare|mad og|indkøb/i],
-  ['ude', '🍕', 'Mad ude og take-away', '#fb923c', /take|pizza|burger|café|cafe|kiosk|7-eleven|mcdonald|sushi|restaurant|wolt|just eat|mad ude|slik/i],
-  ['transport', '🚗', 'Transport og bil', '#a855f7', /bil|benzin|diesel|ok\b|ok og|clever|oplad|bus|tog|dsb|rejsekort|brobizz|parkering|værksted|lån \(totalkredit og bil\)|auto/i],
-  ['laan', '🏦', 'Lån og afdrag', '#14b8a6', /lån|afdrag|totalkredit|kredit/i],
-  ['abo', '📱', 'Mobil og abonnementer', '#ec4899', /mobil|telefon|netflix|hbo|max|viaplay|disney|spotify|youtube|apple|prime|abonnement|fitness/i],
-  ['fritid', '🎉', 'Fritid, tøj og gaver', '#facc15', /fritid|gave|tøj|sko|ferie|rejse|biograf|koncert|hobby|frisør|personlig/i],
-  ['ops', '🐷', 'Opsparing', '#06b6d4', /^opsparing/i]
+  ['bolig', '🏠', 'Bolig og regninger', '#1d6ff2', /husleje|leje|el\b|el,|vand|varme|forsyning|energi|internet|bredbånd|tv|forsikr|tryg|ejendomsskat|grundejer/i],
+  ['mad', '🛒', 'Mad og dagligvarer', '#12b347', /netto|rema|lidl|føtex|bilka|coop|kvickly|superbrugsen|meny|spar\b|aldi|365|lovable|dagligvare|mad og|indkøb/i],
+  ['ude', '🍕', 'Mad ude og take-away', '#ff7a00', /take|pizza|burger|café|cafe|kiosk|7-eleven|mcdonald|sushi|restaurant|wolt|just eat|mad ude|slik/i],
+  ['transport', '🚗', 'Transport og bil', '#9b30ff', /bil|benzin|diesel|ok\b|ok og|clever|oplad|bus|tog|dsb|rejsekort|brobizz|parkering|værksted|lån \(totalkredit og bil\)|auto/i],
+  ['laan', '🏦', 'Lån og afdrag', '#00a99d', /lån|afdrag|totalkredit|kredit/i],
+  ['abo', '📱', 'Mobil og abonnementer', '#ff1f7a', /mobil|telefon|netflix|hbo|max|viaplay|disney|spotify|youtube|apple|prime|abonnement|fitness/i],
+  ['fritid', '🎉', 'Fritid, tøj og gaver', '#ffc400', /fritid|gave|tøj|sko|ferie|rejse|biograf|koncert|hobby|frisør|personlig/i],
+  ['ops', '🐷', 'Opsparing', '#00b4e0', /^opsparing/i]
 ];
 function cirkelData(md) {
   const sum = {};
@@ -661,16 +661,40 @@ function cirkelData(md) {
   return alle.filter(x => x.v > 0).sort((a, b) => b.v - a.v);
 }
 function cirkelKort(md) {
+  // version 89: 3D-cirkeldiagram med kraftige, blanke farver
   const data = cirkelData(md), total = data.reduce((s, x) => s + x.v, 0);
   if (!total) return '';
-  const R = 70, C = 2 * Math.PI * R; let pos = 0;
-  const buer = data.map(x => { const l = x.v / total * C; const s = `<circle r="${R}" cx="100" cy="100" fill="none" stroke="${x.farve}" stroke-width="38" stroke-dasharray="${l.toFixed(2)} ${(C - l).toFixed(2)}" stroke-dashoffset="${(-pos).toFixed(2)}" transform="rotate(-90 100 100)"><title>${esc(x.navn)}: ${kr(Math.round(x.v))}</title></circle>`; pos += l; return s; }).join('');
+  const cx = 120, cy = 86, rx = 108, ry = 66, dyb = 26;
+  const P = (a, dy) => [cx + rx * Math.cos(a), cy + ry * Math.sin(a) + (dy || 0)];
+  const morkere = (hex, f) => { const n = parseInt(hex.slice(1), 16); const c = [n >> 16, n >> 8 & 255, n & 255].map(v => Math.round(v * f)); return 'rgb(' + c.join(',') + ')'; };
+  let a = -Math.PI / 2; const st = data.map(x => { const a0 = a, a1 = a + x.v / total * 2 * Math.PI; a = a1; return {...x, a0, a1}; });
+  // sider (kun den forreste halvdel, hvor sin > 0) – tegnes bagfra og frem
+  const sider = [];
+  st.forEach(x => {
+    const ranges = [];
+    for (let k = -1; k <= 2; k++) { const lo = Math.max(x.a0, k * 2 * Math.PI), hi = Math.min(x.a1, k * 2 * Math.PI + Math.PI); if (hi > lo) ranges.push([lo, hi]); }
+    ranges.forEach(([lo, hi]) => {
+      const [x0, y0] = P(lo), [x1, y1] = P(hi);
+      sider.push({mid: (lo + hi) / 2, d: `M${x0.toFixed(1)},${y0.toFixed(1)} A${rx},${ry} 0 ${hi - lo > Math.PI ? 1 : 0} 1 ${x1.toFixed(1)},${y1.toFixed(1)} L${x1.toFixed(1)},${(y1 + dyb).toFixed(1)} A${rx},${ry} 0 ${hi - lo > Math.PI ? 1 : 0} 0 ${x0.toFixed(1)},${(y0 + dyb).toFixed(1)} Z`, farve: x.farve, k: x.k});
+    });
+  });
+  sider.sort((p, q) => Math.abs(Math.PI / 2 - (((q.mid % (2 * Math.PI)) + 2 * Math.PI) % (2 * Math.PI))) - Math.abs(Math.PI / 2 - (((p.mid % (2 * Math.PI)) + 2 * Math.PI) % (2 * Math.PI))));
+  const top = st.map(x => {
+    const [x0, y0] = P(x.a0), [x1, y1] = P(x.a1), stor = x.a1 - x.a0 > Math.PI ? 1 : 0;
+    const d = st.length === 1 ? `M${cx - rx},${cy} A${rx},${ry} 0 1 1 ${cx + rx},${cy} A${rx},${ry} 0 1 1 ${cx - rx},${cy} Z` : `M${cx},${cy} L${x0.toFixed(1)},${y0.toFixed(1)} A${rx},${ry} 0 ${stor} 1 ${x1.toFixed(1)},${y1.toFixed(1)} Z`;
+    return `<path d="${d}" fill="url(#c3t-${x.k})" stroke="#fff" stroke-width="1.5"><title>${esc(x.navn)}: ${kr(Math.round(x.v))}</title></path>`;
+  }).join('');
+  const defs = data.map(x => `<radialGradient id="c3t-${x.k}" cx="40%" cy="30%" r="80%"><stop offset="0" stop-color="#fff" stop-opacity=".55"/><stop offset=".25" stop-color="${x.farve}"/><stop offset="1" stop-color="${morkere(x.farve, .78)}"/></radialGradient><linearGradient id="c3s-${x.k}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${morkere(x.farve, .8)}"/><stop offset="1" stop-color="${morkere(x.farve, .5)}"/></linearGradient>`).join('');
   const navn = new Date(md + '-01').toLocaleDateString('da-DK', {month: 'long'});
-  return `<div class="card"><b>🥧 Hvad går pengene til i ${navn}?</b>
-  <div style="display:flex;flex-wrap:wrap;align-items:center;gap:14px;margin-top:8px">
-   <svg viewBox="0 0 200 200" width="170" height="170" style="flex:none;margin:0 auto" role="img" aria-label="Cirkeldiagram over udgifter"><defs>${data.map(x => `<linearGradient id="cg-${x.k}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".55"/><stop offset=".18" stop-color="${x.farve}"/><stop offset="1" stop-color="${x.farve}" stop-opacity=".9"/></linearGradient>`).join('')}<radialGradient id="cglans" cx=".35" cy=".25" r=".8"><stop offset="0" stop-color="#fff" stop-opacity=".45"/><stop offset=".5" stop-color="#fff" stop-opacity=".06"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient><filter id="cskygge" x="-20%" y="-20%" width="140%" height="140%"><feDropShadow dx="0" dy="3" stdDeviation="4" flood-opacity=".25"/></filter></defs><g filter="url(#cskygge)">${buer}</g><circle r="89" cx="100" cy="100" fill="url(#cglans)" pointer-events="none"/><circle r="51" cx="100" cy="100" fill="#fff"/><text x="100" y="96" text-anchor="middle" font-size="13" fill="currentColor" opacity=".7">I alt</text><text x="100" y="116" text-anchor="middle" font-size="17" font-weight="800" fill="#dc2626">${kr(Math.round(total))}</text></svg>
-   <ul style="list-style:none;margin:0;padding:0;flex:1;min-width:170px">${data.map(x => `<li style="display:flex;align-items:center;gap:8px;margin:5px 0"><span style="width:16px;height:16px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#fff 0,${x.farve} 45%);box-shadow:0 1px 3px #0003;flex:none"></span><span style="flex:1">${x.ik} ${esc(x.navn)}</span><span style="text-align:right;white-space:nowrap"><b>${Math.round(x.v / total * 100)} %</b><br><span class="muted" style="font-size:13px">${kr(Math.round(x.v))}</span></span></li>`).join('')}</ul>
-  </div><p class="muted" style="font-size:12px;margin:6px 0 0">Faste udgifter, køb og opsparing i måneden. Appen gætter gruppen ud fra navnet.</p></div>`;
+  return `<div class="card"><b style="font-size:19px">🥧 Hvad går pengene til i ${navn}?</b>
+  <svg viewBox="0 0 240 190" width="100%" style="max-width:360px;display:block;margin:10px auto 0" role="img" aria-label="Cirkeldiagram over udgifter">
+   <defs>${defs}<radialGradient id="c3glans" cx="35%" cy="20%" r="70%"><stop offset="0" stop-color="#fff" stop-opacity=".6"/><stop offset=".5" stop-color="#fff" stop-opacity=".08"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient><filter id="c3sk" x="-10%" y="-10%" width="120%" height="140%"><feDropShadow dx="0" dy="6" stdDeviation="6" flood-opacity=".3"/></filter></defs>
+   <g filter="url(#c3sk)">${sider.map(s => `<path d="${s.d}" fill="url(#c3s-${s.k})"/>`).join('')}${top}</g>
+   <ellipse cx="${cx}" cy="${cy}" rx="${rx}" ry="${ry}" fill="url(#c3glans)" pointer-events="none"/>
+  </svg>
+  <div style="text-align:center;margin:2px 0 8px;font-size:17px">I alt <b style="color:#dc2626;font-size:24px">${kr(Math.round(total))}</b></div>
+  <ul style="list-style:none;margin:0;padding:0">${data.map(x => `<li style="display:flex;align-items:center;gap:10px;margin:8px 0;font-size:17px"><span style="width:20px;height:20px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#fff 0,${x.farve} 45%,${morkere(x.farve, .7)} 100%);box-shadow:0 2px 4px #0004;flex:none"></span><span style="flex:1">${x.ik} ${esc(x.navn)}</span><span style="text-align:right;white-space:nowrap"><b style="font-size:19px">${Math.round(x.v / total * 100)} %</b><br><b style="font-size:16px;color:#dc2626">${kr(Math.round(x.v))}</b></span></li>`).join('')}</ul>
+  <p class="muted" style="font-size:15px;margin:8px 0 0">Faste udgifter, køb og opsparing i måneden. Appen gætter gruppen ud fra navnet.</p></div>`;
 }
 
 // ---------- 💰 Sådan kan I spare (råd-siden) ----------
