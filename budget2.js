@@ -304,3 +304,29 @@ function bankGem() {
   });
   bankF = null; save(); vis(); toast(n + ' poster lagt ind i dit budget. Skift måned med pilene øverst.', fortrydTil(s));
 }
+
+// ---------- 📅 Hele året – alle 12 måneder på én gang (version 60) ----------
+let aarVis = null; // hvilket år der vises (null = året for den valgte måned)
+function aarKort(md) {
+  const aar = aarVis || +md.slice(0, 4), nu = iso(new Date()).slice(0, 7);
+  const rk = Array.from({length: 12}, (_, i) => {
+    const m = aar + '-' + String(i + 1).padStart(2, '0'), b = budgetTal(m);
+    const har = b.ind > 0 || b.kob > 0 || b.sparet !== 0;
+    return {m, b, har, navn: new Date(m + '-01').toLocaleDateString('da-DK', {month: 'short'}).replace('.', '')};
+  });
+  const med = rk.filter(r => r.har), sum = k => med.reduce((s, r) => s + r.b[k], 0);
+  const ud = r => r.b.faste + r.b.kob + r.b.sparet;
+  const maxV = Math.max(1, ...med.map(r => Math.max(r.b.ind, ud(r))));
+  const celle = 'text-align:right;white-space:nowrap;padding:6px 4px';
+  return `<div class="card"><details${D.budget.aarAaben ? ' open' : ''} ontoggle="D.budget.aarAaben=this.open;save()"><summary style="cursor:pointer;font-weight:700">📅 Hele året ${aar} <span class="muted" style="font-weight:400">– alle måneder på én gang</span></summary>
+  <div class="row" style="margin-top:8px"><button class="l" onclick="aarVis=${aar - 1};vis()">‹ ${aar - 1}</button><b style="flex:1;text-align:center">${aar}</b><button class="l" onclick="aarVis=${aar + 1};vis()">${aar + 1} ›</button></div>
+  <div style="overflow-x:auto;margin-top:8px"><table style="width:100%;border-collapse:collapse;font-size:15px">
+   <tr class="muted" style="font-size:13px"><th style="text-align:left;padding:6px 4px">Måned</th><th style="${celle}">💵 Ind</th><th style="${celle}">🏦 Ud</th><th style="${celle}">Tilbage</th></tr>
+   ${rk.map(r => `<tr onclick="budgetMd='${r.m}';aarVis=null;vis();scrollTo(0,0)" style="cursor:pointer;border-top:1px dashed var(--line)${r.m === nu ? ';background:var(--acc2)' : ''}">
+    <td style="padding:6px 4px"><b>${r.navn}</b>${r.har ? `<div style="height:5px;border-radius:3px;background:var(--line);margin-top:4px;width:100%"><i style="display:block;height:5px;border-radius:3px;background:var(--acc);width:${Math.round(Math.min(1, ud(r) / maxV) * 100)}%"></i></div>` : ''}</td>
+    ${r.har ? `<td style="${celle}">${kr(Math.round(r.b.ind))}</td><td style="${celle}">${kr(Math.round(ud(r)))}</td><td style="${celle};font-weight:800;color:${r.b.tilbage < 0 ? 'var(--warn)' : 'var(--acc)'}">${kr(Math.round(r.b.tilbage))}</td>` : `<td colspan="3" class="muted" style="${celle}">ingen tal endnu</td>`}</tr>`).join('')}
+   <tr style="border-top:2px solid var(--acc);font-weight:800"><td style="padding:8px 4px">I alt</td><td style="${celle}">${kr(Math.round(sum('ind')))}</td><td style="${celle}">${kr(Math.round(med.reduce((s, r) => s + ud(r), 0)))}</td><td style="${celle};color:${sum('tilbage') < 0 ? 'var(--warn)' : 'var(--acc)'}">${kr(Math.round(sum('tilbage')))}</td></tr>
+  </table></div>
+  <p class="muted" style="font-size:13px;margin:8px 0 0">»Ud« er faste udgifter + køb + opsparing. I alt tæller kun måneder med tal. Tryk på en måned for at se den.</p>
+  </details></div>`;
+}
