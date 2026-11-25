@@ -530,7 +530,12 @@ function forslagKort() {
 function budgetFold(html) {
   try {
     const tpl = document.createElement('template'); tpl.innerHTML = html;
-    const ud = document.createElement('div'), noder = [...tpl.content.childNodes].filter(n => n.nodeType === 1);
+    let ud = document.createElement('div'), noder = [...tpl.content.childNodes].filter(n => n.nodeType === 1);
+    // version 85: gode råd og forslag har deres egen side (åbnes med en knap) – intet er slettet
+    const erRaad = n => n.classList.contains('godraad') || /^💡 (Forslag til et budget|Vis tips)/.test(((n.querySelector('b,button') || {}).textContent || '').trim());
+    const raad = noder.filter(erRaad);
+    window._raadHtml = raad.map(n => { const c = n.cloneNode(true); if (c.tagName === 'DETAILS') c.open = true; return c.outerHTML }).join('');
+    noder = noder.filter(n => !erRaad(n));
     const aabne = (D.budget.aabne = D.budget.aabne && typeof D.budget.aabne === 'object' ? D.budget.aabne : {});
     const forsteKort = noder.find(n => n.classList.contains('card'));
     const vigtig = n => n.classList.contains('row') || n === forsteKort || /Hurtigt:/.test((n.querySelector('b') || {}).textContent || '');
@@ -556,7 +561,9 @@ function budgetFold(html) {
       if (n.classList.contains('card')) { ud.append(pak(titel(n), '', [n])); i++; continue }
       ud.append(n); i++;
     }
-    return top.innerHTML + ud.innerHTML; // det vigtigste (måned, Tilbage, Hurtigt) står øverst
+    const raadKnap = window._raadHtml ? `<button class="b" style="width:100%;margin:0 0 12px;padding:14px;font-size:18px" onclick="raadSide()">💡 Gode råd og forslag til et budget</button>` : '';
+    setTimeout(() => { try { if (typeof dlg !== 'undefined' && dlg.open && dlg.dataset.raad) dlgin.innerHTML = raadIndhold() } catch (e) {} }, 0);
+    return top.innerHTML + raadKnap + ud.innerHTML; // det vigtigste (måned, Tilbage, Hurtigt) står øverst
   } catch (e) { return html }
 }
 (function () {
@@ -566,3 +573,11 @@ function budgetFold(html) {
   const virk = () => { try { if (typeof SIDER === 'object' && SIDER.budget && !SIDER.budget._fold) { const o = SIDER.budget; SIDER.budget = function () { let h = o.apply(this, arguments); const ekstra = (typeof forslagKort === 'function' ? forslagKort() : '') + (typeof sendKort === 'function' ? sendKort() : ''); const mk = h.match(/<h2[^>]*>\s*🛒 Køb\s*<\/h2>/), k = mk ? mk.index : -1; h = k >= 0 ? h.slice(0, k) + ekstra + h.slice(k) : h + ekstra; return budgetFold(h) }; SIDER.budget._fold = 1; if (typeof huskeLaegInd === 'function' && !huskeLaegInd._f) { const oh = huskeLaegInd; window.huskeLaegInd = function (h, tx) { const e = document.getElementById(h === 'ind' ? 'ibelob' : 'fbelob'), dd = e && e.closest('details.bfold'); if (dd) dd.open = true; return oh(h, tx) }; window.huskeLaegInd._f = 1 } return true } } catch (e) {} return false };
   if (!virk()) { document.addEventListener('DOMContentLoaded', virk); setTimeout(virk, 0) }
 })();
+
+// ---------- Version 85: 💡 Gode råd – side for sig selv ----------
+function raadIndhold() {
+  return `<h2>💡 Gode råd og forslag</h2><p class="muted" style="margin:-6px 0 10px">Råd og et forslag til et sundt budget – samlet ét sted.</p>${window._raadHtml || '<p class="muted">Ingen råd lige nu.</p>'}
+  <button class="l" style="width:100%;margin-top:12px" onclick="raadLuk()">Luk</button>`;
+}
+function raadSide() { dlgin.innerHTML = raadIndhold(); dlg.dataset.raad = '1'; dlg.addEventListener('close', raadLuk, {once: true}); if (!dlg.open) dlg.showModal(); }
+function raadLuk() { delete dlg.dataset.raad; if (dlg.open) dlg.close(); }

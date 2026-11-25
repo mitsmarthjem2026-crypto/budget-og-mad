@@ -1,7 +1,7 @@
 // Budget og Mad – gemmer appen på telefonen, så den virker uden internet.
 // Sikre opdateringer: en ny version bliver først brugt, når brugeren selv trykker »Opdater«.
 // Har den nye version fejl, bliver den ikke taget i brug, og appen kører videre på den gamle.
-const VERSION = 74;
+const VERSION = 85;
 const CACHE = 'bom-v' + VERSION;
 const META = 'bom-meta';
 const FILER = ['./', './index.html', './opskrifter.js', './motion.js', './spil.js', './budget2.js', './jura.js', './styring.js', './manifest.json', './version.json',
