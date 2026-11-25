@@ -554,7 +554,7 @@ function budgetFold(html) {
     let i = 0;
     while (i < noder.length) {
       const n = noder[i];
-      if (vigtig(n)) { top.append(n); i++; continue }
+      if (vigtig(n)) { top.append(n); if (n === forsteKort && typeof cirkelKort === 'function') { const c = cirkelKort(budgetMd); if (c) { const tt = document.createElement('template'); tt.innerHTML = c; top.append(tt.content); } } i++; continue }
       if (n.tagName === 'H2') { // »🛒 Køb« og alt herunder samles i én boks
         const rest = noder.slice(i + 1); ud.append(pak(n.textContent.trim(), '– det du har købt', rest)); break;
       }
@@ -578,8 +578,90 @@ function budgetFold(html) {
 
 // ---------- Version 85: 💡 Gode råd – side for sig selv ----------
 function raadIndhold() {
-  return `<h2>💡 Gode råd og forslag</h2><p class="muted" style="margin:-6px 0 10px">Råd og et forslag til et sundt budget – samlet ét sted.</p>${window._raadHtml || '<p class="muted">Ingen råd lige nu.</p>'}
+  return `<h2>💡 Gode råd og forslag</h2><p class="muted" style="margin:-6px 0 10px">Råd og et forslag til et sundt budget – samlet ét sted.</p>${typeof hjaelperKort === 'function' ? hjaelperKort() : ''}${window._raadHtml || '<p class="muted">Ingen råd lige nu.</p>'}
   <button class="l" style="width:100%;margin-top:12px" onclick="raadLuk()">Luk</button>`;
 }
 function raadSide() { dlgin.innerHTML = raadIndhold(); dlg.dataset.raad = '1'; dlg.addEventListener('close', raadLuk, {once: true}); if (!dlg.open) dlg.showModal(); }
 function raadLuk() { delete dlg.dataset.raad; if (dlg.open) dlg.close(); }
+
+// ---------- Version 87: 🤝 Hjælp til økonomien (kun hvis man slår den til) ----------
+// Kigger kun på dine egne tal i appen – på din telefon. Intet sendes nogen steder hen.
+function hjaelperKort() {
+  const til = !!D.budget.hjaelper;
+  if (!til) return `<div class="card"><b>🤝 Hjælp til økonomien</b>
+   <p class="muted" style="margin:6px 0 8px">Vil du have hjælp? Så kigger appen på dine egne tal og giver dig råd om, hvor du kan spare. Det sker kun på din telefon.</p>
+   <button class="b" style="width:100%" onclick="D.budget.hjaelper=true;save();vis()">✅ Ja tak, slå hjælpen til</button></div>`;
+  const r = hjaelperRaad();
+  return `<div class="card"><b>🤝 Hjælp til økonomien</b> <span class="muted">– ud fra dine egne tal</span>
+   ${r.length ? `<ul style="margin:8px 0 0;padding-left:20px">${r.map(x => `<li style="margin:7px 0">${x}</li>`).join('')}</ul>` : '<p class="muted" style="margin:8px 0 0">Skriv lidt flere tal ind (penge ind, faste udgifter og køb), så kan appen give dig råd.</p>'}
+   <button class="l" style="width:100%;margin-top:10px;font-size:14px" onclick="D.budget.hjaelper=false;save();vis()">Slå hjælpen fra</button></div>`;
+}
+function hjaelperRaad() {
+  const r = [], nu = new Date(), md = i => { const d = new Date(nu.getFullYear(), nu.getMonth() - i, 1); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') };
+  const k = n => kr(Math.round(n));
+  const denne = budgetTal(md(0));
+  const tidl = [1, 2, 3].map(md).map(m => ({m, b: budgetTal(m)})).filter(x => x.b.ind > 0 || x.b.kob > 0);
+  // 1) Køb denne måned i forhold til de sidste måneder
+  if (tidl.length) {
+    const snit = tidl.reduce((s, x) => s + x.b.kob, 0) / tidl.length;
+    if (snit > 0 && denne.kob > snit * 1.15) r.push(`Du har brugt <b>${k(denne.kob - snit)}</b> mere på køb i denne måned end du plejer (ca. ${k(snit)} om måneden).`);
+    else if (snit > 0 && denne.kob < snit * 0.85) r.push(`Flot! Du har brugt <b>${k(snit - denne.kob)}</b> mindre på køb end du plejer. 🎉`);
+  }
+  // 2) De største poster blandt køb de sidste 3 måneder (samme tekst)
+  const fra = md(2) + '-01', grp = {};
+  D.budget.udgifter.filter(x => x.dato >= fra && !/^opsparing/i.test(x.tekst || '') && !(typeof fraKonto === 'function' && fraKonto(x))).forEach(x => {
+    const n = String(x.tekst || 'Køb').replace(/\s*\(.*?\)\s*/g, ' ').trim().toLowerCase(); (grp[n] = grp[n] || {navn: String(x.tekst || 'Køb').replace(/\s*\(.*?\)\s*/g, ' ').trim(), sum: 0, antal: 0}); grp[n].sum += x.belob; grp[n].antal++;
+  });
+  const top = Object.values(grp).sort((a, b) => b.sum - a.sum).slice(0, 3);
+  if (top.length) r.push(`Mest penge de sidste 3 måneder: ${top.map(x => `<b>${esc(x.navn)}</b> ${k(x.sum)}`).join(', ')}. Kan du spare lidt på én af dem?`);
+  // 3) Take-away, café og slik
+  const ude = Object.values(grp).filter(x => /take|pizza|burger|café|cafe|kiosk|7-eleven|mcdonald|sushi|restaurant|slik|wolt|just eat|mad ude/i.test(x.navn));
+  const udeSum = ude.reduce((s, x) => s + x.sum, 0);
+  if (udeSum > 0) r.push(`Mad ude og take-away de sidste 3 måneder: <b>${k(udeSum)}</b>. Laver du mad fra appen, koster en aftensmad ca. 45 kr for to.`);
+  // 4) Abonnementer i faste udgifter
+  const abo = D.budget.faste.filter(x => /netflix|hbo|max|viaplay|disney|spotify|tv ?2|youtube|apple|prime|fitness|abonnement|mofibo|podimo|storytel/i.test(x.tekst || ''));
+  if (abo.length >= 2) r.push(`Du har <b>${abo.length} abonnementer</b> for i alt <b>${k(abo.reduce((s, x) => s + x.belob, 0))}</b> om måneden (${abo.map(x => esc(x.tekst)).join(', ')}). Kan nogle sættes på pause?`);
+  // 5) Faste udgifter i forhold til penge ind (50/30/20)
+  if (denne.ind > 0 && denne.faste > denne.ind / 2) r.push(`Dine faste udgifter er <b>${Math.round(denne.faste / denne.ind * 100)} %</b> af det, du får ind. Et sundt budget bruger ca. halvdelen på det nødvendige.`);
+  // 6) Opsparing
+  if (denne.ind > 0) {
+    const ops = denne.sparet + D.budget.udgifter.filter(x => x.dato.slice(0, 7) === md(0) && /^opsparing/i.test(x.tekst || '')).reduce((s, x) => s + x.belob, 0);
+    if (ops < denne.ind * 0.1 && denne.tilbage > 500) r.push(`Du har <b>${k(denne.tilbage)}</b> tilbage i denne måned. Læg fx <b>${k(Math.min(denne.tilbage / 2, denne.ind * 0.2))}</b> til side under »🐷 Opsparing«.`);
+  }
+  if (denne.ind > 0 && denne.tilbage < 0) r.push(`Du er <b>${k(-denne.tilbage)}</b> i minus i denne måned. Kig på dine køb, og vent med det, der kan vente til næste løn.`);
+  return r;
+}
+
+// ---------- 🥧 Hvad går pengene til? (cirkeldiagram øverst i Budget) ----------
+// Regnes kun ud fra dine egne tal på telefonen.
+const CIRKEL_GRP = [
+  ['bolig', '🏠', 'Bolig og regninger', '#3b82f6', /husleje|leje|el\b|el,|vand|varme|forsyning|energi|internet|bredbånd|tv|forsikr|tryg|ejendomsskat|grundejer/i],
+  ['mad', '🛒', 'Mad og dagligvarer', '#22c55e', /netto|rema|lidl|føtex|bilka|coop|kvickly|superbrugsen|meny|spar\b|aldi|365|lovable|dagligvare|mad og|indkøb/i],
+  ['ude', '🍕', 'Mad ude og take-away', '#fb923c', /take|pizza|burger|café|cafe|kiosk|7-eleven|mcdonald|sushi|restaurant|wolt|just eat|mad ude|slik/i],
+  ['transport', '🚗', 'Transport og bil', '#a855f7', /bil|benzin|diesel|ok\b|ok og|clever|oplad|bus|tog|dsb|rejsekort|brobizz|parkering|værksted|lån \(totalkredit og bil\)|auto/i],
+  ['laan', '🏦', 'Lån og afdrag', '#14b8a6', /lån|afdrag|totalkredit|kredit/i],
+  ['abo', '📱', 'Mobil og abonnementer', '#ec4899', /mobil|telefon|netflix|hbo|max|viaplay|disney|spotify|youtube|apple|prime|abonnement|fitness/i],
+  ['fritid', '🎉', 'Fritid, tøj og gaver', '#facc15', /fritid|gave|tøj|sko|ferie|rejse|biograf|koncert|hobby|frisør|personlig/i],
+  ['ops', '🐷', 'Opsparing', '#06b6d4', /^opsparing/i]
+];
+function cirkelData(md) {
+  const sum = {};
+  const læg = (tekst, belob) => { const g = CIRKEL_GRP.find(x => x[4].test(tekst || '')); const k = g ? g[0] : 'andet'; sum[k] = (sum[k] || 0) + belob; };
+  D.budget.faste.forEach(x => læg(x.tekst, x.belob));
+  D.budget.udgifter.filter(x => x.dato.slice(0, 7) === md).forEach(x => læg(x.tekst, x.belob));
+  const sp = sparetI(md); if (sp > 0) sum.ops = (sum.ops || 0) + sp;
+  const alle = [...CIRKEL_GRP.map(([k, ik, navn, farve]) => ({k, ik, navn, farve, v: sum[k] || 0})), {k: 'andet', ik: '📦', navn: 'Andet', farve: '#cbd5e1', v: sum.andet || 0}];
+  return alle.filter(x => x.v > 0).sort((a, b) => b.v - a.v);
+}
+function cirkelKort(md) {
+  const data = cirkelData(md), total = data.reduce((s, x) => s + x.v, 0);
+  if (!total) return '';
+  const R = 70, C = 2 * Math.PI * R; let pos = 0;
+  const buer = data.map(x => { const l = x.v / total * C; const s = `<circle r="${R}" cx="100" cy="100" fill="none" stroke="${x.farve}" stroke-width="38" stroke-dasharray="${l.toFixed(2)} ${(C - l).toFixed(2)}" stroke-dashoffset="${(-pos).toFixed(2)}" transform="rotate(-90 100 100)"><title>${esc(x.navn)}: ${kr(Math.round(x.v))}</title></circle>`; pos += l; return s; }).join('');
+  const navn = new Date(md + '-01').toLocaleDateString('da-DK', {month: 'long'});
+  return `<div class="card"><b>🥧 Hvad går pengene til i ${navn}?</b>
+  <div style="display:flex;flex-wrap:wrap;align-items:center;gap:14px;margin-top:8px">
+   <svg viewBox="0 0 200 200" width="170" height="170" style="flex:none;margin:0 auto" role="img" aria-label="Cirkeldiagram over udgifter"><defs>${data.map(x => `<linearGradient id="cg-${x.k}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".55"/><stop offset=".18" stop-color="${x.farve}"/><stop offset="1" stop-color="${x.farve}" stop-opacity=".9"/></linearGradient>`).join('')}<radialGradient id="cglans" cx=".35" cy=".25" r=".8"><stop offset="0" stop-color="#fff" stop-opacity=".45"/><stop offset=".5" stop-color="#fff" stop-opacity=".06"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient><filter id="cskygge" x="-20%" y="-20%" width="140%" height="140%"><feDropShadow dx="0" dy="3" stdDeviation="4" flood-opacity=".25"/></filter></defs><g filter="url(#cskygge)">${buer}</g><circle r="89" cx="100" cy="100" fill="url(#cglans)" pointer-events="none"/><circle r="51" cx="100" cy="100" fill="#fff"/><text x="100" y="96" text-anchor="middle" font-size="13" fill="currentColor" opacity=".7">I alt</text><text x="100" y="116" text-anchor="middle" font-size="17" font-weight="800" fill="#dc2626">${kr(Math.round(total))}</text></svg>
+   <ul style="list-style:none;margin:0;padding:0;flex:1;min-width:170px">${data.map(x => `<li style="display:flex;align-items:center;gap:8px;margin:5px 0"><span style="width:16px;height:16px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#fff 0,${x.farve} 45%);box-shadow:0 1px 3px #0003;flex:none"></span><span style="flex:1">${x.ik} ${esc(x.navn)}</span><span style="text-align:right;white-space:nowrap"><b>${Math.round(x.v / total * 100)} %</b><br><span class="muted" style="font-size:13px">${kr(Math.round(x.v))}</span></span></li>`).join('')}</ul>
+  </div><p class="muted" style="font-size:12px;margin:6px 0 0">Faste udgifter, køb og opsparing i måneden. Appen gætter gruppen ud fra navnet.</p></div>`;
+}
