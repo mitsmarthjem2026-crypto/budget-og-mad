@@ -138,13 +138,17 @@ function mshLaes(inp) {
 async function mshSaetInd() {
   let tekst = '';
   try { tekst = await navigator.clipboard.readText(); } catch (e) {}
-  if (tekst && tekst.includes('Mit Smart Hjem PRO')) { mshFraTekst(tekst, 'kopieret'); return; }
+  if (tekst && tekst.includes('Mit Smart Hjem PRO') && tekst.includes('privat-budget')) { mshFraTekst(tekst, 'kopieret'); return; }
   const fe = document.getElementById('mshfelt'); if (fe) { fe.style.display = 'block'; const ta = fe.querySelector('textarea'); ta.value = ''; ta.focus(); }
   toast('Tryk og hold i feltet, og vælg »Indsæt«');
 }
 function mshFelt(ta) { const v = ta.value.trim(); if (v.length > 20) mshFraTekst(v, 'kopieret') }
 function mshFraTekst(tekst, navn) {
   const f = {name: navn};
+  // version 64: tål tekst, der er kopieret fra en besked (fx med ``` eller pæne anførselstegn omkring)
+  tekst = String(tekst || '');
+  const s0 = tekst.indexOf('{'), s1 = tekst.lastIndexOf('}'); if (s0 >= 0 && s1 > s0) tekst = tekst.slice(s0, s1 + 1);
+  try { JSON.parse(tekst); } catch (e) { tekst = tekst.replace(/[“”„]/g, '"'); }
   {
     try {
       const fil = JSON.parse(tekst);
