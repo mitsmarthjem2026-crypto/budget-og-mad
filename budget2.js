@@ -402,8 +402,8 @@ function aarKort(md) {
    <tr class="muted" style="font-size:13px"><th style="text-align:left;padding:6px 4px">Måned</th><th style="${celle}">💵 Ind</th><th style="${celle}">🏦 Ud</th><th style="${celle}">Tilbage</th></tr>
    ${rk.map(r => `<tr onclick="budgetMd='${r.m}';aarVis=null;vis();scrollTo(0,0)" style="cursor:pointer;border-top:1px dashed var(--line)${r.m === nu ? ';background:var(--acc2)' : ''}">
     <td style="padding:6px 4px"><b>${r.navn}</b>${r.har ? `<div style="height:5px;border-radius:3px;background:var(--line);margin-top:4px;width:100%"><i style="display:block;height:5px;border-radius:3px;background:var(--acc);width:${Math.round(Math.min(1, ud(r) / maxV) * 100)}%"></i></div>` : ''}</td>
-    ${r.har ? `<td style="${celle}">${kr(Math.round(r.b.ind))}</td><td style="${celle}">${kr(Math.round(ud(r)))}</td><td style="${celle};font-weight:800;color:${r.b.tilbage < 0 ? 'var(--warn)' : '#15803d'}">${kr(Math.round(r.b.tilbage))}</td>` : `<td colspan="3" class="muted" style="${celle}">ingen tal endnu</td>`}</tr>`).join('')}
-   <tr style="border-top:2px solid var(--acc);font-weight:800"><td style="padding:8px 4px">I alt</td><td style="${celle}">${kr(Math.round(sum('ind')))}</td><td style="${celle}">${kr(Math.round(med.reduce((s, r) => s + ud(r), 0)))}</td><td style="${celle};color:${sum('tilbage') < 0 ? 'var(--warn)' : '#15803d'}">${kr(Math.round(sum('tilbage')))}</td></tr>
+    ${r.har ? `<td style="${celle};color:#15803d;font-weight:700">${kr(Math.round(r.b.ind))}</td><td style="${celle};color:#dc2626;font-weight:700">${kr(Math.round(ud(r)))}</td><td style="${celle};font-weight:800;color:${r.b.tilbage < 0 ? 'var(--warn)' : '#15803d'}">${kr(Math.round(r.b.tilbage))}</td>` : `<td colspan="3" class="muted" style="${celle}">ingen tal endnu</td>`}</tr>`).join('')}
+   <tr style="border-top:2px solid var(--acc);font-weight:800"><td style="padding:8px 4px">I alt</td><td style="${celle};color:#15803d">${kr(Math.round(sum('ind')))}</td><td style="${celle};color:#dc2626">${kr(Math.round(med.reduce((s, r) => s + ud(r), 0)))}</td><td style="${celle};color:${sum('tilbage') < 0 ? 'var(--warn)' : '#15803d'}">${kr(Math.round(sum('tilbage')))}</td></tr>
   </table></div>
   <p class="muted" style="font-size:13px;margin:8px 0 0;${jaevn ? 'display:none' : ''}">»Ud« er faste udgifter + køb + opsparing (ikke det, der betales fra budget- eller feriekonto). I alt tæller kun måneder med tal. Tryk på en måned for at se den.</p>
   </details></div>`;
@@ -542,13 +542,15 @@ function budgetFold(html) {
     const titel = n => { const b = n.querySelector('b,h2,h3'); return ((b && b.textContent) || n.textContent || '').trim().replace(/\s+/g, ' ').slice(0, 60) };
     const pak = (navn, emne, indhold) => {
       const k = navn.replace(/[^a-zæøå0-9]/gi, '').slice(0, 30).toLowerCase() || 'boks';
-      const d = document.createElement('details'); d.className = 'card bfold'; if (aabne[k]) d.open = true;
+      const d = document.createElement('details'); d.className = 'card bfold' + (/Penge ind/.test(navn) ? ' bf-ind' : /Bank-budget|Køb/.test(navn) ? ' bf-ud' : ''); if (aabne[k]) d.open = true;
       d.setAttribute('ontoggle', `D.budget.aabne=D.budget.aabne||{};if(this.open)D.budget.aabne['${k}']=1;else delete D.budget.aabne['${k}'];save()`);
       const s = document.createElement('summary'); s.innerHTML = `<b>${esc(navn)}</b>${emne ? ` <span class="muted" style="font-weight:400">${esc(emne)}</span>` : ''}`; d.append(s);
       indhold.forEach(x => { if (x.classList && x.classList.contains('card')) x.classList.add('bfold-ind'); d.append(x) });
       return d;
     };
     const top = document.createElement('div');
+    // version 86: ind med grønt, udgifter med rødt – og større tal
+    if (forsteKort) forsteKort.querySelectorAll('span').forEach(s => { const x = s.textContent; if (/^💵 Ind:/.test(x)) s.classList.add('bfarve', 'bfarve-ind'); else if (/^(🏠 Faste|🛒 Køb):/.test(x)) s.classList.add('bfarve', 'bfarve-ud'); });
     let i = 0;
     while (i < noder.length) {
       const n = noder[i];
@@ -568,7 +570,7 @@ function budgetFold(html) {
 }
 (function () {
   const st = document.createElement('style');
-  st.textContent = '.bfold-ind>b:first-child{display:none}details.card.bfold{padding:0!important;margin-bottom:10px}.bfold>summary{cursor:pointer;padding:12px 16px;list-style:none;font-size:17px}.bfold>summary::-webkit-details-marker{display:none}.bfold>summary::after{content:"▾";float:right;opacity:.5}.bfold[open]>summary::after{content:"▴"}.bfold-ind{box-shadow:none!important;margin:0!important;border-radius:0 0 18px 18px!important;border:0!important}.bfold>:not(summary){margin-left:0;margin-right:0}';
+  st.textContent = '.bfarve{background:#fff!important;color:#333!important;border-radius:999px;padding:6px 14px!important;font-size:16px;display:inline-block;margin:3px 0}.bfarve b{font-size:21px;font-weight:900}.bfarve-ind b{color:#15803d}.bfarve-ud b{color:#dc2626}.bf-ind ul.list b{color:#15803d;font-size:17px}.bf-ud ul.list b{color:#dc2626;font-size:17px}.bfold-ind>b:first-child{display:none}details.card.bfold{padding:0!important;margin-bottom:10px}.bfold>summary{cursor:pointer;padding:12px 16px;list-style:none;font-size:17px}.bfold>summary::-webkit-details-marker{display:none}.bfold>summary::after{content:"▾";float:right;opacity:.5}.bfold[open]>summary::after{content:"▴"}.bfold-ind{box-shadow:none!important;margin:0!important;border-radius:0 0 18px 18px!important;border:0!important}.bfold>:not(summary){margin-left:0;margin-right:0}';
   document.head.appendChild(st);
   const virk = () => { try { if (typeof SIDER === 'object' && SIDER.budget && !SIDER.budget._fold) { const o = SIDER.budget; SIDER.budget = function () { let h = o.apply(this, arguments); const ekstra = (typeof forslagKort === 'function' ? forslagKort() : '') + (typeof sendKort === 'function' ? sendKort() : ''); const mk = h.match(/<h2[^>]*>\s*🛒 Køb\s*<\/h2>/), k = mk ? mk.index : -1; h = k >= 0 ? h.slice(0, k) + ekstra + h.slice(k) : h + ekstra; return budgetFold(h) }; SIDER.budget._fold = 1; if (typeof huskeLaegInd === 'function' && !huskeLaegInd._f) { const oh = huskeLaegInd; window.huskeLaegInd = function (h, tx) { const e = document.getElementById(h === 'ind' ? 'ibelob' : 'fbelob'), dd = e && e.closest('details.bfold'); if (dd) dd.open = true; return oh(h, tx) }; window.huskeLaegInd._f = 1 } return true } } catch (e) {} return false };
   if (!virk()) { document.addEventListener('DOMContentLoaded', virk); setTimeout(virk, 0) }
