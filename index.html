@@ -2,6 +2,8 @@
 <html lang="da">
 <head>
 <meta charset="utf-8">
+<!-- Version 97: sikkerhed – appen må kun hente fra kendte, gratis steder og kan ikke sende data til fremmede servere -->
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval' blob: https://cdn.jsdelivr.net https://esm.sh; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https:; media-src 'self' data: blob:; font-src 'self' data:; worker-src 'self' blob:; connect-src 'self' data: blob: https://cmlxlzzsfvbwgjwwzugx.supabase.co https://world.openfoodfacts.org https://cdn.jsdelivr.net https://esm.sh https://tessdata.projectnaptha.com https://storage.googleapis.com https://tfhub.dev https://www.kaggle.com https://*.openstreetmap.org https://overpass-api.de https://overpass.kumi.systems https://overpass.private.coffee https://*.wikipedia.org https://*.wikimedia.org; object-src 'none'; base-uri 'self'; form-action 'none'; frame-src 'none'">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Budget og Mad">
@@ -340,7 +342,7 @@ body{padding-top:env(safe-area-inset-top)}
 <dialog id="dlg"><div class="in" id="dlgin"></div></dialog>
 
 <script>
-const KEY='madapp-v1';const ENHED=(()=>{let e=localStorage.getItem('madapp-v1-enhed');if(!e){e=(crypto.randomUUID?crypto.randomUUID():Date.now().toString(36)+Math.random().toString(36).slice(2));localStorage.setItem('madapp-v1-enhed',e)}return e})();const APP_VERSION=94, EJER='Søren';
+const KEY='madapp-v1';const ENHED=(()=>{let e=localStorage.getItem('madapp-v1-enhed');if(!e){e=(crypto.randomUUID?crypto.randomUUID():Date.now().toString(36)+Math.random().toString(36).slice(2));localStorage.setItem('madapp-v1-enhed',e)}return e})();const APP_VERSION=97, EJER='Søren';
 let D;try{D=JSON.parse(localStorage.getItem(KEY)||'null')}catch(e){D=null;try{localStorage.setItem(KEY+'-skadet-'+Date.now(),localStorage.getItem(KEY))}catch(x){}}
 if(!D||typeof D!=='object')D={};
 ['opskrifter','indkob','lager','stdSlettet','gemteLister'].forEach(k=>{if(!Array.isArray(D[k]))D[k]=[]});
@@ -375,7 +377,7 @@ const save=()=>{const ny=tilGem();if(ny===sidst)return;if(sidst){HIST.push(sidst
 function visFortrydKnap(){const b=document.getElementById('fortrydknap');if(b){b.hidden=!HIST.length;b.title='Fortryd ('+HIST.length+')'}}
 function fortrydSidste(){if(!HIST.length)return;const s=HIST.pop();D=JSON.parse(s);flet();sidst=s;localStorage.setItem(KEY,s);if(window.brugFoto)brugFoto();if(window.brugIndstil)brugIndstil();if(dlg.open)dlg.close();vis();visFortrydKnap();toast('↩️ Fortrudt'+(HIST.length?' – tryk igen for at fortryde mere':''))}
 const id=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,6);
-const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const kr=n=>{n=Math.round(n*100)/100;return n.toLocaleString('da-DK',{minimumFractionDigits:n%1?2:0,maximumFractionDigits:2})+' kr'};
 const iso=d=>d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
 function mandag(d){d=new Date(d);d.setHours(0,0,0,0);d.setDate(d.getDate()-((d.getDay()+6)%7));return d}
@@ -427,7 +429,7 @@ opskrifter(){
   <div class="chips">${Object.entries(F).map(([k,v])=>`<button class="chip ${fl===k?'on':''}" onclick="window._fl='${k}';window._visN=40;vis()">${v}</button>`).join('')}</div>
   <div class="chips kats"><button class="chip ${kt?'':'on'}" onclick="window._kat='';window._visN=40;vis()">Alle slags</button>${KATS.map(k=>`<button class="chip ${kt===k?'on':''}" onclick="window._kat='${k}';window._visN=40;vis()">${k}</button>`).join('')}</div>
   <p class="muted" style="margin:0 0 10px">${antal} opskrifter${q||fl!=='alle'||kt?' passer':''}</p>
-  ${liste.length?`<div class="grid">${liste.map(o=>{const mt=match(o);return `<div class="card rc rkort" onclick="visOpskrift('${o.id}')"><div class="rfoto ${o.foto?'':'tom'}" ${o.foto?`style="background-image:url(${o.foto})"`:''}>${o.foto?'':'🍽️'}${D.lager.length&&mt.har?`<span class="harbadge">✅ ${mt.har}/${mt.af}</span>`:''}</div><div class="rinfo"><h3>${esc(o.navn)}</h3><div class="muted">${o.tid?'⏱️ '+o.tid+' min · ':''}${o.portioner?o.portioner+' pers. · ':''}${o.ing.length} ingredienser${caPris(o,2)?` · <b>ca. ${caPris(o,2)} kr.</b> for 2`:''}</div><div>${(o.tags||[]).map(x=>`<span class="tag">${x}</span>`).join('')}</div></div></div>`}).join('')}</div>${antal>liste.length?`<button class="b" style="width:100%;margin-top:14px" onclick="window._visN=(window._visN||40)+40;vis()">Vis flere (${antal-liste.length} mere)</button>`:''}`
+  ${liste.length?`<div class="grid">${liste.map(o=>{const mt=match(o);return `<div class="card rc rkort" onclick="visOpskrift('${o.id}')"><div class="rfoto ${o.foto?'':'tom'}" ${o.foto?`style="background-image:url(${o.foto})"`:''}>${o.foto?'':'🍽️'}${D.lager.length&&mt.har?`<span class="harbadge">✅ ${mt.har}/${mt.af}</span>`:''}</div><div class="rinfo"><h3>${esc(o.navn)}</h3><div class="muted">${o.tid?'⏱️ '+o.tid+' min · ':''}${o.portioner?o.portioner+' pers. · ':''}${o.ing.length} ingredienser${caPris(o,2)?` · <b>ca. ${caPris(o,2)} kr.</b> for 2`:''}</div><div>${(o.tags||[]).map(x=>`<span class="tag">${esc(x)}</span>`).join('')}</div></div></div>`}).join('')}</div>${antal>liste.length?`<button class="b" style="width:100%;margin-top:14px" onclick="window._visN=(window._visN||40)+40;vis()">Vis flere (${antal-liste.length} mere)</button>`:''}`
   :`<div class="card empty">${fl==='kan'?'Læg det, du har derhjemme, på Lager – så viser jeg, hvad du kan lave.':D.opskrifter.length?'Ingen opskrifter passer.':'Du har ingen opskrifter endnu. Tryk på »+ Ny opskrift«.'}</div>`}`;
 },
 madplan(){
@@ -541,7 +543,7 @@ function visOpskrift(oid,p){
   p=p||o.portioner||4;visPort=p;const niv=(window._niv||{})[o.id]||0,vr=variant(o.ing.map(i=>skal(i,o,p)),niv),ing=vr.ing,mt=match(o);
   const dage=[...Array(7)].map((_,k)=>{const d=new Date();d.setHours(0,0,0,0);d.setDate(d.getDate()+k);return d});
   dlgin.innerHTML=`${o.foto?`<div class="dfoto" style="background-image:url(${o.foto})"></div>`:''}<h2>${esc(o.navn)}</h2>
-  <div>${o.tid?`<span class="tag">⏱️ ${o.tid} min</span>`:''}${(o.tags||[]).map(x=>`<span class="tag">${x}</span>`).join('')}${D.lager.length?`<span class="tag">🥫 Du har ${mt.har}/${mt.af}</span>`:''}</div>
+  <div>${o.tid?`<span class="tag">⏱️ ${o.tid} min</span>`:''}${(o.tags||[]).map(x=>`<span class="tag">${esc(x)}</span>`).join('')}${D.lager.length?`<span class="tag">🥫 Du har ${mt.har}/${mt.af}</span>`:''}</div>
   ${o.portioner?`<div class="port" style="margin-top:12px"><button class="l" onclick="visOpskrift('${o.id}',${Math.max(1,p-1)})">−</button><input type="number" min="1" max="50" inputmode="numeric" value="${p}" style="width:76px;text-align:center;font-weight:800" onchange="visOpskrift('${o.id}',Math.max(1,Math.min(50,parseInt(this.value)||1)))"><b>personer</b><button class="l" onclick="visOpskrift('${o.id}',${p+1})">+</button></div>`:''}
   ${prisNivKort(o,niv,vr)}
   ${(()=>{const har=ing.filter(i=>iLager(i.navn)),mangler=ing.filter(i=>!iLager(i.navn)),pr=prisOverslag(mangler.length?mangler:ing,p);
@@ -551,7 +553,7 @@ function visOpskrift(oid,p){
    ${har.length?`<h3>✅ Du har på lager (${har.length})</h3><ul class="ingl">${har.map(i=>`<li>✅ ${esc(ingTekst(i))}</li>`).join('')}</ul>`:''}`})()}
   ${o.trin&&o.trin.length?`<h3>Sådan gør du</h3><ol class="trin">${o.trin.map(x=>`<li>${esc(x)}</li>`).join('')}</ol>`:o.frem?`<h3>Sådan gør du</h3><div style="white-space:pre-wrap">${esc(o.frem)}</div>`:''}
   <div class="row" style="margin-top:16px"><button class="b" onclick="opskriftTilIndkob('${o.id}')">🛒 Læg det, jeg mangler, i indkøbslisten</button><button class="b" onclick="document.getElementById('vdag').hidden=false">📅 På madplan</button><button class="b" onclick="lavRet('${o.id}')">👩‍🍳 Jeg har lavet den (træk fra lager)</button></div>
-  <div id="vdag" hidden><p class="muted" style="margin:10px 0 6px">Hvilken dag?</p><div class="chips">${dage.map(d=>`<button class="chip" onclick="setPlan('${iso(d)}','opskrift','${o.id}');dlg.close();toast('${esc(o.navn)} er sat på ${d.toLocaleDateString('da-DK',{weekday:'long'})}')">${d.toLocaleDateString('da-DK',{weekday:'short',day:'numeric'})}</button>`).join('')}</div></div>
+  <div id="vdag" hidden><p class="muted" style="margin:10px 0 6px">Hvilken dag?</p><div class="chips">${dage.map(d=>`<button class="chip" onclick="setPlan('${iso(d)}','opskrift','${o.id}');dlg.close();toast(((D.opskrifter.find(x=>x.id==='${o.id}')||{}).navn||'Retten')+' er sat på ${d.toLocaleDateString('da-DK',{weekday:'long'})}')">${d.toLocaleDateString('da-DK',{weekday:'short',day:'numeric'})}</button>`).join('')}</div></div>
   <div class="row" style="margin-top:10px"><button class="l" id="laesknap" onclick="laesOp('${o.id}')">🔊 Læs op</button><button class="l" onclick="del('opskrift:${o.id}')">📤 Del</button><button class="l" onclick="sletOpskrift('${o.id}')">Slet</button><button class="l" onclick="dlg.close()">Luk</button></div>
   <p class="muted" style="font-size:13px">✅ = det har du på lager. Salt, peber og vand regner vi med, at du har.</p>`;
   if(!dlg.open)dlg.showModal();
@@ -1813,6 +1815,7 @@ async function del(type){
   if(navigator.share){try{await navigator.share({title:'Budget og Mad',text:tekst,url});return}catch(e){if(e.name==='AbortError')return}}
   try{await navigator.clipboard.writeText(tekst+'\n'+url);toast('Linket er kopieret – send det til din ven')}catch(e){prompt('Kopiér linket og send det:',url)}
 }
+function rensDelt(x,n){return String(x??'').replace(/[<>"'`\\]|[\x00-\x1f]/g,'').slice(0,n||200)}
 function modtagDel(){
   if(!location.hash.startsWith('#del='))return;
   const p=udpak(location.hash.slice(5));
@@ -1824,9 +1827,9 @@ function modtagDel(){
   <div class="row" style="margin-top:12px"><button class="b" id="tagimod" style="flex:1">Tilføj til min app</button><button class="l" onclick="dlg.close()">Nej tak</button></div>`;
   dlg.showModal();
   document.getElementById('tagimod').onclick=()=>{const s=snap();
-    if(p.type==='indkob')p.data.forEach(x=>D.indkob.push({id:id(),navn:String(x.navn),maengde:x.maengde??null,enhed:String(x.enhed||''),pris:D.priser[norm(x.navn)]??null,kobt:false}));
-    if(p.type==='opskrift'||p.type==='madplan'){const tilf=o=>{let e=D.opskrifter.find(x=>x.navn===o.navn);if(!e){e={id:id(),navn:String(o.navn),portioner:o.portioner||null,ing:(o.ing||[]).map(i=>({navn:String(i.navn),maengde:i.maengde??null,enhed:String(i.enhed||'')})),trin:Array.isArray(o.trin)?o.trin.map(String):undefined,frem:String(o.frem||''),tags:Array.isArray(o.tags)?o.tags.map(String):[],tid:+o.tid||null,foto:/^fotos\/retter\/[a-z]+\.jpg$/.test(o.foto||'')?o.foto:''};D.opskrifter.push(e)}return e};
-      if(p.type==='opskrift')tilf(p.data);else Object.entries(p.data).forEach(([k,v])=>{if(!/^\d{4}-\d\d-\d\d$/.test(k))return;D.madplan[k]=v.opskrift?{opskrift:tilf(v.opskrift).id}:{tekst:String(v.tekst||'')}})}
+    if(p.type==='indkob')p.data.slice(0,300).forEach(x=>D.indkob.push({id:id(),navn:rensDelt(x.navn,80),maengde:typeof x.maengde==='number'?x.maengde:null,enhed:rensDelt(x.enhed,12),pris:D.priser[norm(x.navn)]??null,kobt:false}));
+    if(p.type==='opskrift'||p.type==='madplan'){const tilf=o=>{let e=D.opskrifter.find(x=>x.navn===o.navn);if(!e){e={id:id(),navn:rensDelt(o.navn,120),portioner:+o.portioner||null,ing:(Array.isArray(o.ing)?o.ing:[]).slice(0,80).map(i=>({navn:rensDelt(i.navn,80),maengde:typeof i.maengde==='number'?i.maengde:null,enhed:rensDelt(i.enhed,12)})),trin:Array.isArray(o.trin)?o.trin.slice(0,60).map(t=>rensDelt(t,600)):undefined,frem:rensDelt(o.frem,4000),tags:Array.isArray(o.tags)?o.tags.slice(0,10).map(t=>rensDelt(t,30)):[],tid:+o.tid||null,foto:/^fotos\/retter\/[a-z]+\.jpg$/.test(o.foto||'')?o.foto:''};D.opskrifter.push(e)}return e};
+      if(p.type==='opskrift')tilf(p.data);else Object.entries(p.data).forEach(([k,v])=>{if(!/^\d{4}-\d\d-\d\d$/.test(k))return;D.madplan[k]=v.opskrift?{opskrift:tilf(v.opskrift).id}:{tekst:rensDelt(v.tekst,200)}})}
     save();dlg.close();gaaTil(p.type==='indkob'?'indkob':p.type==='madplan'?'madplan':'opskrifter');toast('Tilføjet ✔',fortrydTil(s))};
 }
 modtagDel();
