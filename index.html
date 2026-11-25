@@ -258,7 +258,8 @@ button.b,label.b{box-shadow:0 6px 16px rgba(232,85,62,.3)}
 .tile{position:relative;height:160px;border:0;border-radius:24px;background-size:cover;background-position:center;overflow:hidden;color:#fff;text-align:left;padding:14px;display:flex;flex-direction:column;justify-content:flex-end;cursor:pointer;font:inherit;box-shadow:var(--skygge);animation:op .4s ease both;transition:transform .15s}
 .tile::before{content:"";position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.72),rgba(0,0,0,.05) 70%)}
 .tile>*{position:relative}.tile:active{transform:scale(.96)}.tile:hover{transform:translateY(-3px)}
-.t-budget{grid-column:1/-1;height:190px;background-position:center 30%}
+.t-budget{background-position:center 30%} /* v69: samme størrelse som de andre knapper */
+@media (max-width:760px){.tiles{grid-auto-flow:row dense}}
 .tiles .tile:nth-child(2){animation-delay:.05s}.tiles .tile:nth-child(3){animation-delay:.1s}.tiles .tile:nth-child(4){animation-delay:.15s}.tiles .tile:nth-child(5){animation-delay:.2s}
 .te{position:absolute!important;top:12px;left:12px;font-size:24px;width:46px;height:46px;display:flex;align-items:center;justify-content:center;border-radius:50%;background:rgba(255,255,255,.28);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
 .tn{font-size:22px;font-weight:800;letter-spacing:-.3px}.ti{font-size:14px;font-weight:600;opacity:.92}
@@ -287,7 +288,7 @@ body{padding-top:env(safe-area-inset-top)}
 .kgroen button.b,.kgroen label.b{box-shadow:0 6px 16px rgba(31,138,76,.3)!important}
 .t-kalender{grid-column:1/-1;background-position:center 60%}
 @media (min-width:761px){.t-kalender{grid-column:auto}}
-.t-motion{grid-column:1/-1;height:190px;background-position:center 45%}
+.t-motion{background-position:center 45%} /* v69: samme størrelse som de andre knapper */
 @media (min-width:761px){.t-motion{grid-column:auto;height:220px}}
 .kfaner{display:flex;gap:10px;margin-bottom:14px}
 .kfaner button{flex:1;font:inherit;font-size:18px;font-weight:700;border:0;border-radius:16px;padding:14px 8px;background:var(--card);color:var(--txt);box-shadow:var(--skygge);cursor:pointer}
@@ -339,7 +340,7 @@ body{padding-top:env(safe-area-inset-top)}
 <dialog id="dlg"><div class="in" id="dlgin"></div></dialog>
 
 <script>
-const KEY='madapp-v1';const ENHED=(()=>{let e=localStorage.getItem('madapp-v1-enhed');if(!e){e=(crypto.randomUUID?crypto.randomUUID():Date.now().toString(36)+Math.random().toString(36).slice(2));localStorage.setItem('madapp-v1-enhed',e)}return e})();const APP_VERSION=68, EJER='Søren';
+const KEY='madapp-v1';const ENHED=(()=>{let e=localStorage.getItem('madapp-v1-enhed');if(!e){e=(crypto.randomUUID?crypto.randomUUID():Date.now().toString(36)+Math.random().toString(36).slice(2));localStorage.setItem('madapp-v1-enhed',e)}return e})();const APP_VERSION=69, EJER='Søren';
 let D;try{D=JSON.parse(localStorage.getItem(KEY)||'null')}catch(e){D=null;try{localStorage.setItem(KEY+'-skadet-'+Date.now(),localStorage.getItem(KEY))}catch(x){}}
 if(!D||typeof D!=='object')D={};
 ['opskrifter','indkob','lager','stdSlettet','gemteLister'].forEach(k=>{if(!Array.isArray(D[k]))D[k]=[]});
