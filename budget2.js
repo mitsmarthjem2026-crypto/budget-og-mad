@@ -251,17 +251,34 @@ function mshGem() {
 // Filen læses kun på telefonen. Intet sendes nogen steder hen.
 // Vejledninger fra bankernes egne hjælpesider (se kilder.txt).
 let bankF = null; // forslag fra bankfilen, vises før noget gemmes
+// version 74: vejledning for hver bank – kun trin fra bankens egen hjælpeside (kilder i kilder.txt)
 const BANK_GUIDE = [
-  ['Danske Bank', 'I mobilbanken: Vælg konto → tryk på de 3 prikker øverst til højre → »Eksporter kontobevægelser« → vælg CSV og periode → »Eksporter«.'],
-  ['Jyske Bank', 'I net- eller mobilbanken: Vælg kontoen → tryk på de 3 prikker øverst → »Print og eksporter« → vælg periode og filtype (CSV, hvis du kan vælge det) → »OK«.'],
-  ['Nykredit', 'I netbanken på PC: »Konti og kort« → »Konti« → vælg konto → »Gem posteringer som fil« → vælg periode → eksportformat »CSV« → »Næste«.'],
-  ['Andre banker', 'Kig efter »Eksporter«, »Gem som fil« eller »Udlæs til fil« ved kontoens bevægelser, og vælg CSV. Kan det ikke lade sig gøre i mobilbanken, så prøv netbanken på en PC.']
+  ['Danske Bank', [['📱 I mobilbanken', ['Vælg kontoen', 'Tryk på de 3 prikker øverst til højre', 'Tryk »Eksporter kontobevægelser«', 'Vælg filtype CSV og periode', 'Tryk »Eksporter«']], ['💻 I netbanken', ['Gå til »Kontooversigt«, og vælg kontoen', 'Vælg perioden', 'Klik »Gem som fil« under listen', 'Vælg CSV, og klik »Gem«']]]],
+  ['Nordea', [['💻 I netbanken (på PC)', ['Gå til »Oversigt« → »Transaktionskonti«', 'Klik på kontoen', 'Vælg datoerne', 'Klik på knappen »CSV (Excel)«']]], 'Nordeas vejledning nævner ikke, at det kan gøres i mobilbanken.'],
+  ['Jyske Bank', [['📱💻 I mobil- eller netbanken', ['Vælg kontoen', 'Tryk på de 3 prikker øverst', 'Tryk »Print og eksporter«', 'Vælg periode og filtype (vælg CSV)', 'Tryk »OK«']]]],
+  ['Sydbank', [['💻 I netbanken', ['Gå ind på kontoen', 'Klik på de 3 blå prikker, og vælg »Eksporter til fil«', 'Vælg perioden', 'Klik »Eksporter til CSV-fil«']]], 'Filen kommer i Overførsler.'],
+  ['Nykredit', [['💻 I netbanken', ['Klik »Konti og kort« → »Konti«, og vælg kontoen', 'Vælg »Gem posteringer som fil« til højre', 'Vælg periode, og vælg eksportformat »CSV«', 'Klik »Næste« – filen hentes af sig selv']]]],
+  ['Coop Bank', [['💻 I netbanken', ['Vælg »Konti og kort« → »Konti«', 'Klik på kontoen', 'Vælg »Gem posteringer som fil«', 'Vælg oplysninger og filtype (vælg CSV, hvis du kan)']]]],
+  ['Lunar', [['📱 I appen', ['Vælg kontoen', 'Tryk »Mere« → »Detaljer«', 'Tryk »Eksporter kontoudtog«', 'Vælg start- og slutdato, og vælg CSV', 'Tryk »Hent kontoudtog«, og gem filen']]], 'Reserverede beløb kommer ikke med.'],
+  ['Arbejdernes Landsbank', null],
+  ['Spar Nord', null],
+  ['Lån & Spar', null],
+  ['Anden bank', null]
 ];
+let bankValgt = null;
+function bankGuide() {
+  const g = BANK_GUIDE.find(x => x[0] === bankValgt);
+  const valg = `<div class="chips" style="flex-wrap:wrap;overflow:visible;margin-top:8px">${BANK_GUIDE.map(([b]) => `<button class="chip ${b === bankValgt ? 'on' : ''}" onclick="bankValgt=${b === bankValgt ? 'null' : `'${b.replace(/'/g, "\\'")}'`};vis()">${esc(b)}</button>`).join('')}</div>`;
+  if (!g) return valg + '<p class="muted" style="font-size:13px;margin:8px 0 0">Tryk på din bank.</p>';
+  const [navn, dele, note] = g;
+  const ingen = `<p style="margin:8px 0 0">Vi har ikke fundet en vejledning fra ${navn === 'Anden bank' ? 'din bank' : esc(navn)} til private. Prøv i netbanken: gå ind på kontoen, og kig efter »Eksporter« eller »Gem som fil«, og vælg CSV. Kan du ikke finde det, så spørg banken.</p>`;
+  return valg + `<div style="margin-top:10px"><b>${esc(navn)}</b>${dele ? dele.map(([h, trin]) => `<div style="margin-top:8px"><b style="font-size:14px">${h}</b><ol style="margin:4px 0 0 20px;padding:0">${trin.map(x => `<li style="margin:3px 0">${x}</li>`).join('')}</ol></div>`).join('') : ingen}${note ? `<p class="muted" style="font-size:13px;margin:6px 0 0">${note}</p>` : ''}</div>`;
+}
 function bankKort() {
   return `<div class="card"><b>🏦 Hent fil fra banken</b> <span class="muted">– læg dine køb og penge ind på én gang</span>
   <p class="muted" style="margin:6px 0 8px">Hent en CSV-fil med dine kontobevægelser i din bank, og vælg den her. Filen bliver kun læst på din telefon – intet sendes nogen steder hen. Du ser det hele, før noget bliver gemt.</p>
-  <details class="hjdel"><summary style="cursor:pointer"><b>📖 Sådan henter du filen i din bank</b></summary>
-   ${BANK_GUIDE.map(([b, t]) => `<p style="margin:8px 0 0"><b>${b}:</b> ${t}</p>`).join('')}
+  <details class="hjdel"${bankValgt ? ' open' : ''}><summary style="cursor:pointer"><b>📖 Sådan henter du filen i din bank</b> <span class="muted">– vælg din bank</span></summary>
+   ${bankGuide()}
    <p class="muted" style="font-size:13px;margin:8px 0 0">På iPhone: gem filen i »Filer«. Vælg den derefter med knappen herunder.</p></details>
   <label class="b" style="font:inherit;display:block;text-align:center;cursor:pointer;margin:10px 0 0;color:#fff;background:var(--acc);border-radius:10px;padding:10px 16px">📂 Vælg filen fra banken<input type="file" accept=".csv,.txt,text/csv,text/plain" hidden onchange="bankLaes(this)"></label>
   ${bankF ? bankVis() : ''}</div>`;
@@ -302,12 +319,13 @@ function bankLaes(inp) {
       const rk = linjer.map(l => bankDel(l, sep));
       // find overskrift-linjen (Dato / Tekst / Beløb) – ellers gæt ud fra indholdet
       const h = rk.findIndex(x => x.some(c => /dato|date/i.test(c)) && x.some(c => /bel[øo]b|amount/i.test(c)));
-      let iD, iT, iB;
+      let iD, iT, iB, tekstKol = [];
       if (h >= 0) {
         const o = rk[h].map(c => c.toLowerCase());
         iD = o.findIndex(c => /^(bogf|dato|date|posteringsdato)/.test(c)); if (iD < 0) iD = o.findIndex(c => /dato|date/.test(c));
         iB = o.findIndex(c => /^(bel[øo]b|amount)/.test(c)); if (iB < 0) iB = o.findIndex(c => /bel[øo]b|amount/.test(c));
         iT = o.findIndex(c => /tekst|text|beskrivelse|navn|modtager|description/.test(c));
+        tekstKol = ['tekst|text', 'beskrivelse|description', 'navn', 'modtager', 'afsender'].map(m => o.findIndex(c => new RegExp(m).test(c))).filter(i => i >= 0); // v74: første tekst, der ikke er tom
       } else {
         const p = rk[0]; iD = p.findIndex(c => bankDato(c)); iB = p.findIndex((c, i) => i !== iD && isFinite(bankBelob(c))); iT = p.findIndex((c, i) => i !== iD && i !== iB && /[a-zæøå]/i.test(c));
       }
@@ -316,7 +334,7 @@ function bankLaes(inp) {
       rk.slice(h + 1).forEach(x => {
         const dato = bankDato(x[iD]), b = bankBelob(x[iB]);
         if (!dato || !isFinite(b) || !b) return;
-        const tx = (iT >= 0 ? x[iT] : '') || (b > 0 ? 'Penge ind' : 'Køb');
+        const tx = (tekstKol.map(i => x[i]).find(v => v && v.trim()) || (iT >= 0 ? x[iT] : '')) || (b > 0 ? 'Penge ind' : 'Køb');
         poster.push({hvor: b > 0 ? 'ind' : 'kob', tekst: tx.slice(0, 60), belob: Math.round(Math.abs(b) * 100) / 100, dato});
       });
       if (!poster.length) throw new Error('ingen');
