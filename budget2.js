@@ -209,12 +209,29 @@ function mshVis() {
   const datoer = v.filter(p => p.dato).map(p => p.dato).sort(), mnd = x => new Date(x).toLocaleDateString('da-DK', {month: 'long', year: 'numeric'});
   const sumH = h => v.filter(p => p.hvor === h).reduce((s, p) => s + p.belob, 0);
   const knap = `<div class="row" style="margin-top:10px"><button class="b" style="flex:1;font-size:18px" onclick="mshGem()" ${valgt ? '' : 'disabled'}>✓ Læg ${valgt} ind i mit budget</button><button class="l" onclick="msh=null;vis()">Annullér</button></div>`;
+  const har = msh.poster.filter(p => p.findes).length;
+  const fjern = har ? `<div style="margin-top:10px;padding:10px;border:2px dashed var(--warn);border-radius:12px"><b>${har} af tallene har du allerede i dit budget.</b><div class="muted" style="font-size:13px;margin:4px 0 8px">Vil du have dem ud igen, så tryk her. Du kan fortryde bagefter.</div><button class="l" style="width:100%" onclick="mshFjern()">🗑️ Fjern de ${har} fra mit budget</button></div>` : '';
   return `<div style="margin-top:12px;background:var(--acc2);border-radius:12px;padding:12px"><b>Fundet:</b> ${valgt} poster${datoer.length ? ` fra ${mnd(datoer[0])} til ${mnd(datoer[datoer.length - 1])}` : ''}.
    <div style="margin-top:6px">💵 Penge ind i alt: <b>${kr(Math.round(sumH('ind')))}</b><br>🛒 Udgifter i alt: <b>${kr(Math.round(sumH('kob')))}</b></div>
-   <div class="muted" style="font-size:13px;margin-top:4px">Hver post lægges i sin egen måned. Det, du allerede har, springes over.</div>${knap}</div>
+   <div class="muted" style="font-size:13px;margin-top:4px">Hver post lægges i sin egen måned. Det, du allerede har, springes over.</div>${knap}${fjern}</div>
   <details style="margin-top:10px"><summary style="cursor:pointer"><b>Se alle poster</b> <span class="muted">– og fjern fluebenet ved det, du ikke vil have med</span></summary>
   ${['ind', 'fast', 'madb', 'kob', 'maal'].map(h => { const l = msh.poster.map((p, i) => [p, i]).filter(([p]) => p.hvor === h); return l.length ? `<div style="margin-top:10px"><b style="font-size:14px">${navn[h]}</b>${l.map(([p, i]) => `<label class="row" style="margin:6px 0;gap:8px;cursor:pointer;font-weight:400"><input type="checkbox" ${p.valgt ? 'checked' : ''} onchange="msh.poster[${i}].valgt=this.checked;vis()" style="width:22px;height:22px;flex:none"><span style="flex:1">${p.dato ? `<span class="muted">${new Date(p.dato).toLocaleDateString('da-DK', {day: 'numeric', month: 'short', year: '2-digit'})}</span> ` : ''}${esc(p.tekst)}${p.dag ? ` <span class="muted">d. ${p.dag}</span>` : ''}${p.findes ? ' <span class="muted">(har du allerede)</span>' : ''}</span><b>${kr(p.belob)}</b></label>`).join('')}</div>` : '' }).join('')}
   ${knap}</details></div>`;
+}
+// version 66: fjern tal, der kom fra Mit Smart Hjem PRO, igen (kun dem, der passer præcist)
+function mshFjern() {
+  if (!msh) return;
+  const l = msh.poster.filter(p => p.findes);
+  if (!l.length || !confirm('Fjern ' + l.length + ' poster fra dit budget?' + String.fromCharCode(10, 10) + 'Du kan fortryde bagefter.')) return;
+  const s = snap(), sm = x => String(x || '').toLowerCase().trim();
+  l.forEach(p => {
+    if (p.hvor === 'ind') { const i = D.budget.ind.findIndex(x => sm(x.tekst) === sm(p.tekst) && x.belob === p.belob && x.dato.slice(0, 7) === p.dato.slice(0, 7)); if (i >= 0) D.budget.ind.splice(i, 1); }
+    else if (p.hvor === 'kob') { const i = D.budget.udgifter.findIndex(x => sm(x.tekst) === sm(p.tekst) && x.belob === p.belob && x.dato === p.dato); if (i >= 0) D.budget.udgifter.splice(i, 1); }
+    else if (p.hvor === 'fast') { const i = D.budget.faste.findIndex(x => sm(x.tekst) === sm(p.tekst) && x.belob === p.belob); if (i >= 0) D.budget.faste.splice(i, 1); }
+    else if (p.hvor === 'maal') { const i = D.budget.maal.findIndex(x => sm(x.navn) === sm(p.tekst)); if (i >= 0) D.budget.maal.splice(i, 1); }
+    else if (p.hvor === 'madb' && (D.budget.maaned || 0) === p.belob) { D.budget.maaned = 0; D.budget.madPeriode = null; }
+  });
+  msh = null; save(); vis(); toast(l.length + ' poster er fjernet fra dit budget', fortrydTil(s));
 }
 function mshGem() {
   if (!msh) return;
@@ -370,6 +387,39 @@ function aarKort(md) {
     ${r.har ? `<td style="${celle}">${kr(Math.round(r.b.ind))}</td><td style="${celle}">${kr(Math.round(ud(r)))}</td><td style="${celle};font-weight:800;color:${r.b.tilbage < 0 ? 'var(--warn)' : 'var(--acc)'}">${kr(Math.round(r.b.tilbage))}</td>` : `<td colspan="3" class="muted" style="${celle}">ingen tal endnu</td>`}</tr>`).join('')}
    <tr style="border-top:2px solid var(--acc);font-weight:800"><td style="padding:8px 4px">I alt</td><td style="${celle}">${kr(Math.round(sum('ind')))}</td><td style="${celle}">${kr(Math.round(med.reduce((s, r) => s + ud(r), 0)))}</td><td style="${celle};color:${sum('tilbage') < 0 ? 'var(--warn)' : 'var(--acc)'}">${kr(Math.round(sum('tilbage')))}</td></tr>
   </table></div>
-  <p class="muted" style="font-size:13px;margin:8px 0 0;${jaevn ? 'display:none' : ''}">»Ud« er faste udgifter + køb + opsparing. I alt tæller kun måneder med tal. Tryk på en måned for at se den.</p>
+  <p class="muted" style="font-size:13px;margin:8px 0 0;${jaevn ? 'display:none' : ''}">»Ud« er faste udgifter + køb + opsparing (ikke det, der betales fra budget- eller feriekonto). I alt tæller kun måneder med tal. Tryk på en måned for at se den.</p>
   </details></div>`;
+}
+
+// ---------- 🏦 Betalt fra budgetkonto / feriekonto (version 67) ----------
+// Regninger, der betales fra en budgetkonto eller feriekonto, tæller ikke med i »Tilbage« –
+// ellers tæller de dobbelt (én gang som overførsel til kontoen, og én gang som regning).
+const KONTO_GRP = [
+  ['ferie', '✈️', 'Ferie og rejser', /ferie|rejse/i, /opsparing|feriepenge/i],
+  ['forsikr', '🛡️', 'Forsikringer', /forsikr|tryg\b|tryg\s*\(|alm\.? ?brand|topdanmark|codan|\bgf\b|if skadeforsikring/i, null],
+  ['el', '💡', 'El, vand og varme', /el, vand|vand og varme|forsyning|andel energi|\(el\)|fjernvarme|varmeværk|vandværk/i, null],
+  ['laan', '🏠', 'Lån (Totalkredit, bil)', /lån|totalkredit|bilån|auto finans/i, null]
+];
+function kontoValg() {
+  if (D.budget.fraKonto && typeof D.budget.fraKonto === 'object') return D.budget.fraKonto;
+  let ejer = false; try { ejer = erEjer() } catch (e) {}
+  return ejer ? {ferie: 1, forsikr: 1, el: 1} : {};
+}
+function kontoGruppe(x) {
+  const t = String((x && x.tekst) || '');
+  if (/^opsparing/i.test(t)) return null;
+  const g = KONTO_GRP.find(([k, , , rx, ikke]) => rx.test(t) && !(ikke && ikke.test(t)));
+  return g ? g[0] : null;
+}
+function fraKonto(x) { const g = kontoGruppe(x); return !!(g && kontoValg()[g]); }
+function kontoSkift(k) { const v = {...kontoValg()}; if (v[k]) delete v[k]; else v[k] = 1; D.budget.fraKonto = v; save(); vis(); }
+function kontoKort(md) {
+  const alle = D.budget.udgifter.filter(x => kontoGruppe(x));
+  if (!alle.length) return '';
+  const v = kontoValg(), iMd = D.budget.udgifter.filter(x => x.dato.slice(0, 7) === md && fraKonto(x)).reduce((s, x) => s + x.belob, 0);
+  const brugte = KONTO_GRP.filter(([k]) => alle.some(x => kontoGruppe(x) === k));
+  return `<div class="card"><b>🏦 Betales fra budgetkonto eller feriekonto</b>
+  <p class="muted" style="margin:6px 0 8px">Det, der betales fra en budgetkonto eller feriekonto, tæller ikke med i »Tilbage« – ellers tæller det dobbelt. Tryk for at slå til og fra.</p>
+  <div class="chips" style="flex-wrap:wrap;overflow:visible">${brugte.map(([k, ik, navn]) => `<button class="chip ${v[k] ? 'on' : ''}" onclick="kontoSkift('${k}')">${v[k] ? '✓ ' : ''}${ik} ${navn}</button>`).join('')}</div>
+  ${iMd ? `<div class="muted" style="margin-top:8px">Denne måned betalt fra kontoen: <b>${kr(Math.round(iMd))}</b> (tæller ikke med i »Tilbage«)</div>` : ''}</div>`;
 }

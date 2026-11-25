@@ -339,7 +339,7 @@ body{padding-top:env(safe-area-inset-top)}
 <dialog id="dlg"><div class="in" id="dlgin"></div></dialog>
 
 <script>
-const KEY='madapp-v1';const ENHED=(()=>{let e=localStorage.getItem('madapp-v1-enhed');if(!e){e=(crypto.randomUUID?crypto.randomUUID():Date.now().toString(36)+Math.random().toString(36).slice(2));localStorage.setItem('madapp-v1-enhed',e)}return e})();const APP_VERSION=65, EJER='Søren';
+const KEY='madapp-v1';const ENHED=(()=>{let e=localStorage.getItem('madapp-v1-enhed');if(!e){e=(crypto.randomUUID?crypto.randomUUID():Date.now().toString(36)+Math.random().toString(36).slice(2));localStorage.setItem('madapp-v1-enhed',e)}return e})();const APP_VERSION=67, EJER='Søren';
 let D;try{D=JSON.parse(localStorage.getItem(KEY)||'null')}catch(e){D=null;try{localStorage.setItem(KEY+'-skadet-'+Date.now(),localStorage.getItem(KEY))}catch(x){}}
 if(!D||typeof D!=='object')D={};
 ['opskrifter','indkob','lager','stdSlettet','gemteLister'].forEach(k=>{if(!Array.isArray(D[k]))D[k]=[]});
@@ -473,7 +473,7 @@ lager(){
 budget(){
   const md=budgetMd,erNu=md===iso(new Date()).slice(0,7);
   const u=D.budget.udgifter.filter(x=>x.dato.slice(0,7)===md).sort((a,b)=>b.dato.localeCompare(a.dato));
-  const brugt=u.reduce((s,x)=>s+x.belob,0),b=D.budget.maaned||0,pct=b?Math.min(100,brugt/b*100):0;
+  const brugt=u.filter(x=>!(typeof fraKonto==='function'&&fraKonto(x))).reduce((s,x)=>s+x.belob,0),b=D.budget.maaned||0,pct=b?Math.min(100,brugt/b*100):0;
   const navn=new Date(md+'-01').toLocaleDateString('da-DK',{month:'long',year:'numeric'});
   const ind=D.budget.ind.filter(x=>x.dato.slice(0,7)===md),sumInd=ind.reduce((s,x)=>s+x.belob,0);
   const sumFaste=D.budget.faste.reduce((s,x)=>s+x.belob,0),sparetMd=sparetI(md),tilbage=sumInd-sumFaste-brugt-sparetMd;
@@ -487,6 +487,7 @@ budget(){
   ${ejerHentKort()}
   ${overblikKort(md,erNu)}
   ${aarKort(md)}
+  ${kontoKort(md)}
   ${madIDagKort(md,erNu,dageIgen)}
   ${tipsKort(sumInd,sumFaste,brugt,tilbage,erNu)}
   <div class="card" style="border:2px solid var(--acc)"><b>⚡ Hurtigt: sig det, skriv det eller tag et billede</b>
@@ -652,14 +653,14 @@ function csv(){
   D.budget.ind.filter(x=>x.dato.slice(0,7)===md).forEach(x=>r.push([x.dato,'Penge ind',q(x.tekst),f(x.belob)]));
   D.budget.faste.forEach(x=>r.push([md,'Fast udgift',q(x.tekst),f(-x.belob)]));
   D.budget.udgifter.filter(x=>x.dato.slice(0,7)===md).forEach(x=>r.push([x.dato,'Køb',q(x.tekst),f(-x.belob)]));
-  const si=D.budget.ind.filter(x=>x.dato.slice(0,7)===md).reduce((s,x)=>s+x.belob,0),sf=D.budget.faste.reduce((s,x)=>s+x.belob,0),sk=D.budget.udgifter.filter(x=>x.dato.slice(0,7)===md).reduce((s,x)=>s+x.belob,0);
+  const si=D.budget.ind.filter(x=>x.dato.slice(0,7)===md).reduce((s,x)=>s+x.belob,0),sf=D.budget.faste.reduce((s,x)=>s+x.belob,0),sk=D.budget.udgifter.filter(x=>x.dato.slice(0,7)===md&&!(typeof fraKonto==='function'&&fraKonto(x))).reduce((s,x)=>s+x.belob,0);
   D.budget.maal.forEach(g=>g.ind.filter(x=>x.dato.slice(0,7)===md).forEach(x=>r.push([x.dato,'Opsparing',q(g.navn),f(-x.belob)])));const sp=sparetI(md);r.push([],['','','Tilbage',f(si-sf-sk-sp)]);
   const a=document.createElement('a');a.href=URL.createObjectURL(new Blob(['﻿'+r.map(x=>x.join(';')).join('\r\n')],{type:'text/csv'}));a.download='budget-'+md+'.csv';a.click();
 }
 
 // Opsparing (version 8)
 const sparetI=md=>D.budget.maal.reduce((s,g)=>s+g.ind.filter(x=>x.dato.slice(0,7)===md).reduce((a,x)=>a+x.belob,0),0);
-function budgetTal(md){const ind=D.budget.ind.filter(x=>x.dato.slice(0,7)===md).reduce((s,x)=>s+x.belob,0),faste=D.budget.faste.reduce((s,x)=>s+x.belob,0),kob=D.budget.udgifter.filter(x=>x.dato.slice(0,7)===md).reduce((s,x)=>s+x.belob,0),sparet=sparetI(md);return{ind,faste,kob,sparet,tilbage:ind-faste-kob-sparet}}
+function budgetTal(md){const ind=D.budget.ind.filter(x=>x.dato.slice(0,7)===md).reduce((s,x)=>s+x.belob,0),faste=D.budget.faste.reduce((s,x)=>s+x.belob,0),kob=D.budget.udgifter.filter(x=>x.dato.slice(0,7)===md&&!(typeof fraKonto==='function'&&fraKonto(x))).reduce((s,x)=>s+x.belob,0),sparet=sparetI(md);return{ind,faste,kob,sparet,tilbage:ind-faste-kob-sparet}}
 function maalEmoji(n){n=norm(n);const l=[['ferie|rejse|tur','✈️'],['telefon|iphone|mobil','📱'],['computer|pc|mac','💻'],['bil|kørekort','🚗'],['cykel','🚲'],['koncert|festival|billet','🎟️'],['gave|jul','🎁'],['buffer|nød|uforudset','🛟'],['tøj|sko','👟'],['spil|playstation|xbox','🎮'],['flytte|lejlighed|depositum','🏠']];for(const[k,e]of l)if(new RegExp(k).test(n))return e;return '🎯'}
 function opsparingKort(){
   return `<div class="card"><b>🐷 Opsparing</b> <span class="muted">– spar op til noget, du drømmer om</span>
