@@ -342,7 +342,7 @@ body{padding-top:env(safe-area-inset-top)}
 <dialog id="dlg"><div class="in" id="dlgin"></div></dialog>
 
 <script>
-const KEY='madapp-v1';const ENHED=(()=>{let e=localStorage.getItem('madapp-v1-enhed');if(!e){e=(crypto.randomUUID?crypto.randomUUID():Date.now().toString(36)+Math.random().toString(36).slice(2));localStorage.setItem('madapp-v1-enhed',e)}return e})();const APP_VERSION=98, EJER='Søren';
+const KEY='madapp-v1';const ENHED=(()=>{let e=localStorage.getItem('madapp-v1-enhed');if(!e){e=(crypto.randomUUID?crypto.randomUUID():Date.now().toString(36)+Math.random().toString(36).slice(2));localStorage.setItem('madapp-v1-enhed',e)}return e})();const APP_VERSION=99, EJER='Søren';
 let D;try{D=JSON.parse(localStorage.getItem(KEY)||'null')}catch(e){D=null;try{localStorage.setItem(KEY+'-skadet-'+Date.now(),localStorage.getItem(KEY))}catch(x){}}
 if(!D||typeof D!=='object')D={};
 ['opskrifter','indkob','lager','stdSlettet','gemteLister'].forEach(k=>{if(!Array.isArray(D[k]))D[k]=[]});
@@ -1280,14 +1280,17 @@ async function bonFoto(inp){
 const COCO_DA={banana:'Bananer',apple:'Æbler',orange:'Appelsiner',broccoli:'Broccoli',carrot:'Gulerødder','hot dog':'Pølser',pizza:'Pizza',donut:'Donuts',cake:'Kage',sandwich:'Sandwich',bottle:'Flaske (fx mælk/juice)',cup:'Kop/bæger (fx yoghurt)',bowl:'Skål med rester'};
 function hentScript(src){return new Promise((ok,fejl)=>{if(document.querySelector('script[src="'+src+'"]'))return ok();const s=document.createElement('script');s.src=src;s.onload=ok;s.onerror=()=>fejl(new Error('net'));document.head.appendChild(s)})}
 let cocoModel=null;
-async function hentCoco(){if(cocoModel)return cocoModel;await hentScript('https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.22.0/dist/tf.min.js');await hentScript('https://cdn.jsdelivr.net/npm/@tensorflow-models/coco-ssd@2.2.3/dist/coco-ssd.min.js');cocoModel=await cocoSsd.load({base:'mobilenet_v2'});return cocoModel}
+async function hentCoco(){if(cocoModel)return cocoModel;if(!('regeneratorRuntime' in window))window.regeneratorRuntime=undefined;/* version 99: tf.min.js må ikke bruge eval (sikkerhedsreglen), så navnet skal findes i forvejen */await hentScript('https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.22.0/dist/tf.min.js');await hentScript('https://cdn.jsdelivr.net/npm/@tensorflow-models/coco-ssd@2.2.3/dist/coco-ssd.min.js');cocoModel=await cocoSsd.load({base:'mobilenet_v2'});return cocoModel}
 function kendteVareord(){const s=new Set();D.opskrifter.forEach(o=>o.ing.forEach(i=>tok(i.navn).forEach(w=>{if(w.length>=4&&!/^(spsk|dåse|dåser|pakke|bundt|frisk|stk)$/.test(w))s.add(w)})));['mælk','skyr','yoghurt','smør','ost','æg','juice','fløde','pålæg','skinke','leverpostej','rugbrød','toast','pasta','ris','havregryn','kyllingebryst','hakket','bacon','pølser','agurk','tomat','tomater','peberfrugt','salat','løg','kartofler','creme','fraiche','remoulade','ketchup','sennep','mayonnaise'].forEach(w=>s.add(w));return s}
 async function koeleskabFoto(inp){
   const fl=inp.files[0];if(!fl)return;const st=document.getElementById('lstatus');st.textContent='Ser på billedet… (første gang skal appen hente genkendelsen – det kan tage lidt tid)';
-  const img=new Image();img.src=URL.createObjectURL(fl);await new Promise(r=>img.onload=r);
+  const img=new Image();img.src=URL.createObjectURL(fl);const ok=await new Promise(r=>{img.onload=()=>r(true);img.onerror=()=>r(false)});inp.value='';
+  if(!ok){st.textContent='';URL.revokeObjectURL(img.src);alert('Billedet kan ikke læses. Prøv at tage billedet igen.');return}
+  // version 99: gør store mobilbilleder mindre, så telefonen ikke går i stå
+  const sk=Math.min(1,1600/Math.max(img.naturalWidth,img.naturalHeight)),cv=document.createElement('canvas');cv.width=Math.round(img.naturalWidth*sk);cv.height=Math.round(img.naturalHeight*sk);cv.getContext('2d').drawImage(img,0,0,cv.width,cv.height);
   const fund=new Map();let fejl='';
-  try{const mdl=await hentCoco();const res=await mdl.detect(img,30,.35);res.forEach(p=>{const da=COCO_DA[p.class];if(da)fund.set(da,(fund.get(da)||0)+1)})}catch(e){fejl='billede'}
-  try{st.textContent='Læser tekst på pakkerne…';await hentTesseract();const r=await Tesseract.recognize(fl,'dan');const ord=kendteVareord();
+  try{const mdl=await hentCoco();st.textContent='Ser efter varer på billedet…';const res=await mdl.detect(cv,30,.35);res.forEach(p=>{const da=COCO_DA[p.class];if(da)fund.set(da,(fund.get(da)||0)+1)});/* version 99: kig også på hver fjerdedel af billedet, så små ting på hylderne bliver fundet */for(let i=0;i<2;i++)for(let j=0;j<2;j++){const w=cv.width*.6,h=cv.height*.6,x=i*cv.width*.4,y=j*cv.height*.4,c=document.createElement('canvas');c.width=Math.round(w);c.height=Math.round(h);c.getContext('2d').drawImage(cv,x,y,w,h,0,0,c.width,c.height);(await mdl.detect(c,20,.45)).forEach(p=>{const da=COCO_DA[p.class];if(da&&!fund.has(da))fund.set(da,1)})}}catch(e){fejl='billede'}
+  try{st.textContent='Læser tekst på pakkerne…';await hentTesseract();const r=await Tesseract.recognize(cv,'dan');const ord=kendteVareord();
     const set=new Set();r.data.text.toLowerCase().replace(/[^a-zæøå\s]/g,' ').split(/\s+/).forEach(w=>{if(w.length>=3&&ord.has(w))set.add(w)});
     set.forEach(w=>{const navn=w.charAt(0).toUpperCase()+w.slice(1);if(![...fund.keys()].some(k=>norm(k).includes(w)))fund.set(navn,1)})}catch(e){if(!fejl)fejl='tekst'}
   URL.revokeObjectURL(img.src);st.textContent='';
@@ -1298,7 +1301,7 @@ async function koeleskabFoto(inp){
   <p class="muted" style="font-size:13px">Appen kan kun genkende nogle få ting på billeder (fx frugt, gulerødder, broccoli, flasker) og læse tekst på pakker. Resten skriver du selv. Billedet sendes ikke nogen steder hen.</p>
   <div class="row" style="margin-top:10px"><button class="b" style="flex:1" onclick="gemKoeleskab(${liste.length})">🥫 Læg på lager</button><button class="l" onclick="dlg.close()">Annullér</button></div>`;
   dlg.showModal();
-  if(fejl==='billede'&&!liste.length)toast('Billedgenkendelsen kræver internet første gang');
+  if(fejl&&!liste.length)toast(fejl==='billede'?'Billedgenkendelsen kunne ikke hentes – tjek internettet og prøv igen':'Teksten på pakkerne kunne ikke læses – tjek internettet og prøv igen');
 }
 function gemKoeleskab(n){
   const s=snap();let k=0;const navne=[];
