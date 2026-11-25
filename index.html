@@ -339,7 +339,7 @@ body{padding-top:env(safe-area-inset-top)}
 <dialog id="dlg"><div class="in" id="dlgin"></div></dialog>
 
 <script>
-const KEY='madapp-v1';const ENHED=(()=>{let e=localStorage.getItem('madapp-v1-enhed');if(!e){e=(crypto.randomUUID?crypto.randomUUID():Date.now().toString(36)+Math.random().toString(36).slice(2));localStorage.setItem('madapp-v1-enhed',e)}return e})();const APP_VERSION=62, EJER='Søren';
+const KEY='madapp-v1';const ENHED=(()=>{let e=localStorage.getItem('madapp-v1-enhed');if(!e){e=(crypto.randomUUID?crypto.randomUUID():Date.now().toString(36)+Math.random().toString(36).slice(2));localStorage.setItem('madapp-v1-enhed',e)}return e})();const APP_VERSION=63, EJER='Søren';
 let D;try{D=JSON.parse(localStorage.getItem(KEY)||'null')}catch(e){D=null;try{localStorage.setItem(KEY+'-skadet-'+Date.now(),localStorage.getItem(KEY))}catch(x){}}
 if(!D||typeof D!=='object')D={};
 ['opskrifter','indkob','lager','stdSlettet','gemteLister'].forEach(k=>{if(!Array.isArray(D[k]))D[k]=[]});
@@ -484,6 +484,7 @@ budget(){
   <div class="big" style="font-size:40px;color:${tilbage<0?'var(--warn)':'var(--acc)'}">${kr(tilbage)}</div>
   ${erNu&&tilbage>0?`<div class="muted">Det er ca. ${kr(Math.floor(tilbage/dageIgen))} pr. dag resten af måneden (${dageIgen} dage)</div>`:''}
   <div class="row" style="justify-content:center;gap:18px;margin-top:10px"><span>💵 Ind: <b>${kr(sumInd)}</b></span><span>🏠 Faste: <b>${kr(sumFaste)}</b></span><span>🛒 Køb: <b>${kr(brugt)}</b></span>${D.budget.maal.length?`<span>🐷 Sparet: <b>${kr(sparetMd)}</b></span>`:''}</div></div>
+  ${ejerHentKort()}
   ${overblikKort(md,erNu)}
   ${aarKort(md)}
   ${madIDagKort(md,erNu,dageIgen)}
@@ -506,7 +507,6 @@ budget(){
   ${D.budget.faste.length?`<div class="row" style="justify-content:space-between;margin-top:8px;font-weight:700"><span>I alt pr. måned: ${kr(sumFaste)}</span><span class="muted">pr. år: ${kr(sumFaste*12)}</span></div>`:''}</div>
   ${huskeKort()}
   ${opsparingKort()}
-  ${ejerHentKort()}
   ${bankKort()}
   <h2 style="margin-top:22px">🛒 Køb</h2>
   <div class="card"><div class="row"><label style="margin:0">Budget til mad pr. måned</label><input type="text" inputmode="decimal" id="mbudget" value="${b||''}" placeholder="kr" style="width:140px"><button class="l" onclick="setBudget()">Gem</button></div>

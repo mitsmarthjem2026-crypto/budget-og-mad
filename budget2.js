@@ -120,17 +120,34 @@ function ejerHentKort() {
   let ejer = false; try { ejer = erEjer() } catch (e) {}
   if (!ejer) return '';
   return `<div class="card" style="border:2px dashed var(--acc)"><b>📥 Hent mine tal fra Mit Smart Hjem PRO</b> <span class="muted">– kun dig (ejer)</span>
-  <p class="muted" style="margin:6px 0 8px">I Mit Smart Hjem PRO: tryk ⚙ Indstillinger → knappen øverst »💰 Gem mit budget i en fil« → »Arkiver i Filer«. Vælg filen her. Den læses kun på denne telefon – intet sendes nogen steder hen. Du ser tallene, før de bliver gemt.</p>
-  <label class="b" style="font:inherit;display:block;text-align:center;cursor:pointer;margin:0;color:#fff;background:var(--acc);border-radius:10px;padding:10px 16px">📂 Vælg filen<input type="file" accept=".json,application/json" hidden onchange="mshLaes(this)"></label>
+  <p style="margin:6px 0 8px"><b>Nemmest:</b> I Mit Smart Hjem PRO: tryk ⚙ Indstillinger → knappen øverst »📋 Kopiér mit budget til Budget og Mad«. Kom så tilbage hertil, og tryk:</p>
+  <button class="b" style="width:100%;font-size:19px;padding:14px" onclick="mshSaetInd()">📋 Sæt mit budget ind</button>
+  <div id="mshfelt" style="display:none;margin-top:8px"><textarea placeholder="Tryk og hold her, og vælg »Indsæt«" style="width:100%;min-height:70px" oninput="mshFelt(this)"></textarea></div>
+  <p class="muted" style="margin:8px 0 6px;font-size:13px">Det bliver på denne telefon – intet sendes nogen steder hen. Du ser tallene, før de bliver gemt.</p>
+  <label class="l" style="font:inherit;display:block;text-align:center;cursor:pointer;margin:0;border-radius:10px;padding:8px 16px">📂 Eller vælg en fil<input type="file" accept=".json,application/json" hidden onchange="mshLaes(this)"></label>
   ${msh ? mshVis() : ''}</div>`;
 }
 function mshTal(v) { const n = parseFloat(String(v ?? '').replace(/\s/g, '').replace(/\.(?=\d{3}(\D|$))/g, '').replace(',', '.')); return isFinite(n) ? n : 0 }
 function mshLaes(inp) {
   const f = inp.files && inp.files[0]; if (!f) return;
   const r = new FileReader();
-  r.onload = () => {
+  r.onload = () => { mshFraTekst(r.result, f.name); inp.value = ''; };
+  r.readAsText(f);
+}
+// version 63: »📋 Sæt mit budget ind« – læser det, der er kopieret i Mit Smart Hjem PRO (ingen filer)
+async function mshSaetInd() {
+  let tekst = '';
+  try { tekst = await navigator.clipboard.readText(); } catch (e) {}
+  if (tekst && tekst.includes('Mit Smart Hjem PRO')) { mshFraTekst(tekst, 'kopieret'); return; }
+  const fe = document.getElementById('mshfelt'); if (fe) { fe.style.display = 'block'; const ta = fe.querySelector('textarea'); ta.value = ''; ta.focus(); }
+  toast('Tryk og hold i feltet, og vælg »Indsæt«');
+}
+function mshFelt(ta) { const v = ta.value.trim(); if (v.length > 20) mshFraTekst(v, 'kopieret') }
+function mshFraTekst(tekst, navn) {
+  const f = {name: navn};
+  {
     try {
-      const fil = JSON.parse(r.result);
+      const fil = JSON.parse(tekst);
       if (!fil || fil.app !== 'Mit Smart Hjem PRO' || !fil.ls) throw new Error('forkert fil');
       const fam = JSON.parse(fil.ls['privat-budget-familie-v2'] || '[]') || [];
       const md = iso(new Date()).slice(0, 7), dag = d => { const n = parseInt(String(d || '').slice(8, 10)); return n >= 1 && n <= 31 ? n : null };
@@ -171,10 +188,8 @@ function mshLaes(inp) {
       poster.forEach(p => p.valgt = !p.findes);
       msh = {poster, navn: f.name};
       vis(); toast(poster.length ? poster.length + ' poster fundet – se dem igennem' : 'Der var ingen budgettal i filen');
-    } catch (e) { alert('Det er ikke en fil fra Mit Smart Hjem PRO (»💰 Gem mit budget i en fil«).') }
-    inp.value = '';
-  };
-  r.readAsText(f);
+    } catch (e) { alert('Det er ikke dit budget fra Mit Smart Hjem PRO. Tryk først »📋 Kopiér mit budget til Budget og Mad« i Mit Smart Hjem PRO (⚙ Indstillinger, øverst).') }
+  }
 }
 function mshFindes(p) {
   const s = x => String(x || '').toLowerCase().trim();
@@ -190,7 +205,7 @@ function mshVis() {
   const datoer = v.filter(p => p.dato).map(p => p.dato).sort(), mnd = x => new Date(x).toLocaleDateString('da-DK', {month: 'long', year: 'numeric'});
   const sumH = h => v.filter(p => p.hvor === h).reduce((s, p) => s + p.belob, 0);
   const knap = `<div class="row" style="margin-top:10px"><button class="b" style="flex:1;font-size:18px" onclick="mshGem()" ${valgt ? '' : 'disabled'}>✓ Læg ${valgt} ind i mit budget</button><button class="l" onclick="msh=null;vis()">Annullér</button></div>`;
-  return `<div style="margin-top:12px;background:var(--acc2);border-radius:12px;padding:12px"><b>Fundet i filen:</b> ${valgt} poster${datoer.length ? ` fra ${mnd(datoer[0])} til ${mnd(datoer[datoer.length - 1])}` : ''}.
+  return `<div style="margin-top:12px;background:var(--acc2);border-radius:12px;padding:12px"><b>Fundet:</b> ${valgt} poster${datoer.length ? ` fra ${mnd(datoer[0])} til ${mnd(datoer[datoer.length - 1])}` : ''}.
    <div style="margin-top:6px">💵 Penge ind i alt: <b>${kr(Math.round(sumH('ind')))}</b><br>🛒 Udgifter i alt: <b>${kr(Math.round(sumH('kob')))}</b></div>
    <div class="muted" style="font-size:13px;margin-top:4px">Hver post lægges i sin egen måned. Det, du allerede har, springes over.</div>${knap}</div>
   <details style="margin-top:10px"><summary style="cursor:pointer"><b>Se alle poster</b> <span class="muted">– og fjern fluebenet ved det, du ikke vil have med</span></summary>
