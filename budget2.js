@@ -135,16 +135,24 @@ function mshLaes(inp) {
       const fam = JSON.parse(fil.ls['privat-budget-familie-v2'] || '[]') || [];
       const md = iso(new Date()).slice(0, 7), dag = d => { const n = parseInt(String(d || '').slice(8, 10)); return n >= 1 && n <= 31 ? n : null };
       const poster = [];
+      // version 62: som i Mit Smart Hjem PRO – en post, der gentages, kommer med i hver måned, hvor den hører til
+      // (fra sin startdato og frem til december næste år). Hver post lander i sin egen måned.
+      const slutAar = new Date().getFullYear() + 1;
       (Array.isArray(fam[0]) ? fam[0] : []).forEach(r => {
         if (!Array.isArray(r)) return;
-        const navn = String(r[0] || '').trim(), belob = mshTal(r[1]), type = r[3] || 'Udgift', gentag = r[4] || 'En gang';
-        if (!navn || !(belob > 0)) return;
-        const deler = gentag === 'Hvert kvartal' ? 3 : gentag === 'Hvert år' ? 12 : 1;
-        const tekst = navn + (deler > 1 ? (deler === 3 ? ' (kvartal, delt pr. md.)' : ' (år, delt pr. md.)') : '');
-        const b = Math.round(belob / deler * 100) / 100;
-        if (/^indt/i.test(type)) poster.push({hvor: 'ind', tekst, belob: b, dato: gentag === 'En gang' ? (r[2] || iso(new Date())) : md + '-' + String(dag(r[2]) || 1).padStart(2, '0')});
-        else if (gentag === 'En gang') poster.push({hvor: 'kob', tekst: navn, belob, dato: r[2] || iso(new Date())});
-        else poster.push({hvor: 'fast', tekst: (/^opspar/i.test(type) ? 'Opsparing: ' : '') + tekst, belob: b, dag: dag(r[2])});
+        const navn = String(r[0] || '').trim(), belob = Math.abs(mshTal(r[1])), type = String(r[3] || 'Udgift'), gentag = String(r[4] || 'En gang');
+        const m0 = String(r[2] || '').match(/^(\d{4})-(\d{2})-(\d{2})/);
+        if (!navn || !(belob > 0) || !m0) return;
+        const y = +m0[1], mo = +m0[2], d = +m0[3];
+        const step = /kvartal/i.test(gentag) ? 3 : /år/i.test(gentag) ? 12 : /måned/i.test(gentag) ? 1 : 0;
+        const hvor = /^indt/i.test(type) ? 'ind' : 'kob', tekst = (/^opspar/i.test(type) ? 'Opsparing: ' : '') + navn;
+        for (let k = 0; ; k += step) {
+          const t2 = (y * 12 + mo - 1) + k, aa = Math.floor(t2 / 12), mm = t2 % 12 + 1;
+          if (aa > slutAar) break;
+          const dd = Math.min(d, new Date(aa, mm, 0).getDate());
+          poster.push({hvor, tekst, belob, dato: aa + '-' + String(mm).padStart(2, '0') + '-' + String(dd).padStart(2, '0')});
+          if (!step) break;
+        }
       });
       (Array.isArray(fam[2]) ? fam[2] : []).forEach(g => {
         if (!Array.isArray(g)) return;
@@ -177,11 +185,17 @@ function mshFindes(p) {
   return D.budget.maal.some(x => s(x.navn) === s(p.tekst));
 }
 function mshVis() {
-  const navn = {ind: '💵 Penge ind', fast: '🏦 Faste udgifter (hver måned)', kob: '🛒 Køb (én gang)', madb: '🍽️ Budget til mad', maal: '🐷 Sparemål'};
-  const valgt = msh.poster.filter(p => p.valgt).length;
-  return `<div style="margin-top:12px"><b>Er det rigtigt?</b> <span class="muted">Fjern fluebenet ved det, du ikke vil have med.</span>
-  ${['ind', 'fast', 'madb', 'kob', 'maal'].map(h => { const l = msh.poster.map((p, i) => [p, i]).filter(([p]) => p.hvor === h); return l.length ? `<div style="margin-top:10px"><b style="font-size:14px">${navn[h]}</b>${l.map(([p, i]) => `<label class="row" style="margin:6px 0;gap:8px;cursor:pointer;font-weight:400"><input type="checkbox" ${p.valgt ? 'checked' : ''} onchange="msh.poster[${i}].valgt=this.checked;vis()" style="width:22px;height:22px;flex:none"><span style="flex:1">${esc(p.tekst)}${p.dag ? ` <span class="muted">d. ${p.dag}</span>` : ''}${p.findes ? ' <span class="muted">(har du allerede)</span>' : ''}</span><b>${kr(p.belob)}</b></label>`).join('')}</div>` : '' }).join('')}
-  <div class="row" style="margin-top:12px"><button class="b" style="flex:1" onclick="mshGem()" ${valgt ? '' : 'disabled'}>✓ Læg ${valgt} ind i mit budget</button><button class="l" onclick="msh=null;vis()">Annullér</button></div></div>`;
+  const navn = {ind: '💵 Penge ind', fast: '🏦 Faste udgifter (hver måned)', kob: '🛒 Udgifter', madb: '🍽️ Budget til mad', maal: '🐷 Sparemål'};
+  const valgt = msh.poster.filter(p => p.valgt).length, v = msh.poster.filter(p => p.valgt);
+  const datoer = v.filter(p => p.dato).map(p => p.dato).sort(), mnd = x => new Date(x).toLocaleDateString('da-DK', {month: 'long', year: 'numeric'});
+  const sumH = h => v.filter(p => p.hvor === h).reduce((s, p) => s + p.belob, 0);
+  const knap = `<div class="row" style="margin-top:10px"><button class="b" style="flex:1;font-size:18px" onclick="mshGem()" ${valgt ? '' : 'disabled'}>✓ Læg ${valgt} ind i mit budget</button><button class="l" onclick="msh=null;vis()">Annullér</button></div>`;
+  return `<div style="margin-top:12px;background:var(--acc2);border-radius:12px;padding:12px"><b>Fundet i filen:</b> ${valgt} poster${datoer.length ? ` fra ${mnd(datoer[0])} til ${mnd(datoer[datoer.length - 1])}` : ''}.
+   <div style="margin-top:6px">💵 Penge ind i alt: <b>${kr(Math.round(sumH('ind')))}</b><br>🛒 Udgifter i alt: <b>${kr(Math.round(sumH('kob')))}</b></div>
+   <div class="muted" style="font-size:13px;margin-top:4px">Hver post lægges i sin egen måned. Det, du allerede har, springes over.</div>${knap}</div>
+  <details style="margin-top:10px"><summary style="cursor:pointer"><b>Se alle poster</b> <span class="muted">– og fjern fluebenet ved det, du ikke vil have med</span></summary>
+  ${['ind', 'fast', 'madb', 'kob', 'maal'].map(h => { const l = msh.poster.map((p, i) => [p, i]).filter(([p]) => p.hvor === h); return l.length ? `<div style="margin-top:10px"><b style="font-size:14px">${navn[h]}</b>${l.map(([p, i]) => `<label class="row" style="margin:6px 0;gap:8px;cursor:pointer;font-weight:400"><input type="checkbox" ${p.valgt ? 'checked' : ''} onchange="msh.poster[${i}].valgt=this.checked;vis()" style="width:22px;height:22px;flex:none"><span style="flex:1">${p.dato ? `<span class="muted">${new Date(p.dato).toLocaleDateString('da-DK', {day: 'numeric', month: 'short', year: '2-digit'})}</span> ` : ''}${esc(p.tekst)}${p.dag ? ` <span class="muted">d. ${p.dag}</span>` : ''}${p.findes ? ' <span class="muted">(har du allerede)</span>' : ''}</span><b>${kr(p.belob)}</b></label>`).join('')}</div>` : '' }).join('')}
+  ${knap}</details></div>`;
 }
 function mshGem() {
   if (!msh) return;
@@ -194,7 +208,7 @@ function mshGem() {
     else if (p.hvor === 'madb') { D.budget.maaned = p.belob; D.budget.madPeriode = {type: 'maaned', belob: p.belob}; }
     else D.budget.maal.push({id: id(), navn: p.tekst, emoji: maalEmoji(p.tekst), maal: p.belob, ind: p.har > 0 ? [{dato: '2000-01-01', belob: p.har}] : [] /* gammel dato, så det ikke trækkes fra »Tilbage« i denne måned */});
   });
-  msh = null; save(); vis(); toast(n + ' poster lagt ind i dit budget', fortrydTil(s));
+  msh = null; save(); vis(); toast(n + ' poster lagt ind i dit budget. Se dem under »📅 Hele året«.', fortrydTil(s));
 }
 
 // ---------- 🏦 Hent fil fra banken (CSV) – version 59 ----------
