@@ -642,14 +642,14 @@ function hjaelperRaad() {
 // ---------- 🥧 Hvad går pengene til? (cirkeldiagram øverst i Budget) ----------
 // Regnes kun ud fra dine egne tal på telefonen.
 const CIRKEL_GRP = [
-  ['bolig', '🏠', 'Bolig og regninger', '#1d6ff2', /husleje|leje|el\b|el,|vand|varme|forsyning|energi|internet|bredbånd|tv|forsikr|tryg|ejendomsskat|grundejer/i],
-  ['mad', '🛒', 'Mad og dagligvarer', '#12b347', /netto|rema|lidl|føtex|bilka|coop|kvickly|superbrugsen|meny|spar\b|aldi|365|lovable|dagligvare|mad og|indkøb/i],
-  ['ude', '🍕', 'Mad ude og take-away', '#ff7a00', /take|pizza|burger|café|cafe|kiosk|7-eleven|mcdonald|sushi|restaurant|wolt|just eat|mad ude|slik/i],
-  ['transport', '🚗', 'Transport og bil', '#9b30ff', /bil|benzin|diesel|ok\b|ok og|clever|oplad|bus|tog|dsb|rejsekort|brobizz|parkering|værksted|lån \(totalkredit og bil\)|auto/i],
-  ['laan', '🏦', 'Lån og afdrag', '#00a99d', /lån|afdrag|totalkredit|kredit/i],
-  ['abo', '📱', 'Mobil og abonnementer', '#ff1f7a', /mobil|telefon|netflix|hbo|max|viaplay|disney|spotify|youtube|apple|prime|abonnement|fitness/i],
-  ['fritid', '🎉', 'Fritid, tøj og gaver', '#ffc400', /fritid|gave|tøj|sko|ferie|rejse|biograf|koncert|hobby|frisør|personlig/i],
-  ['ops', '🐷', 'Opsparing', '#00b4e0', /^opsparing/i]
+  ['bolig', '🏠', 'Bolig og regninger', '#2f80ed', /husleje|leje|el\b|el,|vand|varme|forsyning|energi|internet|bredbånd|tv|forsikr|tryg|ejendomsskat|grundejer/i],
+  ['mad', '🛒', 'Mad og dagligvarer', '#22c55e', /netto|rema|lidl|føtex|bilka|coop|kvickly|superbrugsen|meny|spar\b|aldi|365|lovable|dagligvare|mad og|indkøb/i],
+  ['ude', '🍕', 'Mad ude og take-away', '#ef233c', /take|pizza|burger|café|cafe|kiosk|7-eleven|mcdonald|sushi|restaurant|wolt|just eat|mad ude|slik/i],
+  ['transport', '🚗', 'Transport og bil', '#8b5cf6', /bil|benzin|diesel|ok\b|ok og|clever|oplad|bus|tog|dsb|rejsekort|brobizz|parkering|værksted|lån \(totalkredit og bil\)|auto/i],
+  ['laan', '🏦', 'Lån og afdrag', '#14b8a6', /lån|afdrag|totalkredit|kredit/i],
+  ['abo', '📱', 'Mobil og abonnementer', '#f472b6', /mobil|telefon|netflix|hbo|max|viaplay|disney|spotify|youtube|apple|prime|abonnement|fitness/i],
+  ['fritid', '🎉', 'Fritid, tøj og gaver', '#fbbf24', /fritid|gave|tøj|sko|ferie|rejse|biograf|koncert|hobby|frisør|personlig/i],
+  ['ops', '🐷', 'Opsparing', '#06b6d4', /^opsparing/i]
 ];
 function cirkelData(md) {
   const sum = {};
@@ -682,15 +682,15 @@ function cirkelKort(md) {
   const top = st.map(x => {
     const [x0, y0] = P(x.a0), [x1, y1] = P(x.a1), stor = x.a1 - x.a0 > Math.PI ? 1 : 0;
     const d = st.length === 1 ? `M${cx - rx},${cy} A${rx},${ry} 0 1 1 ${cx + rx},${cy} A${rx},${ry} 0 1 1 ${cx - rx},${cy} Z` : `M${cx},${cy} L${x0.toFixed(1)},${y0.toFixed(1)} A${rx},${ry} 0 ${stor} 1 ${x1.toFixed(1)},${y1.toFixed(1)} Z`;
-    return `<path d="${d}" fill="url(#c3t-${x.k})" stroke="#fff" stroke-width="1.5"><title>${esc(x.navn)}: ${kr(Math.round(x.v))}</title></path>`;
+    return `<path d="${d}" fill="url(#c3t-${x.k})" stroke="#fff" stroke-width="2.5" stroke-linejoin="round"><title>${esc(x.navn)}: ${kr(Math.round(x.v))}</title></path>`;
   }).join('');
-  const defs = data.map(x => `<radialGradient id="c3t-${x.k}" cx="40%" cy="30%" r="80%"><stop offset="0" stop-color="#fff" stop-opacity=".55"/><stop offset=".25" stop-color="${x.farve}"/><stop offset="1" stop-color="${morkere(x.farve, .78)}"/></radialGradient><linearGradient id="c3s-${x.k}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${morkere(x.farve, .8)}"/><stop offset="1" stop-color="${morkere(x.farve, .5)}"/></linearGradient>`).join('');
+  const defs = data.map(x => `<radialGradient id="c3t-${x.k}" cx="40%" cy="30%" r="80%"><stop offset="0" stop-color="#fff" stop-opacity=".55"/><stop offset=".25" stop-color="${x.farve}"/><stop offset="1" stop-color="${morkere(x.farve, .78)}"/></radialGradient><linearGradient id="c3s-${x.k}" gradientUnits="userSpaceOnUse" x1="${cx - rx}" y1="0" x2="${cx + rx}" y2="0"><stop offset="0" stop-color="${morkere(x.farve, .45)}"/><stop offset=".35" stop-color="${morkere(x.farve, .85)}"/><stop offset=".55" stop-color="${x.farve}"/><stop offset="1" stop-color="${morkere(x.farve, .45)}"/></linearGradient>`).join('');
   const navn = new Date(md + '-01').toLocaleDateString('da-DK', {month: 'long'});
   return `<div class="card"><b style="font-size:19px">🥧 Hvad går pengene til i ${navn}?</b>
   <svg viewBox="0 0 240 190" width="100%" style="max-width:360px;display:block;margin:10px auto 0" role="img" aria-label="Cirkeldiagram over udgifter">
    <defs>${defs}<radialGradient id="c3glans" cx="35%" cy="20%" r="70%"><stop offset="0" stop-color="#fff" stop-opacity=".6"/><stop offset=".5" stop-color="#fff" stop-opacity=".08"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient><filter id="c3sk" x="-10%" y="-10%" width="120%" height="140%"><feDropShadow dx="0" dy="6" stdDeviation="6" flood-opacity=".3"/></filter></defs>
    <g filter="url(#c3sk)">${sider.map(s => `<path d="${s.d}" fill="url(#c3s-${s.k})"/>`).join('')}${top}</g>
-   <ellipse cx="${cx}" cy="${cy}" rx="${rx}" ry="${ry}" fill="url(#c3glans)" pointer-events="none"/>
+   <ellipse cx="${cx}" cy="${cy}" rx="${rx}" ry="${ry}" fill="url(#c3glans)" pointer-events="none"/><ellipse cx="${cx}" cy="${cy}" rx="${rx - 1.5}" ry="${ry - 1.5}" fill="none" stroke="#fff" stroke-opacity=".7" stroke-width="3" pointer-events="none"/><path d="M${cx - rx},${cy} L${cx - rx},${cy + dyb} A${rx},${ry} 0 0 0 ${cx + rx},${cy + dyb} L${cx + rx},${cy}" fill="none" stroke="#000" stroke-opacity=".12" stroke-width="2" stroke-linejoin="round" pointer-events="none"/>
   </svg>
   <div style="text-align:center;margin:2px 0 8px;font-size:17px">I alt <b style="color:#dc2626;font-size:24px">${kr(Math.round(total))}</b></div>
   <ul style="list-style:none;margin:0;padding:0">${data.map(x => `<li style="display:flex;align-items:center;gap:10px;margin:8px 0;font-size:17px"><span style="width:20px;height:20px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#fff 0,${x.farve} 45%,${morkere(x.farve, .7)} 100%);box-shadow:0 2px 4px #0004;flex:none"></span><span style="flex:1">${x.ik} ${esc(x.navn)}</span><span style="text-align:right;white-space:nowrap"><b style="font-size:19px">${Math.round(x.v / total * 100)} %</b><br><b style="font-size:16px;color:#dc2626">${kr(Math.round(x.v))}</b></span></li>`).join('')}</ul>
